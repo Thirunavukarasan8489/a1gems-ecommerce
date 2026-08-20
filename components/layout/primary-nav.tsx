@@ -1,0 +1,38 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { primaryNav } from "@/lib/data/nav";
+import { cn } from "@/lib/utils";
+
+export function PrimaryNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="hidden flex-1 justify-center lg:flex">
+      <ul className="flex items-center gap-1">
+        {primaryNav.map((item) => {
+          const active =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-plum-900/8 text-plum-950"
+                    : "text-plum-800 hover:bg-plum-900/6 hover:text-plum-950",
+                )}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}

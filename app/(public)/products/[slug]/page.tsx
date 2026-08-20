@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -9,7 +10,6 @@ import {
   Truck,
 } from "lucide-react";
 import { AddToCart } from "@/components/cart/add-to-cart";
-import { EnquiryForm } from "@/components/lead/enquiry-form";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductRail } from "@/components/product/product-rail";
 import { Badge } from "@/components/ui/badge";
@@ -157,8 +157,8 @@ export default async function ProductDetailPage(
 
             {enquirable && (
               <div className="grid gap-3 sm:grid-cols-2">
-                <a
-                  href="#enquiry-form"
+                <Link
+                  href={`/contact?product=${encodeURIComponent(product.name)}${category ? `&category=${encodeURIComponent(category.name)}` : ""}`}
                   className={buttonStyles({
                     variant: buyable ? "outline" : "emerald",
                     size: "lg",
@@ -167,7 +167,7 @@ export default async function ProductDetailPage(
                 >
                   <MessageCircle size={18} />
                   Enquire now
-                </a>
+                </Link>
                 {product.whatsappEnabled && (
                   <a
                     href={whatsappLink(
@@ -283,28 +283,6 @@ export default async function ProductDetailPage(
           </section>
         </div>
       </div>
-
-      {enquirable && (
-        <section
-          id="enquiry-form"
-          className="scroll-mt-28 bg-ivory-200 py-12 sm:py-16"
-        >
-          <div className="shell gutter lg:grid lg:grid-cols-[1fr_1.15fr] lg:items-start lg:gap-14">
-            <SectionHeading
-              eyebrow="Enquiry"
-              title="Ask about this stone"
-              body="Tell us what you need and a gemmologist will come back with an honest assessment — including when a different stone would serve you better."
-            />
-            <div className="mt-7 lg:mt-0">
-              <EnquiryForm
-                productName={product.name}
-                categoryName={category?.name}
-                source="product-page"
-              />
-            </div>
-          </div>
-        </section>
-      )}
 
       {related.length > 0 && (
         <section className="shell gutter py-12 sm:py-16">

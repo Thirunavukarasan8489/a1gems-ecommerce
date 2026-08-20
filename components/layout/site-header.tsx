@@ -4,7 +4,8 @@ import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { CartButton } from "@/components/layout/cart-button";
 import { Logo } from "@/components/layout/logo";
 import { MobileDrawer } from "@/components/layout/mobile-drawer";
-import { business, primaryNav } from "@/lib/data/nav";
+import { PrimaryNav } from "@/components/layout/primary-nav";
+import { business } from "@/lib/data/nav";
 
 export function SiteHeader() {
   return (
@@ -17,20 +18,7 @@ export function SiteHeader() {
 
           <Logo className="mr-auto lg:mr-0" />
 
-          <nav className="hidden flex-1 justify-center lg:flex">
-            <ul className="flex items-center gap-1">
-              {primaryNav.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="rounded-full px-3.5 py-2 text-sm font-medium text-plum-800 transition-colors hover:bg-plum-900/6 hover:text-plum-950"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <PrimaryNav />
 
           <div className="flex items-center gap-1">
             <a

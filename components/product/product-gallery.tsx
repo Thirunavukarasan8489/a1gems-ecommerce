@@ -44,7 +44,12 @@ export function ProductGallery({
   const goTo = (index: number) => {
     const track = trackRef.current;
     const slide = track?.children[index] as HTMLElement | undefined;
-    slide?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+    if (!track || !slide) return;
+
+    // Scroll the track itself, not scrollIntoView — scrollIntoView walks
+    // every scrollable ancestor including the page, which can yank the whole
+    // page vertically just to reveal a horizontally-scrolling gallery.
+    track.scrollTo({ left: slide.offsetLeft, behavior: "smooth" });
   };
 
   return (

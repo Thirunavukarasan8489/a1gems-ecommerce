@@ -14,7 +14,15 @@ export const metadata: Metadata = {
     "Talk to an A1 Gems gemmologist. Free consultation by phone, WhatsApp or enquiry form. Showroom in Mylapore, Chennai.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage(props: PageProps<"/contact">) {
+  const searchParams = await props.searchParams;
+  const pick = (key: string) => {
+    const value = searchParams[key];
+    return Array.isArray(value) ? value[0] : value;
+  };
+  const product = pick("product");
+  const category = pick("category");
+
   return (
     <>
       <PageHeader
@@ -78,7 +86,11 @@ export default function ContactPage() {
             <h2 className="mb-5 font-display text-2xl font-semibold text-plum-900">
               Send an enquiry
             </h2>
-            <EnquiryForm source="contact-page" />
+            <EnquiryForm
+              productName={product}
+              categoryName={category}
+              source={product ? "product-page" : "contact-page"}
+            />
           </div>
         </div>
       </div>

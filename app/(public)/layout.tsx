@@ -2,6 +2,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { CartToast } from "@/components/cart/cart-toast";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { WhatsappFab } from "@/components/layout/whatsapp-fab";
 
 export default function PublicLayout({ children }: LayoutProps<"/">) {
   return (
@@ -14,6 +15,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
       <div aria-hidden className="pb-tabbar bg-plum-950 lg:hidden" />
 
       <BottomNav />
+      <WhatsappFab />
       <CartToast />
     </>
   );
