@@ -99,3 +99,29 @@ export interface CartLine {
   unitPrice: number;
   quantity: number;
 }
+
+export interface LeadNote {
+  _id?: string;
+  content: string;
+  addedBy?: string;
+  createdAt: string | Date;
+}
+
+export interface LeadType {
+  _id: string;
+  customerName: string;
+  phone: string;
+  whatsapp?: string;
+  email?: string;
+  location?: string;
+  product?: Partial<Product>;
+  category?: Partial<Category>;
+  message: string;
+  source: string;
+  status: 'NEW' | 'CONTACTED' | 'FOLLOW_UP' | 'QUALIFIED' | 'CONVERTED' | 'CLOSED' | 'SPAM';
+  assignedTo?: string;
+  notes?: LeadNote[];
+  followUpDate?: string | Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}

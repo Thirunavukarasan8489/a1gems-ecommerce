@@ -1,8 +1,8 @@
-import { BottomNav } from "@/components/layout/bottom-nav";
-import { CartToast } from "@/components/cart/cart-toast";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
-import { WhatsappFab } from "@/components/layout/whatsapp-fab";
+import { BottomNav } from "@/components/public/layout/bottom-nav";
+import { CartToast } from "@/components/public/cart/cart-toast";
+import { SiteFooter } from "@/components/public/layout/site-footer";
+import { SiteHeader } from "@/components/public/layout/site-header";
+import { WhatsappFab } from "@/components/public/layout/whatsapp-fab";
 
 export default function PublicLayout({ children }: LayoutProps<"/">) {
   return (

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
-import { CartProvider } from "@/components/cart/cart-provider";
+import { CartProvider } from "@/components/public/cart/cart-provider";
 import "./globals.css";
 
 // Display face for headings — high-contrast serif, reads as jewellery.

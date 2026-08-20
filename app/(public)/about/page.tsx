@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
-import { HowItWorks } from "@/components/home/how-it-works";
-import { WhyChooseUs } from "@/components/home/why-choose-us";
-import { buttonStyles } from "@/components/ui/button";
-import { GemImage } from "@/components/ui/gem-image";
-import { PageHeader } from "@/components/ui/page-header";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { HowItWorks } from "@/components/public/home/how-it-works";
+import { WhyChooseUs } from "@/components/public/home/why-choose-us";
+import { buttonStyles } from "@/components/public/ui/button";
+import { GemImage } from "@/components/public/ui/gem-image";
+import { PageHeader } from "@/components/public/ui/page-header";
+import { SectionHeading } from "@/components/public/ui/section-heading";
 import { stats } from "@/lib/data/content";
 
 export const metadata: Metadata = {

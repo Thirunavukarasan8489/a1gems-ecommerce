@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CartView } from "./cart-view";
-import { PageHeader } from "@/components/ui/page-header";
+import { PageHeader } from "@/components/public/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Your Cart",

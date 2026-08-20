@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { EnquiryForm } from "@/components/lead/enquiry-form";
-import { Accordion } from "@/components/ui/accordion";
-import { buttonStyles } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { EnquiryForm } from "@/components/public/lead/enquiry-form";
+import { Accordion } from "@/components/public/ui/accordion";
+import { buttonStyles } from "@/components/public/ui/button";
+import { PageHeader } from "@/components/public/ui/page-header";
+import { SectionHeading } from "@/components/public/ui/section-heading";
 import { faqs } from "@/lib/data/content";
 import { business, whatsappLink } from "@/lib/data/nav";
 

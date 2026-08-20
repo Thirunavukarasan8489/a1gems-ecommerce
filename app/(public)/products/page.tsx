@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ProductGrid } from "@/components/product/product-rail";
+import { ProductGrid } from "@/components/public/product/product-rail";
 import {
   FilterBar,
   FilterSidebar,
-} from "@/components/product/product-filters";
-import { buttonStyles } from "@/components/ui/button";
-import { EmptyState, PageHeader } from "@/components/ui/page-header";
+} from "@/components/public/product/product-filters";
+import { buttonStyles } from "@/components/public/ui/button";
+import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
 import { products } from "@/lib/data/products";
 import { applyFilters, toQuery } from "@/lib/filters";
 

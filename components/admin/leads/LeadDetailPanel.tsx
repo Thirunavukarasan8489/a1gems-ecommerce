@@ -1,0 +1,201 @@
+'use client';
+
+import { useState } from 'react';
+import { Mail, MessageCircle, Phone, MapPin, User, Calendar, Edit, Send } from 'lucide-react';
+import { updateLeadStatus, sendLeadEmail } from '@/lib/actions/admin-leads';
+import StatusPill from '@/components/admin/ui/StatusPill';
+import { LeadType } from '@/lib/types';
+
+export default function LeadDetailPanel({ lead }: { lead: LeadType }) {
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailSubject, setEmailSubject] = useState(`Regarding your enquiry at A1 Gems`);
+  const [emailMessage, setEmailMessage] = useState('');
+  
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setIsUpdatingStatus(true);
+    await updateLeadStatus(lead._id.toString(), e.target.value);
+    setIsUpdatingStatus(false);
+  };
+
+  const handleSendEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailSubject || !emailMessage) return;
+    
+    setIsSendingEmail(true);
+    await sendLeadEmail(lead._id.toString(), emailSubject, emailMessage);
+    setEmailMessage('');
+    setIsSendingEmail(false);
+    alert('Email sent successfully');
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      {/* Left Column (Customer & Enquiry) */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Customer Info Card */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm">
+          <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <User size={18} className="text-slate-400" />
+              Customer Information
+            </h2>
+          </div>
+          <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-slate-500 mb-1">Full Name</p>
+              <p className="font-medium text-slate-900 dark:text-slate-100">{lead.customerName}</p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-500 mb-1">Phone</p>
+              <a href={`tel:${lead.phone}`} className="font-medium text-blue-600 hover:underline flex items-center gap-1">
+                <Phone size={14} /> {lead.phone}
+              </a>
+            </div>
+            {lead.email && (
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Email</p>
+                <a href={`mailto:${lead.email}`} className="font-medium text-blue-600 hover:underline flex items-center gap-1">
+                  <Mail size={14} /> {lead.email}
+                </a>
+              </div>
+            )}
+            {lead.location && (
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Location</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100 flex items-center gap-1">
+                  <MapPin size={14} className="text-slate-400" /> {lead.location}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Enquiry Info Card */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm">
+          <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <MessageCircle size={18} className="text-slate-400" />
+              Enquiry Details
+            </h2>
+          </div>
+          <div className="p-5 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Source</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">{lead.source}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500 mb-1">Date</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100 flex items-center gap-1">
+                  <Calendar size={14} className="text-slate-400" /> {new Date(lead.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              {lead.product && (
+                <div className="md:col-span-2">
+                  <p className="text-sm text-slate-500 mb-1">Product of Interest</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">{lead.product.name || 'View Product'}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-md border border-slate-100 dark:border-slate-700">
+              <p className="text-sm text-slate-500 mb-2">Message:</p>
+              <p className="text-slate-800 dark:text-slate-200 whitespace-pre-wrap">{lead.message}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column (Management & Actions) */}
+      <div className="space-y-6">
+        
+        {/* Management Card */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm">
+          <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <Edit size={18} className="text-slate-400" />
+              Management
+            </h2>
+          </div>
+          <div className="p-5 space-y-4">
+            <div>
+              <p className="text-sm text-slate-500 mb-2">Current Status</p>
+              <div className="flex items-center gap-3">
+                <StatusPill status={lead.status} type="lead" />
+                {isUpdatingStatus && <span className="text-xs text-slate-400 animate-pulse">Updating...</span>}
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm text-slate-500 mb-1" htmlFor="status-select">Change Status</label>
+              <select 
+                id="status-select"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={lead.status}
+                onChange={handleStatusChange}
+                disabled={isUpdatingStatus}
+              >
+                <option value="NEW">New</option>
+                <option value="CONTACTED">Contacted</option>
+                <option value="FOLLOW_UP">Follow Up</option>
+                <option value="QUALIFIED">Qualified</option>
+                <option value="CONVERTED">Converted</option>
+                <option value="CLOSED">Closed</option>
+                <option value="SPAM">Spam</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Email Action Card */}
+        {lead.email && (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm">
+            <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <Send size={18} className="text-slate-400" />
+                Send Email
+              </h2>
+            </div>
+            <div className="p-5">
+              <form onSubmit={handleSendEmail} className="space-y-3">
+                <div>
+                  <input 
+                    type="text" 
+                    placeholder="Subject"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <textarea 
+                    placeholder="Type your message here..."
+                    rows={4}
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    required
+                  />
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={isSendingEmail}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition-colors disabled:opacity-50 text-sm flex justify-center items-center gap-2"
+                >
+                  {isSendingEmail ? 'Sending...' : (
+                    <>
+                      <Send size={16} /> Send directly via Email
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
