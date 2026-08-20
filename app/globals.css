@@ -1,26 +1,292 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================================
+   A1 GEMS — DESIGN TOKENS  ("Velvet & Gold")
+   ----------------------------------------------------------------------------
+   Palette rationale:
+   - PLUM  : the velvet interior of a jewellery box. Used for text + dark
+             surfaces. Warm-neutral so gemstone colours pop against it.
+   - GOLD  : primary action / brand accent. In the Indian jewellery market gold
+             reads as value, trust and auspiciousness. Used sparingly so it
+             stays precious.
+   - EMERALD: secondary accent — literally "the gem". Also carries success,
+             in-stock and certification meaning.
+   - IVORY : page background. A warm off-white instead of #fff gives a printed
+             catalogue feel and is easier on the eye on mobile OLED screens.
+   ========================================================================= */
+
+@theme {
+  /* ---- Plum (brand neutral) -------------------------------------------- */
+  --color-plum-50: #faf7fb;
+  --color-plum-100: #f3eef6;
+  --color-plum-200: #e4daea;
+  --color-plum-300: #cbbbd6;
+  --color-plum-400: #a48db5;
+  --color-plum-500: #7e6394;
+  --color-plum-600: #5f4675;
+  --color-plum-700: #47325a;
+  --color-plum-800: #2f2040;
+  --color-plum-900: #1e1329;
+  --color-plum-950: #130b1b;
+
+  /* ---- Gold (primary) --------------------------------------------------- */
+  --color-gold-50: #fdf9ec;
+  --color-gold-100: #faf0cc;
+  --color-gold-200: #f3df93;
+  --color-gold-300: #eacb5c;
+  --color-gold-400: #ddb63a;
+  --color-gold-500: #c99a26;
+  --color-gold-600: #a87a1c;
+  --color-gold-700: #855c19;
+  --color-gold-800: #6b491b;
+  --color-gold-900: #5a3d1b;
+
+  /* ---- Emerald (secondary) ---------------------------------------------- */
+  --color-emerald-50: #ecfdf6;
+  --color-emerald-100: #d1fae7;
+  --color-emerald-200: #a6f3d2;
+  --color-emerald-300: #6de5b7;
+  --color-emerald-400: #33ce99;
+  --color-emerald-500: #10b481;
+  --color-emerald-600: #059068;
+  --color-emerald-700: #067354;
+  --color-emerald-800: #085b45;
+  --color-emerald-900: #084b3a;
+
+  /* ---- Ivory (surfaces) ------------------------------------------------- */
+  --color-ivory-50: #fdfcfa;
+  --color-ivory-100: #fbf8f3;
+  --color-ivory-200: #f5efe5;
+  --color-ivory-300: #ebe1d1;
+
+  /* ---- Semantic --------------------------------------------------------- */
+  --color-danger-50: #fff1f2;
+  --color-danger-100: #ffe4e6;
+  --color-danger-500: #e11d48;
+  --color-danger-600: #be123c;
+  --color-danger-700: #9f1239;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #f59e0b;
+  --color-warning-700: #b45309;
+
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-500: #3b82f6;
+  --color-info-700: #1d4ed8;
+
+  /* ---- Aliases used across the UI --------------------------------------- */
+  --color-canvas: var(--color-ivory-100);
+  --color-surface: #ffffff;
+  --color-surface-sunken: var(--color-ivory-200);
+  --color-ink: var(--color-plum-900);
+  --color-ink-soft: var(--color-plum-600);
+  --color-ink-muted: #6b6472;
+  --color-hairline: var(--color-ivory-300);
+
+  /* ---- Type ------------------------------------------------------------- */
+  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  /* ---- Radius ----------------------------------------------------------- */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  /* ---- Elevation — soft, warm-tinted shadows, never grey ---------------- */
+  --shadow-xs: 0 1px 2px 0 rgb(30 19 41 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(30 19 41 / 0.07), 0 1px 2px -1px rgb(30 19 41 / 0.05);
+  --shadow-md: 0 4px 14px -4px rgb(30 19 41 / 0.12), 0 2px 6px -2px rgb(30 19 41 / 0.06);
+  --shadow-lg: 0 12px 32px -8px rgb(30 19 41 / 0.16), 0 4px 10px -4px rgb(30 19 41 / 0.07);
+  --shadow-gold: 0 6px 20px -6px rgb(201 154 38 / 0.45);
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-rise: rise 0.5s var(--ease-out-soft) both;
+  --animate-marquee: marquee 26s linear infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes shimmer {
+  0% {
+    background-position: -180% 0;
+  }
+  100% {
+    background-position: 180% 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================= */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Sticky header height so in-page anchors are not hidden behind it. */
+    scroll-padding-top: 6.5rem;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    /* Prevents the horizontal-scroll rails from widening the whole page. */
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* 16px minimum on form controls — anything smaller makes iOS Safari zoom in
+     when the field is focused, which feels broken on a phone. */
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background-color: var(--color-gold-200);
+    color: var(--color-plum-900);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================================
+   UTILITIES
+   ========================================================================= */
+
+/* Horizontal product rails: swipeable on mobile, no visible scrollbar. */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Page gutter. Tightest on phones where screen width is the scarce resource. */
+@utility gutter {
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+}
+
+/* Clears the fixed mobile tab bar + the iOS home indicator. */
+@utility pb-tabbar {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  @media (width >= 64rem) {
+    padding-bottom: 0;
+  }
+}
+
+@utility safe-b {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* The gold foil treatment used on section eyebrows and the wordmark. */
+@utility text-foil {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-gold-600) 0%,
+    var(--color-gold-300) 30%,
+    var(--color-gold-100) 45%,
+    var(--color-gold-300) 60%,
+    var(--color-gold-600) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility hairline {
+  border-color: var(--color-hairline);
+}
+
+/* Loading placeholder for images and skeletons. */
+@utility skeleton {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-ivory-200) 20%,
+    var(--color-ivory-300) 40%,
+    var(--color-ivory-200) 60%
+  );
+  background-size: 220% 100%;
+  animation: var(--animate-shimmer);
+}
+
+@utility line-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@utility line-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
