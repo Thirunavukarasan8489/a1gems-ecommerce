@@ -1,18 +1,11 @@
 import Link from "next/link";
 import { buttonStyles } from "@/components/ui/button";
+import { OrnamentalBg } from "@/components/ui/ornamental-bg";
 
 export default function NotFound() {
   return (
     <main className="relative flex flex-1 items-center overflow-hidden bg-plum-950 text-ivory-100">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          background:
-            "radial-gradient(55% 55% at 25% 10%, rgba(31,79,216,.32), transparent 70%)," +
-            "radial-gradient(50% 50% at 85% 90%, rgba(201,154,38,.28), transparent 70%)",
-        }}
-      />
+      <OrnamentalBg glowPosition="50% 30%" />
 
       <div className="shell gutter relative py-24 text-center">
         <p className="font-display text-6xl font-semibold sm:text-8xl">

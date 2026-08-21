@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   A1 GEMS — DESIGN TOKENS  ("Velvet & Gold")
+   A1 GEMS — DESIGN TOKENS  ("Oxblood & Gold")
    ----------------------------------------------------------------------------
    Palette rationale:
-   - PLUM  : the velvet interior of a jewellery box. Used for text + dark
-             surfaces. Warm-neutral so gemstone colours pop against it.
-   - GOLD  : primary action / brand accent. In the Indian jewellery market gold
-             reads as value, trust and auspiciousness. Used sparingly so it
-             stays precious.
-   - EMERALD: secondary accent — literally "the gem". Also carries success,
-             in-stock and certification meaning.
-   - IVORY : page background. A warm off-white instead of #fff gives a printed
-             catalogue feel and is easier on the eye on mobile OLED screens.
+   - PLUM  : renamed loosely — this is now a deep maroon/oxblood, the colour of
+             velvet ring boxes and shop awnings at GRT, Malabar, Kalyan. Used
+             for text + dark surfaces. The earlier version of this palette was
+             a cool purple-black, which read as generic "luxury SaaS" rather
+             than Indian jewellery-trade maroon. Kept the token name so every
+             component that already references plum-* repaints for free.
+   - GOLD  : primary action / brand accent — unchanged, already correct.
+   - EMERALD: secondary accent — literally "the gem" — unchanged.
+   - IVORY : page background, warm off-white — unchanged.
    ========================================================================= */
 
 @theme {
-  /* ---- Plum (brand neutral) -------------------------------------------- */
-  --color-plum-50: #faf7fb;
-  --color-plum-100: #f3eef6;
-  --color-plum-200: #e4daea;
-  --color-plum-300: #cbbbd6;
-  --color-plum-400: #a48db5;
-  --color-plum-500: #7e6394;
-  --color-plum-600: #5f4675;
-  --color-plum-700: #47325a;
-  --color-plum-800: #2f2040;
-  --color-plum-900: #1e1329;
-  --color-plum-950: #130b1b;
+  /* ---- Plum → Oxblood maroon (brand neutral) ---------------------------- */
+  --color-plum-50: #fbf4f3;
+  --color-plum-100: #f5e5e3;
+  --color-plum-200: #e8c8c4;
+  --color-plum-300: #d2a09a;
+  --color-plum-400: #b5726a;
+  --color-plum-500: #954940;
+  --color-plum-600: #7a332c;
+  --color-plum-700: #5c2620;
+  --color-plum-800: #431a17;
+  --color-plum-900: #2c1210;
+  --color-plum-950: #190a09;
 
   /* ---- Gold (primary) --------------------------------------------------- */
   --color-gold-50: #fdf9ec;
@@ -85,9 +85,14 @@
   --color-ink-muted: #6b6472;
   --color-hairline: var(--color-ivory-300);
 
-  /* ---- Type ------------------------------------------------------------- */
-  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  /* ---- Type --------------------------------------------------------------
+     Cormorant (tall, engraved-catalogue serif) + Hind (a Latin/Devanagari
+     sibling pair from Ek Type, designed for Indian use — not the
+     Playfair+Jakarta combo every "elegant jewellery site" AI output defaults
+     to) + Noto Sans Devanagari for the handful of Hindi accent words. */
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-sans: var(--font-hind), ui-sans-serif, system-ui, sans-serif;
+  --font-devanagari: var(--font-noto-devanagari), var(--font-hind), sans-serif;
 
   /* ---- Radius ----------------------------------------------------------- */
   --radius-xs: 0.375rem;
@@ -97,11 +102,11 @@
   --radius-xl: 1.25rem;
   --radius-2xl: 1.75rem;
 
-  /* ---- Elevation — soft, warm-tinted shadows, never grey ---------------- */
-  --shadow-xs: 0 1px 2px 0 rgb(30 19 41 / 0.05);
-  --shadow-sm: 0 1px 3px 0 rgb(30 19 41 / 0.07), 0 1px 2px -1px rgb(30 19 41 / 0.05);
-  --shadow-md: 0 4px 14px -4px rgb(30 19 41 / 0.12), 0 2px 6px -2px rgb(30 19 41 / 0.06);
-  --shadow-lg: 0 12px 32px -8px rgb(30 19 41 / 0.16), 0 4px 10px -4px rgb(30 19 41 / 0.07);
+  /* ---- Elevation — warm oxblood-tinted shadows, never grey --------------- */
+  --shadow-xs: 0 1px 2px 0 rgb(25 10 9 / 0.06);
+  --shadow-sm: 0 1px 3px 0 rgb(25 10 9 / 0.08), 0 1px 2px -1px rgb(25 10 9 / 0.06);
+  --shadow-md: 0 4px 14px -4px rgb(25 10 9 / 0.14), 0 2px 6px -2px rgb(25 10 9 / 0.07);
+  --shadow-lg: 0 12px 32px -8px rgb(25 10 9 / 0.18), 0 4px 10px -4px rgb(25 10 9 / 0.08);
   --shadow-gold: 0 6px 20px -6px rgb(201 154 38 / 0.45);
 
   /* ---- Motion ----------------------------------------------------------- */

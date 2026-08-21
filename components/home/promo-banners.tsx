@@ -19,7 +19,7 @@ const banners = [
     cta: "See the parcel",
     href: "/collections/blue-sapphire",
     from: "#1f4fd8",
-    to: "#2f2040",
+    to: "#431a17",
   },
   {
     eyebrow: "Made to size",
@@ -28,7 +28,7 @@ const banners = [
     cta: "Shop bracelets",
     href: "/collections/bracelets",
     from: "#8b5cf6",
-    to: "#1e1329",
+    to: "#2c1210",
   },
   {
     eyebrow: "Mogok, Myanmar",
@@ -37,7 +37,7 @@ const banners = [
     cta: "Shop rubies",
     href: "/collections/ruby",
     from: "#c81e4a",
-    to: "#2f2040",
+    to: "#431a17",
   },
   {
     eyebrow: "Free with every order",
@@ -46,7 +46,7 @@ const banners = [
     cta: "Start a conversation",
     href: "/contact",
     from: "#c99a26",
-    to: "#5f4675",
+    to: "#7a332c",
   },
 ];
 

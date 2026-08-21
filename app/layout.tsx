@@ -1,19 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import { Cormorant_Garamond, Hind, Noto_Sans_Devanagari } from "next/font/google";
 import { CartProvider } from "@/components/cart/cart-provider";
 import "./globals.css";
 
-// Display face for headings — high-contrast serif, reads as jewellery.
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+// Display face for headings — tall, engraved-catalogue serif.
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-// UI face — geometric, wide apertures, holds up at small mobile sizes.
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+// UI face — Hind is a Latin/Devanagari sibling pair from Ek Type, designed
+// for Indian use, so it pairs naturally with the Hindi accent words below.
+const hind = Hind({
+  variable: "--font-hind",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+// A handful of short Hindi accent words throughout the UI (rashi names, small
+// badges) — the Devanagari subset, not the full Noto character set.
+const notoDevanagari = Noto_Sans_Devanagari({
+  variable: "--font-noto-devanagari",
+  subsets: ["devanagari"],
+  weight: ["500", "600"],
   display: "swap",
 });
 
@@ -48,14 +60,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   // Never trap users at 100% — pinch-zoom is an accessibility requirement.
   maximumScale: 5,
-  themeColor: "#130b1b",
+  themeColor: "#190a09",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-IN"
-      className={`${playfair.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${hind.variable} ${notoDevanagari.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <CartProvider>{children}</CartProvider>

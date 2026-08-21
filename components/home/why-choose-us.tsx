@@ -1,17 +1,11 @@
+import { OrnamentalBg } from "@/components/ui/ornamental-bg";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { whyChooseUs } from "@/lib/data/content";
 
 export function WhyChooseUs() {
   return (
     <section className="relative overflow-hidden bg-plum-900 text-ivory-100">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          background:
-            "radial-gradient(50% 60% at 88% 0%, rgba(201,154,38,.22), transparent 70%)",
-        }}
-      />
+      <OrnamentalBg glowPosition="88% 0%" />
 
       <div className="shell gutter relative py-14 sm:py-18 lg:py-22">
         <SectionHeading

@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { GemImage } from "@/components/ui/gem-image";
 import { categories } from "@/lib/data/categories";
 import { products } from "@/lib/data/products";
+import { categoryTerms } from "@/lib/utils";
 
 export function FeaturedCategories() {
   return (
@@ -20,6 +21,7 @@ export function FeaturedCategories() {
           const count = products.filter(
             (p) => p.categorySlug === cat.slug && p.published,
           ).length;
+          const terms = categoryTerms(cat.name);
 
           return (
             <li key={cat.slug}>
@@ -34,10 +36,11 @@ export function FeaturedCategories() {
                 />
 
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum-950/90 via-plum-950/45 to-transparent p-3 pt-10 sm:p-4">
-                  <p className="font-display text-sm leading-tight font-semibold text-ivory-100 sm:text-base">
-                    {cat.name.split(" / ")[0]}
+                  <p className="font-display text-base leading-tight font-semibold text-ivory-100 sm:text-lg">
+                    {terms.primary}
                   </p>
-                  <p className="mt-0.5 text-[0.6875rem] text-plum-300">
+                  <p className="mt-0.5 flex items-center gap-1.5 text-[0.6875rem] text-plum-300">
+                    {terms.secondary && <span>{terms.secondary} ·</span>}
                     {count} {count === 1 ? "piece" : "pieces"}
                   </p>
                 </div>

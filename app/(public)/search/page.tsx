@@ -8,6 +8,7 @@ import { EmptyState, PageHeader } from "@/components/ui/page-header";
 import { categories } from "@/lib/data/categories";
 import { getBestsellers, products } from "@/lib/data/products";
 import { applyFilters, toQuery } from "@/lib/filters";
+import { categoryTerms } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -97,7 +98,7 @@ export default async function SearchPage(props: PageProps<"/search">) {
                           className="size-2.5 rotate-45 rounded-[2px]"
                           style={{ background: cat.gemColor }}
                         />
-                        {cat.name.split(" / ")[0]}
+                        {categoryTerms(cat.name).primary}
                       </Link>
                     </li>
                   ))}

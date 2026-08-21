@@ -5,6 +5,7 @@ import { GemImage } from "@/components/ui/gem-image";
 import { PageHeader } from "@/components/ui/page-header";
 import { categories } from "@/lib/data/categories";
 import { products } from "@/lib/data/products";
+import { categoryTerms } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Collections",
@@ -28,6 +29,7 @@ export default function CollectionsPage() {
             const count = products.filter(
               (p) => p.categorySlug === cat.slug && p.published,
             ).length;
+            const terms = categoryTerms(cat.name);
 
             return (
               <li key={cat.slug}>
@@ -38,12 +40,17 @@ export default function CollectionsPage() {
                   <GemImage
                     color={cat.gemColor}
                     seed={i * 4}
-                    className="size-24 shrink-0 rounded-xl transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105 sm:size-32"
+                    className="size-24 shrink-0 rounded-xl transition-transform duration-500 ease-out-soft group-hover:scale-105 sm:size-32"
                   />
 
                   <div className="flex min-w-0 flex-1 flex-col">
                     <h2 className="font-display text-lg leading-tight font-semibold text-plum-900 sm:text-xl">
-                      {cat.name}
+                      {terms.primary}
+                      {terms.secondary && (
+                        <span className="ml-2 font-sans text-sm font-normal text-ink-muted">
+                          {terms.secondary}
+                        </span>
+                      )}
                     </h2>
                     <p className="mt-1.5 line-3 text-[0.8125rem] leading-relaxed text-ink-muted">
                       {cat.description}

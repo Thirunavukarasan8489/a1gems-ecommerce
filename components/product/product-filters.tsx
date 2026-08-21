@@ -12,7 +12,7 @@ import {
   sortOptions,
   toQuery,
 } from "@/lib/filters";
-import { cn } from "@/lib/utils";
+import { categoryTerms, cn } from "@/lib/utils";
 
 /**
  * Filters live in the URL so a filtered listing is shareable, bookmarkable and
@@ -82,7 +82,7 @@ function Facets({
                 className="size-2.5 rotate-45 rounded-[2px]"
                 style={{ background: cat.gemColor }}
               />
-              {cat.name.split(" / ")[0]}
+              {categoryTerms(cat.name).primary}
             </Chip>
           ))}
         </Facet>
