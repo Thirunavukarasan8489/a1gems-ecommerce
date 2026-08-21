@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { buttonStyles } from "@/components/ui/button";
 import { categories } from "@/lib/data/categories";

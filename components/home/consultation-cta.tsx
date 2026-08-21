@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageCircle, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 import { buttonStyles } from "@/components/ui/button";
 import { business, whatsappLink } from "@/lib/data/nav";
 

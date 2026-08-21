@@ -1,4 +1,3 @@
-import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/data/nav";
 const WhatsappIcon = () => (
   <svg

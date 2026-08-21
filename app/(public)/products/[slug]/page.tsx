@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Truck,
 } from "lucide-react";
+import { PincodeChecker } from "@/components/product/pincode-checker";
 import { AddToCart } from "@/components/cart/add-to-cart";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductRail } from "@/components/product/product-rail";
@@ -71,10 +72,18 @@ export default async function ProductDetailPage(
   const enquirable = canEnquire(product);
   const related = getRelatedProducts(product);
 
+  // Extract Carats & calculate Indian Ratti (1 Ratti ~ 0.91 Ct)
+  const ctMatch = product.specifications.weight?.match(/([\d.]+)/);
+  const ctVal = ctMatch ? parseFloat(ctMatch[1]) : null;
+  const rattiVal = ctVal ? (ctVal / 0.91).toFixed(2) : null;
+  const weightDisplay = rattiVal
+    ? `${product.specifications.weight} (${rattiVal} Ratti)`
+    : product.specifications.weight;
+
   const specs = [
     ["Stone", product.specifications.stone],
     ["Material", product.specifications.material],
-    ["Weight", product.specifications.weight],
+    ["Weight", weightDisplay],
     ["Dimensions", product.specifications.size],
     ["Origin", product.specifications.origin],
     ["SKU", product.sku],
@@ -144,7 +153,7 @@ export default async function ProductDetailPage(
             {off && <Badge tone="gold">Save {off}%</Badge>}
           </div>
           <p className="mt-1 text-xs text-ink-muted">
-            Inclusive of all taxes. Shipping calculated at checkout.
+            Inclusive of all taxes. Free insured delivery across India.
           </p>
 
           <p className="mt-5 text-[0.9375rem] leading-relaxed text-plum-800">
@@ -194,6 +203,11 @@ export default async function ProductDetailPage(
                 verification before any payment.
               </p>
             )}
+          </div>
+
+          {/* Indian PIN Code Delivery Checker */}
+          <div className="mt-6">
+            <PincodeChecker />
           </div>
 
           {/* Certification callout — the trust anchor of the whole page. */}

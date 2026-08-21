@@ -8,6 +8,7 @@ import { Hero } from "@/components/home/hero";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { PromoBanners } from "@/components/home/promo-banners";
 import { Testimonials } from "@/components/home/testimonials";
+import { RashiFinder } from "@/components/home/rashi-finder";
 import { TrustStrip } from "@/components/home/trust-strip";
 import { WhyChooseUs } from "@/components/home/why-choose-us";
 import { ProductRail } from "@/components/product/product-rail";
@@ -38,6 +39,7 @@ export default function HomePage() {
     <>
       <Hero />
       <TrustStrip />
+      <RashiFinder />
 
       <div className="pt-10 sm:pt-14">
         <PromoBanners />
