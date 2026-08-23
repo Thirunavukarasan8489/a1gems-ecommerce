@@ -5,10 +5,10 @@ import type { Metadata } from "next";
 import {
   FilterBar,
   FilterSidebar,
-} from "@/components/product/product-filters";
-import { ProductGrid } from "@/components/product/product-rail";
-import { buttonStyles } from "@/components/ui/button";
-import { EmptyState, PageHeader } from "@/components/ui/page-header";
+} from "@/components/public/product/product-filters";
+import { ProductGrid } from "@/components/public/product/product-rail";
+import { buttonStyles } from "@/components/public/ui/button";
+import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
 import { categories, getCategory } from "@/lib/data/categories";
 import { getProductsByCategory } from "@/lib/data/products";
 import { applyFilters, toQuery } from "@/lib/filters";
@@ -29,6 +29,25 @@ export async function generateMetadata(
   return {
     title: category.name,
     description: category.description,
+    openGraph: {
+      title: category.name,
+      description: category.description,
+      type: "website",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: category.name,
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: category.name,
+      description: category.description,
+      images: ["/og-image.jpg"],
+    },
   };
 }
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { MessageCircle, PackageSearch } from "lucide-react";
-import { buttonStyles } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
+import { buttonStyles } from "@/components/public/ui/button";
+import { PageHeader } from "@/components/public/ui/page-header";
 import { business, whatsappLink } from "@/lib/data/nav";
 
 export const metadata: Metadata = {

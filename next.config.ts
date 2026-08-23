@@ -6,6 +6,19 @@ const nextConfig: NextConfig = {
   // dev-only overlay (never present in a production build), so disabling it
   // trades a diagnostic badge for a bottom nav that's actually visible.
   devIndicators: false,
+
+  // Compress responses with gzip
+  compress: true,
+
+  // Configure remote patterns for next/image
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

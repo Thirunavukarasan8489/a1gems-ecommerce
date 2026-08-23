@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
-import { GemImage } from "@/components/ui/gem-image";
-import { PageHeader } from "@/components/ui/page-header";
+import { GemImage } from "@/components/public/ui/gem-image";
+import { PageHeader } from "@/components/public/ui/page-header";
 import { categories } from "@/lib/data/categories";
 import { products } from "@/lib/data/products";
 import { categoryTerms } from "@/lib/utils";

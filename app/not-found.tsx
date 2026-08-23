@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { buttonStyles } from "@/components/ui/button";
-import { OrnamentalBg } from "@/components/ui/ornamental-bg";
+import { buttonStyles } from "@/components/public/ui/button";
+import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 
 export default function NotFound() {
   return (

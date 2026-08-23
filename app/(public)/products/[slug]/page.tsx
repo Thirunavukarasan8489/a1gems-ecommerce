@@ -9,14 +9,14 @@ import {
   ShieldCheck,
   Truck,
 } from "lucide-react";
-import { AddToCart } from "@/components/cart/add-to-cart";
-import { ProductGallery } from "@/components/product/product-gallery";
-import { ProductRail } from "@/components/product/product-rail";
-import { Badge } from "@/components/ui/badge";
-import { buttonStyles } from "@/components/ui/button";
-import { Breadcrumbs } from "@/components/ui/page-header";
-import { Rating } from "@/components/ui/rating";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { AddToCart } from "@/components/public/cart/add-to-cart";
+import { ProductGallery } from "@/components/public/product/product-gallery";
+import { ProductRail } from "@/components/public/product/product-rail";
+import { Badge } from "@/components/public/ui/badge";
+import { buttonStyles } from "@/components/public/ui/button";
+import { Breadcrumbs } from "@/components/public/ui/page-header";
+import { Rating } from "@/components/public/ui/rating";
+import { SectionHeading } from "@/components/public/ui/section-heading";
 import { getCategory } from "@/lib/data/categories";
 import {
   getProduct,
@@ -52,6 +52,20 @@ export async function generateMetadata(
       title: product.name,
       description: product.shortDescription,
       type: "website",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription,
+      images: ["/og-image.jpg"],
     },
   };
 }

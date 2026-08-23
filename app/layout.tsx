@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Hind, Noto_Sans_Devanagari } from "next/font/google";
-import { CartProvider } from "@/components/cart/cart-provider";
+import {
+  Cormorant_Garamond,
+  Hind,
+  Noto_Sans_Devanagari,
+} from "next/font/google";
+import { CartProvider } from "@/components/public/cart/cart-provider";
+import AuthProvider from "@/components/shared/AuthProvider";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 // Display face for headings — tall, engraved-catalogue serif.
@@ -52,6 +58,21 @@ export const metadata: Metadata = {
     title: "A1 Gems — Certified Natural Gemstones",
     description:
       "Natural, independently certified gemstones sourced at origin. Treatments always disclosed.",
+    images: [
+      {
+        url: "/og-image.jpg", // Fallback generic image
+        width: 1200,
+        height: 630,
+        alt: "A1 Gems - Premium Certified Gemstones",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "A1 Gems — Certified Natural Gemstones",
+    description:
+      "Natural, independently certified gemstones sourced at origin. Treatments always disclosed.",
+    images: ["/og-image.jpg"],
   },
 };
 
@@ -63,14 +84,24 @@ export const viewport: Viewport = {
   themeColor: "#190a09",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+import { GoogleAnalytics } from "@/components/shared/analytics";
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en-IN"
       className={`${cormorant.variable} ${hind.variable} ${notoDevanagari.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <CartProvider>{children}</CartProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        <AuthProvider>
+          <CartProvider>{children}</CartProvider>
+        </AuthProvider>
+        <Toaster position="top-right" />
       </body>
     </html>
   );

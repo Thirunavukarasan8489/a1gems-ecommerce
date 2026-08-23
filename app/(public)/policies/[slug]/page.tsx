@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/ui/page-header";
+import { PageHeader } from "@/components/public/ui/page-header";
 import { getPolicy, policies } from "@/lib/data/policies";
 
 export function generateStaticParams() {

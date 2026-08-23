@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { MessageCircle } from "lucide-react";
-import { Accordion } from "@/components/ui/accordion";
-import { buttonStyles } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
+import { Accordion } from "@/components/public/ui/accordion";
+import { buttonStyles } from "@/components/public/ui/button";
+import { PageHeader } from "@/components/public/ui/page-header";
 import { faqs } from "@/lib/data/content";
 import { whatsappLink } from "@/lib/data/nav";
 

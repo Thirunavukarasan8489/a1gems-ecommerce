@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { Lock, Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
-import { useCart } from "@/components/cart/cart-provider";
-import { buttonStyles } from "@/components/ui/button";
-import { GemImage } from "@/components/ui/gem-image";
+import { useCart } from "@/components/public/cart/cart-provider";
+import { buttonStyles } from "@/components/public/ui/button";
+import { GemImage } from "@/components/public/ui/gem-image";
 import { commerceSettings, shippingFor } from "@/lib/data/settings";
 import { formatINR } from "@/lib/utils";
 

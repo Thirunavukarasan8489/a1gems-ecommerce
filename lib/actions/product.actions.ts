@@ -1,0 +1,193 @@
+'use server';
+
+import dbConnect from '@/lib/db';
+import { Product } from '@/lib/models/product';
+import { getSession } from '@/lib/auth';
+import { logAuditAction } from '@/lib/actions/audit';
+import { revalidatePath } from 'next/cache';
+
+async function checkAuth(allowedRoles: string[]) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  if (!allowedRoles.includes(session.role as string)) {
+    throw new Error('Forbidden: Insufficient permissions');
+  }
+  return session;
+}
+
+// Generate guaranteed unique slug from product name
+export async function generateUniqueProductSlug(name: string, excludeId?: string): Promise<string> {
+  const baseSlug = name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '') || 'product';
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const query: any = { slug };
+    if (excludeId) {
+      query._id = { $ne: excludeId };
+    }
+    const exists = await Product.findOne(query).select('_id').lean();
+    if (!exists) {
+      return slug;
+    }
+    counter++;
+    slug = `${baseSlug}-${counter}`;
+  }
+}
+
+export async function getProducts() {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
+    await dbConnect();
+    const products = await Product.find().populate('category', 'name').sort({ createdAt: -1 });
+    return { success: true, data: JSON.parse(JSON.stringify(products)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getProductById(id: string) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
+    await dbConnect();
+    const product = await Product.findById(id).populate('category', 'name').lean();
+    if (!product) return { success: false, error: 'Product not found' };
+    return { success: true, data: JSON.parse(JSON.stringify(product)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function createProduct(data: any) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    await dbConnect();
+    
+    // Automatically generate guaranteed unique slug on backend
+    const slug = await generateUniqueProductSlug(data.name);
+
+    // Handle Category reference
+    const mappedData: any = { 
+      ...data, 
+      slug,
+      category: data.categoryId || data.category 
+    };
+    delete mappedData.categoryId;
+
+    // If variants enabled, compute aggregate stock and default base price if needed
+    if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
+      const totalVariantStock = mappedData.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      mappedData.stockQuantity = totalVariantStock;
+      
+      if (!mappedData.basePrice || mappedData.basePrice === 0) {
+        mappedData.basePrice = Number(mappedData.variants[0].price) || 0;
+      }
+      if (!mappedData.baseSku || mappedData.baseSku === '') {
+        mappedData.baseSku = mappedData.variants[0].sku || `${slug.substring(0, 8).toUpperCase()}-BASE`;
+      }
+    }
+
+    // Determine stockStatus
+    const threshold = Number(mappedData.lowStockThreshold) || 5;
+    const currentStock = Number(mappedData.stockQuantity) || 0;
+    if (currentStock === 0) {
+      mappedData.stockStatus = 'OUT_OF_STOCK';
+    } else if (currentStock <= threshold) {
+      mappedData.stockStatus = 'LOW_STOCK';
+    } else {
+      mappedData.stockStatus = 'IN_STOCK';
+    }
+    
+    const product = await Product.create(mappedData);
+    
+    await logAuditAction({
+      action: 'PRODUCT_CREATED',
+      entity: 'Product',
+      entityId: product._id.toString(),
+      metadata: { name: product.name, sku: product.baseSku, slug: product.slug }
+    });
+
+    revalidatePath('/admin/products');
+    revalidatePath('/admin/inventory');
+    return { success: true, data: JSON.parse(JSON.stringify(product)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateProduct(id: string, data: any) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    await dbConnect();
+    
+    const mappedData: any = { ...data };
+    if (mappedData.categoryId) {
+      mappedData.category = mappedData.categoryId;
+      delete mappedData.categoryId;
+    }
+
+    // Ensure slug is uniquely maintained if name changed
+    if (mappedData.name && !mappedData.slug) {
+      mappedData.slug = await generateUniqueProductSlug(mappedData.name, id);
+    }
+    
+    // If variants enabled, compute aggregate stock
+    if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
+      mappedData.stockQuantity = mappedData.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+    }
+
+    // Re-evaluate stockStatus
+    if (mappedData.stockQuantity !== undefined) {
+      const threshold = Number(mappedData.lowStockThreshold) || 5;
+      const currentStock = Number(mappedData.stockQuantity) || 0;
+      if (currentStock === 0) {
+        mappedData.stockStatus = 'OUT_OF_STOCK';
+      } else if (currentStock <= threshold) {
+        mappedData.stockStatus = 'LOW_STOCK';
+      } else {
+        mappedData.stockStatus = 'IN_STOCK';
+      }
+    }
+
+    const product = await Product.findByIdAndUpdate(id, mappedData, { new: true });
+    
+    await logAuditAction({
+      action: 'PRODUCT_UPDATED',
+      entity: 'Product',
+      entityId: id,
+      metadata: { name: product?.name }
+    });
+
+    revalidatePath('/admin/products');
+    revalidatePath('/admin/inventory');
+    return { success: true, data: JSON.parse(JSON.stringify(product)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteProduct(id: string) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    await dbConnect();
+    
+    await Product.findByIdAndDelete(id);
+    
+    await logAuditAction({
+      action: 'PRODUCT_DELETED',
+      entity: 'Product',
+      entityId: id,
+    });
+
+    revalidatePath('/admin/products');
+    revalidatePath('/admin/inventory');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}

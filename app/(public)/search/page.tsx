@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ProductGrid } from "@/components/product/product-rail";
-import { SearchInput } from "@/components/product/search-input";
-import { buttonStyles } from "@/components/ui/button";
-import { EmptyState, PageHeader } from "@/components/ui/page-header";
+import { ProductGrid } from "@/components/public/product/product-rail";
+import { SearchInput } from "@/components/public/product/search-input";
+import { buttonStyles } from "@/components/public/ui/button";
+import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
 import { categories } from "@/lib/data/categories";
 import { getBestsellers, products } from "@/lib/data/products";
 import { applyFilters, toQuery } from "@/lib/filters";

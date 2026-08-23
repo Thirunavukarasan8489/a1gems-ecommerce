@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRight, Clock } from "lucide-react";
-import { EnquiryForm } from "@/components/lead/enquiry-form";
-import { GemImage } from "@/components/ui/gem-image";
-import { Breadcrumbs } from "@/components/ui/page-header";
+import { EnquiryForm } from "@/components/public/lead/enquiry-form";
+import { GemImage } from "@/components/public/ui/gem-image";
+import { Breadcrumbs } from "@/components/public/ui/page-header";
 import { guides, getGuide } from "@/lib/data/content";
 
 export function generateStaticParams() {
@@ -21,7 +21,25 @@ export async function generateMetadata(
   return {
     title: guide.title,
     description: guide.excerpt,
-    openGraph: { title: guide.title, description: guide.excerpt, type: "article" },
+    openGraph: {
+      title: guide.title,
+      description: guide.excerpt,
+      type: "article",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: guide.title,
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: guide.title,
+      description: guide.excerpt,
+      images: ["/og-image.jpg"],
+    },
   };
 }
 

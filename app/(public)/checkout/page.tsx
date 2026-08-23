@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { MessageCircle, Wrench } from "lucide-react";
-import { buttonStyles } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
+import { buttonStyles } from "@/components/public/ui/button";
+import { PageHeader } from "@/components/public/ui/page-header";
 import { whatsappLink } from "@/lib/data/nav";
 
 export const metadata: Metadata = {

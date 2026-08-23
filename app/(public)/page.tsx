@@ -1,20 +1,20 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { AboutSection } from "@/components/home/about-section";
-import { ConsultationCta } from "@/components/home/consultation-cta";
-import { FeaturedCategories } from "@/components/home/featured-categories";
-import { FinalCta } from "@/components/home/final-cta";
-import { Hero } from "@/components/home/hero";
-import { HowItWorks } from "@/components/home/how-it-works";
-import { PromoBanners } from "@/components/home/promo-banners";
-import { RashiFinder } from "@/components/home/rashi-finder";
-import { Testimonials } from "@/components/home/testimonials";
-import { TrustStrip } from "@/components/home/trust-strip";
-import { WhyChooseUs } from "@/components/home/why-choose-us";
-import { ProductRail } from "@/components/product/product-rail";
-import { Accordion } from "@/components/ui/accordion";
-import { buttonStyles } from "@/components/ui/button";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { AboutSection } from "@/components/public/home/about-section";
+import { ConsultationCta } from "@/components/public/home/consultation-cta";
+import { FeaturedCategories } from "@/components/public/home/featured-categories";
+import { FinalCta } from "@/components/public/home/final-cta";
+import { Hero } from "@/components/public/home/hero";
+import { HowItWorks } from "@/components/public/home/how-it-works";
+import { PromoBanners } from "@/components/public/home/promo-banners";
+import { RashiFinder } from "@/components/public/home/rashi-finder";
+import { Testimonials } from "@/components/public/home/testimonials";
+import { TrustStrip } from "@/components/public/home/trust-strip";
+import { WhyChooseUs } from "@/components/public/home/why-choose-us";
+import { ProductRail } from "@/components/public/product/product-rail";
+import { Accordion } from "@/components/public/ui/accordion";
+import { buttonStyles } from "@/components/public/ui/button";
+import { SectionHeading } from "@/components/public/ui/section-heading";
 import { faqs } from "@/lib/data/content";
 import {
   getBestsellers,

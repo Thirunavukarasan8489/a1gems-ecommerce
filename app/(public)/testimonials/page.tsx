@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Quote } from "lucide-react";
-import { PageHeader } from "@/components/ui/page-header";
-import { Rating } from "@/components/ui/rating";
+import { PageHeader } from "@/components/public/ui/page-header";
+import { Rating } from "@/components/public/ui/rating";
 import { testimonials } from "@/lib/data/content";
 
 export const metadata: Metadata = {
