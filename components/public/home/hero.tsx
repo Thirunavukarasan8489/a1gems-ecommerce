@@ -2,30 +2,25 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, MessageCircle } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
+import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 import { categories } from "@/lib/data/categories";
 import { stats } from "@/lib/data/content";
 import { whatsappLink } from "@/lib/data/nav";
+import { categoryTerms } from "@/lib/utils";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-plum-950 text-ivory-100">
-      {/* Gem-coloured light bleeding through the velvet. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          background:
-            "radial-gradient(60% 45% at 15% 0%, rgba(31,79,216,.38), transparent 70%)," +
-            "radial-gradient(55% 40% at 90% 10%, rgba(200,30,74,.32), transparent 70%)," +
-            "radial-gradient(70% 50% at 60% 100%, rgba(201,154,38,.24), transparent 70%)",
-        }}
-      />
+      <OrnamentalBg glowPosition="30% 10%" />
 
       <div className="shell gutter relative py-14 sm:py-20 lg:grid lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:py-24">
         <div className="animate-rise">
           <p className="inline-flex items-center gap-2 rounded-full border border-gold-500/30 bg-gold-500/10 px-3.5 py-1.5 text-[0.6875rem] font-semibold tracking-[0.14em] uppercase">
             <BadgeCheck size={14} className="text-gold-400" />
-            <span className="text-foil">GIA · IGI · GRS · SSEF</span>
+            <span className="text-foil">
+              GIA · IGI · GRS · SSEF{" "}
+              <span className="font-devanagari">प्रमाणित</span>
+            </span>
           </p>
 
           <h1 className="mt-6 text-[2.5rem] leading-[1.06] font-semibold sm:text-6xl lg:text-[4.25rem]">
@@ -87,30 +82,40 @@ export function Hero() {
             staggered arrangement with room to breathe. */}
         <div className="mt-12 lg:mt-0">
           <ul className="grid grid-cols-3 gap-3 lg:gap-5">
-            {categories.slice(0, 3).map((cat, i) => (
-              <li
-                key={cat.slug}
-                className="animate-rise"
-                style={{
-                  animationDelay: `${120 + i * 90}ms`,
-                  transform: `translateY(${i === 1 ? "-1.25rem" : "0"})`,
-                }}
-              >
-                <Link
-                  href={`/collections/${cat.slug}`}
-                  className="group block overflow-hidden rounded-2xl ring-1 ring-white/12 transition-shadow duration-300 hover:ring-gold-400/50"
+            {categories.slice(0, 3).map((cat, i) => {
+              const terms = categoryTerms(cat.name);
+              return (
+                <li
+                  key={cat.slug}
+                  className="animate-rise"
+                  style={{
+                    animationDelay: `${120 + i * 90}ms`,
+                    transform: `translateY(${i === 1 ? "-1.25rem" : "0"})`,
+                  }}
                 >
-                  <GemImage
-                    color={cat.gemColor}
-                    seed={i * 3}
-                    className="aspect-3/4 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
-                  />
-                  <p className="bg-white/6 px-2 py-2.5 text-center text-[0.625rem] leading-tight font-semibold tracking-wide text-ivory-100 uppercase backdrop-blur-sm sm:text-xs">
-                    {cat.name.split(" / ")[0]}
-                  </p>
-                </Link>
-              </li>
-            ))}
+                  <Link
+                    href={`/collections/${cat.slug}`}
+                    className="group block overflow-hidden rounded-2xl ring-1 ring-white/12 transition-shadow duration-300 hover:ring-gold-400/50"
+                  >
+                    <GemImage
+                      color={cat.gemColor}
+                      seed={i * 3}
+                      className="aspect-3/4 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
+                    />
+                    <p className="bg-white/6 px-2 py-2.5 text-center leading-tight text-ivory-100 backdrop-blur-sm">
+                      <span className="block font-display text-sm font-semibold sm:text-base">
+                        {terms.primary}
+                      </span>
+                      {terms.secondary && (
+                        <span className="text-[0.5625rem] tracking-wide text-plum-300 uppercase">
+                          {terms.secondary}
+                        </span>
+                      )}
+                    </p>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

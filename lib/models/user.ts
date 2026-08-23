@@ -10,6 +10,14 @@ const UserSchema = new mongoose.Schema(
       enum: ['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER'],
       default: 'LEAD_MANAGER',
     },
+    screenPermissions: {
+      type: [String],
+      default: ['CATALOGUE', 'LEAD_MANAGEMENT'],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

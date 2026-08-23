@@ -5,35 +5,55 @@ import { Lock, Mail, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  rememberMe: z.boolean().optional(),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    setLoginError(null);
     
     try {
       const result = await signIn('credentials', {
         redirect: false,
-        email,
-        password,
+        email: data.email,
+        password: data.password,
       });
 
       if (result?.error) {
-        // Handle error (in a real app, show a toast or error message)
+        setLoginError('Invalid credentials. Please try again.');
         console.error(result.error);
-        setIsLoading(false);
       } else {
         router.push('/admin');
       }
     } catch (error) {
       console.error('Login failed', error);
-      setIsLoading(false);
+      setLoginError('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -52,8 +72,14 @@ export default function AdminLogin() {
 
         {/* Login Card */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-slate-700/60 p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
+            {loginError && (
+              <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
+                {loginError}
+              </div>
+            )}
+
             <div className="space-y-4">
               {/* Email Input */}
               <div>
@@ -67,13 +93,16 @@ export default function AdminLogin() {
                   <input
                     id="email"
                     type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors sm:text-sm"
+                    {...register('email')}
+                    className={`block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900/50 border ${
+                      errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
+                    } rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
                     placeholder="admin@a1gems.com"
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                )}
               </div>
 
               {/* Password Input */}
@@ -82,7 +111,7 @@ export default function AdminLogin() {
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="password">
                     Password
                   </label>
-                  <Link href="#" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
+                  <Link href="/admin/forgot-password" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
                     Forgot password?
                   </Link>
                 </div>
@@ -93,10 +122,10 @@ export default function AdminLogin() {
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors sm:text-sm"
+                    {...register('password')}
+                    className={`block w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900/50 border ${
+                      errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
+                    } rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
                     placeholder="••••••••"
                   />
                   <button
@@ -111,18 +140,21 @@ export default function AdminLogin() {
                     )}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                )}
               </div>
             </div>
 
             {/* Remember Me */}
             <div className="flex items-center">
               <input
-                id="remember-me"
-                name="remember-me"
+                id="rememberMe"
                 type="checkbox"
+                {...register('rememberMe')}
                 className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-600 dark:text-slate-400">
+              <label htmlFor="rememberMe" className="ml-2 block text-sm text-slate-600 dark:text-slate-400">
                 Keep me signed in
               </label>
             </div>
@@ -130,10 +162,10 @@ export default function AdminLogin() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all dark:focus:ring-offset-slate-900"
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

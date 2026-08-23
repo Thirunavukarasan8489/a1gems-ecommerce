@@ -6,7 +6,12 @@ export const proxy = withAuth(
     const { pathname } = req.nextUrl;
     const { token } = req.nextauth;
 
-    const isProtectedRoute = pathname.startsWith('/admin') && pathname !== '/admin/login';
+    const isAuthRoute = 
+      pathname === '/admin/login' || 
+      pathname === '/admin/forgot-password' || 
+      pathname.startsWith('/admin/reset-password');
+
+    const isProtectedRoute = pathname.startsWith('/admin') && !isAuthRoute;
 
     // Protection logic for /admin routes
     if (isProtectedRoute) {
@@ -20,11 +25,21 @@ export const proxy = withAuth(
         // Redirect unauthorized users (e.g. CUSTOMER) to the public homepage or unauthorized page
         return NextResponse.redirect(new URL('/', req.url));
       }
+
+      // Strict protection for System / Settings routes
+      if (pathname.startsWith('/admin/system') || pathname.startsWith('/admin/settings')) {
+        if (token.role !== 'SUPER_ADMIN') {
+          return NextResponse.redirect(new URL('/admin', req.url));
+        }
+      }
     }
     
-    // Redirect authenticated admins away from login page to dashboard
-    if (pathname === '/admin/login' && token) {
-      return NextResponse.redirect(new URL('/admin', req.url));
+    // Redirect authenticated admins away from auth pages to dashboard
+    if (isAuthRoute && token) {
+      const validAdminRoles = ['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER'];
+      if (validAdminRoles.includes(token.role as string)) {
+        return NextResponse.redirect(new URL('/admin', req.url));
+      }
     }
 
     return NextResponse.next();

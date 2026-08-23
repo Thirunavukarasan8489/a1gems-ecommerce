@@ -8,6 +8,7 @@ import { Logo } from "@/components/public/layout/logo";
 import { buttonStyles } from "@/components/public/ui/button";
 import { categories } from "@/lib/data/categories";
 import { business, primaryNav, secondaryNav, whatsappLink } from "@/lib/data/nav";
+import { categoryTerms } from "@/lib/utils";
 
 export function MobileDrawer() {
   const [open, setOpen] = React.useState(false);
@@ -86,27 +87,40 @@ export function MobileDrawer() {
             </div>
 
             <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-5">
-              <p className="mb-3 text-[0.625rem] font-semibold tracking-[0.18em] text-gold-700 uppercase">
+              <p className="mb-3 flex items-center gap-1.5 text-[0.625rem] font-semibold tracking-[0.18em] text-gold-700 uppercase">
                 Shop by stone
+                <span className="font-devanagari font-normal tracking-normal normal-case text-gold-600">
+                  · रत्न
+                </span>
               </p>
               <ul className="mb-7 grid grid-cols-2 gap-2">
-                {categories.map((cat) => (
-                  <li key={cat.slug}>
-                    <Link
-                      href={`/collections/${cat.slug}`}
-                      className="flex h-full items-center gap-2.5 rounded-xl border border-ivory-300 bg-white p-3 text-[0.8125rem] leading-tight font-medium text-plum-800 active:scale-[0.98]"
-                    >
-                      <span
-                        aria-hidden
-                        className="size-6 shrink-0 rotate-45 rounded-[0.3rem]"
-                        style={{
-                          background: `linear-gradient(135deg, ${cat.gemColor}, color-mix(in oklab, ${cat.gemColor} 45%, #130b1b))`,
-                        }}
-                      />
-                      {cat.name.split(" / ")[0]}
-                    </Link>
-                  </li>
-                ))}
+                {categories.map((cat) => {
+                  const terms = categoryTerms(cat.name);
+                  return (
+                    <li key={cat.slug}>
+                      <Link
+                        href={`/collections/${cat.slug}`}
+                        className="flex h-full items-center gap-2.5 rounded-xl border border-ivory-300 bg-white p-3 text-[0.8125rem] leading-tight font-medium text-plum-800 active:scale-[0.98]"
+                      >
+                        <span
+                          aria-hidden
+                          className="size-6 shrink-0 rotate-45 rounded-[0.3rem]"
+                          style={{
+                            background: `linear-gradient(135deg, ${cat.gemColor}, color-mix(in oklab, ${cat.gemColor} 45%, #190a09))`,
+                          }}
+                        />
+                        <span>
+                          {terms.primary}
+                          {terms.secondary && (
+                            <span className="block text-[0.6875rem] font-normal text-ink-muted">
+                              {terms.secondary}
+                            </span>
+                          )}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
 
               <ul className="mb-7 space-y-0.5">

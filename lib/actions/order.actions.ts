@@ -1,0 +1,201 @@
+'use server';
+
+import dbConnect from '@/lib/db';
+import { Order } from '@/lib/models/order';
+import { Product } from '@/lib/models/product';
+import { getSession } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
+import mongoose from 'mongoose';
+import { logAuditAction } from '@/lib/actions/audit';
+
+// Helper to check auth
+async function checkAuth(allowedRoles: string[]) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  
+  // Normalize roles to match DB ENUMS (SUPER_ADMIN, etc.)
+  const normRoles = allowedRoles.map(r => r.replace(' ', '_').toUpperCase());
+  if (!normRoles.includes(session.role as string)) {
+    throw new Error('Forbidden: Insufficient permissions');
+  }
+  return session;
+}
+
+export async function getOrders() {
+  try {
+    const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
+    if (!isAuth) return { success: false, error: 'Unauthorized' };
+
+    await dbConnect();
+    const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+
+    return { success: true, data: JSON.parse(JSON.stringify(orders)) };
+  } catch (error: any) {
+    console.error('Error fetching orders:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getOrderById(id: string) {
+  try {
+    const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
+    if (!isAuth) return { success: false, error: 'Unauthorized' };
+
+    await dbConnect();
+    const order = await Order.findById(id).lean();
+    if (!order) return { success: false, error: 'Order not found' };
+
+    return { success: true, data: JSON.parse(JSON.stringify(order)) };
+  } catch (error: any) {
+    console.error('Error fetching order:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function createOrder(data: any) {
+  try {
+    const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
+    if (!isAuth) return { success: false, error: 'Unauthorized' };
+
+    await dbConnect();
+    
+    // We must use a MongoDB transaction since we're modifying Order and Product stock
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 1. Generate Order Number
+      const count = await Order.countDocuments();
+      const orderNumber = `ORD-${new Date().getFullYear()}-${(count + 1).toString().padStart(4, '0')}`;
+      
+      const orderPayload = {
+        ...data,
+        orderNumber,
+        purchaseType: data.purchaseType || 'PERSONAL',
+      };
+
+      // 2. Create the Order
+      const newOrder = await Order.create([orderPayload], { session });
+
+      // 3. Update Product Inventory
+      for (const item of data.items) {
+        if (!item.productId) continue;
+        
+        const product = await Product.findById(item.productId).session(session);
+        if (product) {
+          if (product.inventory.stockQuantity < item.quantity) {
+            throw new Error(`Insufficient stock for product ${product.name}`);
+          }
+          product.inventory.stockQuantity -= item.quantity;
+          
+          if (product.inventory.stockQuantity === 0) {
+            product.inventory.stockStatus = 'OUT_OF_STOCK';
+          }
+          await product.save({ session });
+        }
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      revalidatePath('/admin/orders');
+      return { success: true, data: JSON.parse(JSON.stringify(newOrder[0])) };
+    } catch (error: any) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  } catch (error: any) {
+    console.error('Error creating order:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateOrderStatus(id: string, updateData: { orderStatus?: string, paymentStatus?: string }) {
+  try {
+    const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
+    if (!isAuth) return { success: false, error: 'Unauthorized' };
+
+    await dbConnect();
+    
+    const order = await Order.findByIdAndUpdate(id, updateData, { new: true }).lean();
+    if (!order) return { success: false, error: 'Order not found' };
+
+    await logAuditAction({
+      action: 'ORDER_STATUS_UPDATED',
+      entity: 'Order',
+      entityId: id,
+      metadata: updateData
+    });
+
+    revalidatePath('/admin/orders');
+    revalidatePath(`/admin/orders/${id}`);
+    return { success: true, data: JSON.parse(JSON.stringify(order)) };
+  } catch (error: any) {
+    console.error('Error updating order:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function cancelOrder(id: string, reason: string) {
+  try {
+    const isAuth = await checkAuth(['Super Admin', 'Content Manager']);
+    if (!isAuth) return { success: false, error: 'Unauthorized' };
+
+    await dbConnect();
+    
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const order = await Order.findById(id).session(session);
+      if (!order) throw new Error('Order not found');
+      
+      if (['CANCELLED', 'RETURNED'].includes(order.orderStatus)) {
+        throw new Error('Order is already cancelled or returned');
+      }
+
+      // Restock inventory
+      for (const item of order.items) {
+        if (!item.productId) continue;
+        const product = await Product.findById(item.productId).session(session);
+        if (product) {
+          product.inventory.stockQuantity += item.quantity;
+          if (product.inventory.stockStatus === 'OUT_OF_STOCK' && product.inventory.stockQuantity > 0) {
+            product.inventory.stockStatus = 'IN_STOCK';
+          }
+          await product.save({ session });
+        }
+      }
+
+      order.orderStatus = 'CANCELLED';
+      // Ideally we would add cancellationReason to the schema, but we can append it to admin notes or just set status.
+      if (reason) {
+        order.notes = order.notes ? `${order.notes}\nCancellation Reason: ${reason}` : `Cancellation Reason: ${reason}`;
+      }
+
+      await order.save({ session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      await logAuditAction({
+        action: 'ORDER_CANCELLED',
+        entity: 'Order',
+        entityId: id,
+        metadata: { reason }
+      });
+
+      revalidatePath('/admin/orders');
+      revalidatePath(`/admin/orders/${id}`);
+      return { success: true, data: JSON.parse(JSON.stringify(order)) };
+    } catch (error: any) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  } catch (error: any) {
+    console.error('Error cancelling order:', error);
+    return { success: false, error: error.message };
+  }
+}

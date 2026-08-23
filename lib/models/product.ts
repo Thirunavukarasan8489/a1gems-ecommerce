@@ -9,21 +9,31 @@ const ProductSchema = new mongoose.Schema(
     shortDescription: { type: String },
     description: { type: String },
     
-    // Pricing
-    sellingPrice: { type: Number, required: true },
+    // Pricing & Inventory (Base)
+    basePrice: { type: Number, required: true },
     comparePrice: { type: Number },
+    baseSku: { type: String, required: true, unique: true },
+    stockQuantity: { type: Number, required: true, default: 0 },
+    
+    // Variants
+    hasVariants: { type: Boolean, default: false },
+    variants: [{
+      name: { type: String, required: true },
+      sku: { type: String, required: true },
+      price: { type: Number, required: true },
+      stock: { type: Number, required: true, default: 0 },
+    }],
     
     // Inventory
-    sku: { type: String, required: true, unique: true },
-    stockQuantity: { type: Number, required: true, default: 0 },
     reservedQuantity: { type: Number, required: true, default: 0 },
     lowStockThreshold: { type: Number, default: 5 },
-    stockStatus: { type: String, enum: ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'] },
+    stockStatus: { type: String, enum: ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'], default: 'IN_STOCK' },
+    status: { type: String, enum: ['ACTIVE', 'DRAFT'], default: 'DRAFT' },
     
     // Purchase Config
     purchaseType: { 
       type: String, 
-      enum: ['ENQUIRY_ONLY', 'BUY_ONLY', 'BUY_AND_ENQUIRE'],
+      enum: ['ENQUIRE_ONLY', 'BUY_ONLY', 'BUY_ENQUIRE'],
       required: true 
     },
     whatsappEnabled: { type: Boolean, default: false },
@@ -37,7 +47,7 @@ const ProductSchema = new mongoose.Schema(
     certification: { type: String },
     
     // Images
-    primaryImage: { type: String, required: true }, // Cloudinary URL
+    primaryImage: { type: String }, // Cloudinary URL
     gallery: [{ type: String }],
     altText: { type: String },
     
@@ -49,5 +59,8 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+ProductSchema.index({ status: 1, stockStatus: 1 });
+ProductSchema.index({ category: 1 });
 
 export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);

@@ -5,6 +5,7 @@
 
 export const announcements = [
   "Free insured shipping across India on orders above ₹25,000",
+  "Cash on Delivery available · GST invoice for business orders",
   "Every stone ships with an independent lab certificate",
   "Talk to a gemmologist before you buy — consultation is free",
 ];

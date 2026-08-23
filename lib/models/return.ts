@@ -1,39 +1,27 @@
 import mongoose from 'mongoose';
 
-const ReturnSchema = new mongoose.Schema(
+const ReturnItemSchema = new mongoose.Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  sku: { type: String, required: true },
+  name: { type: String, required: true },
+  quantity: { type: Number, required: true },
+});
+
+const ReturnRequestSchema = new mongoose.Schema(
   {
+    returnNumber: { type: String, required: true, unique: true },
     orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
-    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Or string if guest
-    
-    // Items being returned
-    items: [{
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      quantity: { type: Number, required: true }
-    }],
-    
+    items: [ReturnItemSchema],
     reason: { type: String, required: true },
-    customerComments: { type: String },
-    
-    // Images of the product taken by customer
-    evidenceImages: [{ type: String }],
-    
-    // Status Flow: PENDING -> APPROVED -> PICKUP_SCHEDULED -> RECEIVED -> INSPECTED -> REFUND_INITIATED | REJECTED
     status: {
       type: String,
-      enum: ['PENDING', 'APPROVED', 'PICKUP_SCHEDULED', 'RECEIVED', 'INSPECTED', 'REFUND_INITIATED', 'REJECTED'],
-      default: 'PENDING'
+      enum: ['PENDING_INSPECTION', 'APPROVED', 'REJECTED', 'REFUNDED'],
+      default: 'PENDING_INSPECTION',
     },
-    
-    // Admin Review
+    refundAmount: { type: Number, default: 0 },
     adminNotes: { type: String },
-    reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    
-    inspectionResult: {
-      type: String,
-      enum: ['PASS', 'FAIL'],
-    }
   },
   { timestamps: true }
 );
 
-export const Return = mongoose.models.Return || mongoose.model('Return', ReturnSchema);
+export const ReturnRequest = mongoose.models.ReturnRequest || mongoose.model('ReturnRequest', ReturnRequestSchema);

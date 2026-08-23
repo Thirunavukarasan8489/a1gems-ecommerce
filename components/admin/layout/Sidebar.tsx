@@ -4,14 +4,26 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
-  Users, 
-  ShoppingCart, 
   Package, 
+  Layers, 
+  Boxes, 
+  Image as ImageIcon,
+  ShoppingCart, 
+  Users, 
+  CreditCard, 
+  Truck, 
+  RotateCcw,
+  UserCheck,
+  Calendar,
+  BarChart3,
   Globe, 
+  Megaphone,
+  FileSpreadsheet,
+  BookOpen,
   FileText, 
-  Search, 
-  Settings, 
-  ShieldAlert
+  PhoneCall,
+  ShieldAlert,
+  UserCog
 } from 'lucide-react';
 
 const sidebarGroups = [
@@ -22,10 +34,12 @@ const sidebarGroups = [
     ],
   },
   {
-    title: 'LEAD MANAGEMENT',
+    title: 'CATALOGUE',
     items: [
-      { name: 'Leads', href: '/admin/leads', icon: Users },
-      { name: 'Follow-ups', href: '/admin/leads/follow-ups', icon: Users },
+      { name: 'Categories', href: '/admin/categories', icon: Layers },
+      { name: 'Products', href: '/admin/products', icon: Package },
+      { name: 'Inventory', href: '/admin/inventory', icon: Boxes },
+      { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
     ],
   },
   {
@@ -33,54 +47,40 @@ const sidebarGroups = [
     items: [
       { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
       { name: 'Customers', href: '/admin/customers', icon: Users },
-      { name: 'Payments', href: '/admin/payments', icon: ShoppingCart },
-      { name: 'Shipments', href: '/admin/shipments', icon: Package },
-      { name: 'Returns', href: '/admin/returns', icon: Package },
-      { name: 'Refunds', href: '/admin/refunds', icon: ShoppingCart },
+      { name: 'Payments', href: '/admin/payments', icon: CreditCard },
+      { name: 'Shipments', href: '/admin/shipments', icon: Truck },
+      { name: 'Returns', href: '/admin/returns', icon: RotateCcw },
     ],
   },
   {
-    title: 'CATALOGUE',
+    title: 'LEAD MANAGEMENT',
     items: [
-      { name: 'Products', href: '/admin/products', icon: Package },
-      { name: 'Categories', href: '/admin/categories', icon: Package },
-      { name: 'Inventory', href: '/admin/inventory', icon: Package },
-      { name: 'Media Library', href: '/admin/media', icon: Globe },
+      { name: 'Leads', href: '/admin/leads', icon: UserCheck },
+      { name: 'Follow-ups', href: '/admin/leads/follow-ups', icon: Calendar },
+      { name: 'Analytics', href: '/admin/leads/analytics', icon: BarChart3 },
     ],
   },
   {
     title: 'WEBSITE',
     items: [
       { name: 'Homepage', href: '/admin/website/homepage', icon: Globe },
-      { name: 'Banners', href: '/admin/website/banners', icon: Globe },
-      { name: 'Navigation', href: '/admin/website/navigation', icon: Globe },
+      { name: 'Banners', href: '/admin/website', icon: Megaphone },
+      { name: 'Pages', href: '/admin/website/pages', icon: FileSpreadsheet },
     ],
   },
   {
     title: 'CONTENT',
     items: [
-      { name: 'About & Testimonials', href: '/admin/content', icon: FileText },
-      { name: 'Gemstone Guides', href: '/admin/content/guides', icon: FileText },
-      { name: 'FAQs', href: '/admin/content/faqs', icon: FileText },
+      { name: 'Gemstone Guides', href: '/admin/content/guides', icon: BookOpen },
+      { name: 'About & Sections', href: '/admin/content', icon: FileText },
+      { name: 'Contact Us', href: '/admin/content/contact', icon: PhoneCall },
     ],
   },
   {
-    title: 'SEO',
-    items: [
-      { name: 'Global SEO', href: '/admin/seo', icon: Search },
-    ],
-  },
-  {
-    title: 'SETTINGS',
-    items: [
-      { name: 'General Settings', href: '/admin/settings', icon: Settings },
-      { name: 'Admin Users', href: '/admin/settings/users', icon: Users },
-    ],
-  },
-  {
-    title: 'SYSTEM',
+    title: 'SYSTEM & SETTINGS',
     items: [
       { name: 'Audit Logs', href: '/admin/system/audit', icon: ShieldAlert },
+      { name: 'Users & Permissions', href: '/admin/system/users', icon: UserCog },
     ],
   }
 ];

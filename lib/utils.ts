@@ -28,3 +28,16 @@ export function slugify(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }
+
+/**
+ * Category names are stored "English / Sanskrit" (e.g. "Ruby / Manik"). Buyers
+ * in this market search the Sanskrit/rashi-ratna term as often as the English
+ * one, so decorative labels (chips, cards, nav) lead with it while functional
+ * wayfinding (breadcrumbs, page titles) keeps the full string.
+ */
+export function categoryTerms(name: string) {
+  const [english, sanskrit] = name.split(" / ");
+  return sanskrit
+    ? { primary: sanskrit, secondary: english }
+    : { primary: english, secondary: null as string | null };
+}

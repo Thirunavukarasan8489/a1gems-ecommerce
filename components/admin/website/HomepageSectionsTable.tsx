@@ -1,0 +1,77 @@
+'use client';
+
+import DataTable from '@/components/admin/ui/DataTable';
+import StatusBadge from '@/components/admin/ui/StatusBadge';
+import { Edit, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+
+type HomepageSectionRow = {
+  _id: string;
+  name: string;
+  type: string;
+  displayOrder: number;
+  isActive: boolean;
+  updatedAt: string;
+};
+
+export default function HomepageSectionsTable({ sections }: { sections: HomepageSectionRow[] }) {
+  const columns = [
+    {
+      header: 'Section Name',
+      cell: (item: HomepageSectionRow) => (
+        <span className="font-medium text-slate-800 dark:text-slate-200">{item.name}</span>
+      ),
+    },
+    {
+      header: 'Type',
+      cell: (item: HomepageSectionRow) => (
+        <span className="text-slate-600 dark:text-slate-400">{item.type.replace(/_/g, ' ')}</span>
+      ),
+    },
+    {
+      header: 'Order',
+      cell: (item: HomepageSectionRow) => (
+        <span className="text-slate-600 dark:text-slate-400">{item.displayOrder}</span>
+      ),
+    },
+    {
+      header: 'Status',
+      cell: (item: HomepageSectionRow) => (
+        <StatusBadge 
+          label={item.isActive ? 'ACTIVE' : 'INACTIVE'} 
+          variant={item.isActive ? 'success' : 'neutral'} 
+        />
+      ),
+    },
+    {
+      header: 'Last Updated',
+      cell: (item: HomepageSectionRow) => (
+        <span className="text-slate-500 dark:text-slate-400 text-sm">
+          {new Date(item.updatedAt).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      header: 'Actions',
+      cell: (item: HomepageSectionRow) => (
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/admin/website/homepage/${item._id}/edit`}
+            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            <Edit size={16} />
+          </Link>
+          <button
+            type="button"
+            className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            title="Delete section"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  return <DataTable title="Homepage Sections" columns={columns} data={sections} />;
+}

@@ -6,7 +6,7 @@ import { GemImage } from "@/components/public/ui/gem-image";
 import { Rating } from "@/components/public/ui/rating";
 import { getCategory } from "@/lib/data/categories";
 import { canBuy, stockStatus, type Product } from "@/lib/types";
-import { cn, discountPercent, formatINR } from "@/lib/utils";
+import { categoryTerms, cn, discountPercent, formatINR } from "@/lib/utils";
 
 export function ProductCard({
   product,
@@ -56,7 +56,7 @@ export function ProductCard({
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         {category && (
           <p className="mb-1 truncate text-[0.625rem] font-semibold tracking-[0.12em] text-gold-700 uppercase">
-            {category.name.split(" / ")[0]}
+            {categoryTerms(category.name).primary}
           </p>
         )}
 

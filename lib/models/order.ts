@@ -53,4 +53,7 @@ const OrderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+OrderSchema.index({ orderStatus: 1 });
+OrderSchema.index({ paymentStatus: 1 });
+
 export const Order = mongoose.models.Order || mongoose.model('Order', OrderSchema);

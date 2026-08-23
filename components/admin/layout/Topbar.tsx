@@ -1,10 +1,25 @@
 'use client';
 
-import { Search, Bell, Moon, Sun, User as UserIcon, Menu } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Bell, Moon, Sun, User as UserIcon, Menu, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [isDark, setIsDark] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { data: session } = useSession();
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Simple toggle for dark mode (requires a ThemeProvider in layout)
   const toggleDark = () => {
@@ -42,10 +57,6 @@ export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
       {/* Right side: Actions */}
       <div className="flex items-center gap-4">
         
-        {/* Quick Add Dropdown placeholder */}
-        <button className="hidden md:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-          + Add New
-        </button>
 
         <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
 
@@ -64,15 +75,59 @@ export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
         </button>
 
         {/* Profile */}
-        <button className="flex items-center gap-2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full pr-3 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300">
-            <UserIcon size={16} />
-          </div>
-          <div className="hidden md:block text-left">
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-none">Admin</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Super Admin</p>
-          </div>
-        </button>
+        <div className="relative" ref={profileRef}>
+          <button 
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center gap-2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full pr-3 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+          >
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300">
+              <UserIcon size={16} />
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-none">
+                {session?.user?.name || 'Admin User'}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 capitalize">
+                {((session as any)?.role as string)?.replace('_', ' ').toLowerCase() || 'Super Admin'}
+              </p>
+            </div>
+            <ChevronDown size={14} className="text-slate-400 hidden md:block" />
+          </button>
+
+          {/* Dropdown Menu */}
+          {isProfileOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700 md:hidden">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  {session?.user?.name || 'Admin User'}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize mt-1">
+                  {((session as any)?.role as string)?.replace('_', ' ').toLowerCase() || 'Super Admin'}
+                </p>
+              </div>
+              <button 
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  // Optional: route to settings
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+              >
+                <Settings size={16} className="text-slate-400" />
+                Account Settings
+              </button>
+              <button 
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  signOut({ callbackUrl: '/admin/login' });
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

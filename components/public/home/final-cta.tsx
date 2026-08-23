@@ -1,20 +1,16 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
+import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
+import { OrnamentalDivider } from "@/components/public/ui/ornamental-divider";
 
 export function FinalCta() {
   return (
     <section className="relative overflow-hidden bg-plum-950 py-16 text-center text-ivory-100 sm:py-20 lg:py-24">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(45% 60% at 50% 110%, rgba(201,154,38,.35), transparent 70%)",
-        }}
-      />
+      <OrnamentalBg glowPosition="50% 100%" />
 
       <div className="shell gutter relative">
+        <OrnamentalDivider onDark className="mb-5" />
         <p className="text-[0.6875rem] font-semibold tracking-[0.2em] uppercase">
           <span className="text-foil">Ready when you are</span>
         </p>

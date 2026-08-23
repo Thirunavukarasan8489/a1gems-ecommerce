@@ -32,4 +32,7 @@ const LeadSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+LeadSchema.index({ status: 1 });
+LeadSchema.index({ followUpDate: 1 });
+
 export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);

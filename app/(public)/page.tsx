@@ -7,6 +7,7 @@ import { FinalCta } from "@/components/public/home/final-cta";
 import { Hero } from "@/components/public/home/hero";
 import { HowItWorks } from "@/components/public/home/how-it-works";
 import { PromoBanners } from "@/components/public/home/promo-banners";
+import { RashiFinder } from "@/components/public/home/rashi-finder";
 import { Testimonials } from "@/components/public/home/testimonials";
 import { TrustStrip } from "@/components/public/home/trust-strip";
 import { WhyChooseUs } from "@/components/public/home/why-choose-us";
@@ -44,6 +45,7 @@ export default function HomePage() {
       </div>
 
       <FeaturedCategories />
+      <RashiFinder />
 
       <section className="shell gutter pb-12 sm:pb-16 lg:pb-20">
         <SectionHeading
@@ -78,9 +80,9 @@ export default function HomePage() {
               >
                 <div
                   aria-hidden
-                  className="absolute inset-0 transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-105"
+                  className="absolute inset-0 transition-transform duration-700 ease-out-soft group-hover:scale-105"
                   style={{
-                    background: `radial-gradient(90% 70% at 50% 22%, ${product.gemColor} 0%, color-mix(in oklab, ${product.gemColor} 40%, #130b1b) 55%, #130b1b 100%)`,
+                    background: `radial-gradient(90% 70% at 50% 22%, ${product.gemColor} 0%, color-mix(in oklab, ${product.gemColor} 40%, #190a09) 55%, #190a09 100%)`,
                   }}
                 />
                 <div

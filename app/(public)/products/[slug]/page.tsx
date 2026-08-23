@@ -52,6 +52,20 @@ export async function generateMetadata(
       title: product.name,
       description: product.shortDescription,
       type: "website",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription,
+      images: ["/og-image.jpg"],
     },
   };
 }

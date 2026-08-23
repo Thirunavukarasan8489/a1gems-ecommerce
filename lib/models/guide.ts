@@ -4,20 +4,15 @@ const GuideSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    author: { type: String },
-    
-    // MDX or HTML payload
-    content: { type: String, required: true },
-    
-    // Cover Image
-    coverImage: { type: String },
-    
-    // SEO
-    metaTitle: { type: String },
-    metaDescription: { type: String },
-    keywords: [{ type: String }],
-    
-    isPublished: { type: Boolean, default: false }
+    excerpt: { type: String },
+    content: { type: String },
+    featuredImage: { type: String }, // Cloudinary URL
+    readTimeMinutes: { type: Number, default: 5 },
+    author: { type: String, default: 'A1 Gems Editorial Team' },
+    seoTitle: { type: String },
+    seoDescription: { type: String },
+    isActive: { type: Boolean, default: true },
+    publishedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

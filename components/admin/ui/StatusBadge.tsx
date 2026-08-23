@@ -13,12 +13,13 @@ type StatusVariant =
   | 'neutral'; // e.g. Draft, Inactive
 
 interface StatusBadgeProps {
-  label: string;
+  label?: string;
+  status?: string;
   variant?: StatusVariant;
   className?: string;
 }
 
-export default function StatusBadge({ label, variant = 'neutral', className }: StatusBadgeProps) {
+export default function StatusBadge({ label, status, variant, className }: StatusBadgeProps) {
   
   const variantStyles = {
     success: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800',
@@ -28,9 +29,22 @@ export default function StatusBadge({ label, variant = 'neutral', className }: S
     neutral: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700',
   };
 
+  const displayLabel = label || status || 'Unknown';
+  
+  // Auto-map status to variant if variant is not explicitly provided
+  let activeVariant: StatusVariant = variant || 'neutral';
+  
+  if (!variant && status) {
+    const s = status.toUpperCase();
+    if (['ACTIVE', 'IN_STOCK', 'QUALIFIED', 'CONVERTED', 'DELIVERED', 'COMPLETED', 'SUCCESS'].includes(s)) activeVariant = 'success';
+    else if (['PENDING', 'LOW_STOCK', 'CONTACTED', 'FOLLOW_UP', 'PROCESSING'].includes(s)) activeVariant = 'warning';
+    else if (['INACTIVE', 'OUT_OF_STOCK', 'CANCELLED', 'CLOSED', 'SPAM', 'FAILED'].includes(s)) activeVariant = 'danger';
+    else if (['NEW', 'SHIPPED', 'OUT_FOR_DELIVERY'].includes(s)) activeVariant = 'info';
+  }
+
   return (
-    <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium", variantStyles[variant], className)}>
-      {label}
+    <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] uppercase tracking-wider font-semibold", variantStyles[activeVariant], className)}>
+      {displayLabel.replace(/_/g, ' ')}
     </span>
   );
 }

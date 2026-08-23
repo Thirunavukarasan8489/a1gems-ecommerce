@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, SearchX } from "lucide-react";
+import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 import { cn } from "@/lib/utils";
 
 export function Breadcrumbs({
@@ -74,15 +75,7 @@ export function PageHeader({
 }) {
   return (
     <section className="relative overflow-hidden bg-plum-950 text-ivory-100">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          background:
-            "radial-gradient(55% 65% at 12% 0%, rgba(31,79,216,.3), transparent 70%)," +
-            "radial-gradient(50% 55% at 92% 20%, rgba(201,154,38,.26), transparent 70%)",
-        }}
-      />
+      <OrnamentalBg glowPosition="15% 0%" />
       <div className="shell gutter relative py-8 sm:py-12 lg:py-14">
         {breadcrumbs && <Breadcrumbs items={breadcrumbs} onDark />}
         {eyebrow && (

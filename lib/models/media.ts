@@ -1,21 +1,20 @@
 import mongoose from 'mongoose';
 
-const MediaSchema = new mongoose.Schema(
+const MediaAssetSchema = new mongoose.Schema(
   {
     publicId: { type: String, required: true, unique: true },
     url: { type: String, required: true },
-    format: { type: String },
+    secureUrl: { type: String, required: true },
+    format: { type: String }, // e.g., 'jpg', 'png', 'mp4'
+    resourceType: { type: String, default: 'image' }, // 'image', 'video', 'raw'
+    bytes: { type: Number },
     width: { type: Number },
     height: { type: Number },
-    size: { type: Number },
-    
-    // SEO fields
     altText: { type: String },
-    caption: { type: String },
-    
-    folder: { type: String, default: 'general' }
+    folder: { type: String },
+    uploadedBy: { type: String }, // Could store user ID or name
   },
   { timestamps: true }
 );
 
-export const Media = mongoose.models.Media || mongoose.model('Media', MediaSchema);
+export const MediaAsset = mongoose.models.MediaAsset || mongoose.model('MediaAsset', MediaAssetSchema);
