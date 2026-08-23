@@ -310,20 +310,22 @@ export default function InventoryPage() {
               {/* If item has variants */}
               {adjustingItem.hasVariants && adjustingItem.variants.length > 0 && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Select Target Variant *
-                  </label>
-                  <select
-                    value={selectedVariantId}
-                    onChange={e => setSelectedVariantId(e.target.value)}
-                    className="w-full rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm"
-                  >
-                    {adjustingItem.variants.map((v: any) => (
-                      <option key={v._id} value={v._id}>
-                        {v.name} ({v.sku}) — Current Stock: {v.stock}
-                      </option>
-                    ))}
-                  </select>
+                  <AdminSelect
+                    label="Select Target Variant *"
+                    value={
+                      adjustingItem.variants
+                        .map((v: any) => ({
+                          value: v._id,
+                          label: `${v.name} (${v.sku}) — Current Stock: ${v.stock}`
+                        }))
+                        .find((o: any) => o.value === selectedVariantId) || null
+                    }
+                    onChange={(opt: any) => setSelectedVariantId(opt ? opt.value : '')}
+                    options={adjustingItem.variants.map((v: any) => ({
+                      value: v._id,
+                      label: `${v.name} (${v.sku}) — Current Stock: ${v.stock}`
+                    }))}
+                  />
                 </div>
               )}
 
@@ -371,19 +373,22 @@ export default function InventoryPage() {
 
               {/* Reason */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Reason for Adjustment
-                </label>
-                <select
-                  value={adjustReason}
-                  onChange={e => setAdjustReason(e.target.value)}
-                  className="w-full rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm"
-                >
-                  <option value="Stock Purchase / Restock">Stock Purchase / Restock</option>
-                  <option value="Showroom Display / Demonstration">Showroom Display / Demonstration</option>
-                  <option value="Damaged / Sent for Lab Recertification">Damaged / Sent for Lab Recertification</option>
-                  <option value="Inventory Count Correction">Inventory Count Correction</option>
-                </select>
+                <AdminSelect
+                  label="Reason for Adjustment"
+                  value={[
+                    { value: 'Stock Purchase / Restock', label: 'Stock Purchase / Restock' },
+                    { value: 'Showroom Display / Demonstration', label: 'Showroom Display / Demonstration' },
+                    { value: 'Damaged / Sent for Lab Recertification', label: 'Damaged / Sent for Lab Recertification' },
+                    { value: 'Inventory Count Correction', label: 'Inventory Count Correction' }
+                  ].find(o => o.value === adjustReason) || null}
+                  onChange={(opt: any) => setAdjustReason(opt ? opt.value : 'Stock Purchase / Restock')}
+                  options={[
+                    { value: 'Stock Purchase / Restock', label: 'Stock Purchase / Restock' },
+                    { value: 'Showroom Display / Demonstration', label: 'Showroom Display / Demonstration' },
+                    { value: 'Damaged / Sent for Lab Recertification', label: 'Damaged / Sent for Lab Recertification' },
+                    { value: 'Inventory Count Correction', label: 'Inventory Count Correction' }
+                  ]}
+                />
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">

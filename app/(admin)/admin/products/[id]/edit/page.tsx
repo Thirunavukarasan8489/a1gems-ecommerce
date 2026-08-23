@@ -479,16 +479,24 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                    Catalog Status
-                  </label>
-                  <select 
-                    {...register('status')} 
-                    className="w-full rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2.5 text-sm"
-                  >
-                    <option value="ACTIVE">Active (Visible on Store)</option>
-                    <option value="DRAFT">Draft (Hidden)</option>
-                  </select>
+                  <Controller
+                    control={control}
+                    name="status"
+                    render={({ field }) => (
+                      <AdminSelect
+                        label="Catalog Status"
+                        options={[
+                          { value: 'ACTIVE', label: 'Active (Visible on Store)' },
+                          { value: 'DRAFT', label: 'Draft (Hidden)' }
+                        ]}
+                        value={[
+                          { value: 'ACTIVE', label: 'Active (Visible on Store)' },
+                          { value: 'DRAFT', label: 'Draft (Hidden)' }
+                        ].find(o => o.value === field.value) || null}
+                        onChange={(opt: any) => field.onChange(opt ? opt.value : 'ACTIVE')}
+                      />
+                    )}
+                  />
                 </div>
               </div>
 

@@ -7,6 +7,7 @@ import { Order } from '@/lib/models/order';
 import { getSession } from '@/lib/auth';
 import { logAuditAction } from '@/lib/actions/audit';
 import { deleteMediaByUrl } from '@/lib/actions/media.actions';
+import { ProductSchema } from '@/lib/validations/product.schema';
 import { revalidatePath } from 'next/cache';
 
 async function checkAuth(allowedRoles: string[]) {
@@ -47,7 +48,7 @@ export async function getProducts() {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
     await dbConnect();
-    const products = await Product.find().populate('category', 'name').sort({ createdAt: -1 });
+    const products = await Product.find().populate('category', 'name').sort({ createdAt: -1 }).lean();
     return { success: true, data: JSON.parse(JSON.stringify(products)) };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -69,16 +70,23 @@ export async function getProductById(id: string) {
 export async function createProduct(data: any) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    
+    const parsed = ProductSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
     
     // Automatically generate guaranteed unique slug on backend
-    const slug = await generateUniqueProductSlug(data.name);
+    const slug = await generateUniqueProductSlug(validatedData.name);
 
     // Handle Category reference
     const mappedData: any = { 
-      ...data, 
+      ...validatedData, 
       slug,
-      category: data.categoryId || data.category 
+      category: validatedData.categoryId || validatedData.category 
     };
     delete mappedData.categoryId;
 
@@ -126,9 +134,16 @@ export async function createProduct(data: any) {
 export async function updateProduct(id: string, data: any) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    
+    const parsed = ProductSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
     
-    const mappedData: any = { ...data };
+    const mappedData: any = { ...validatedData };
     if (mappedData.categoryId) {
       mappedData.category = mappedData.categoryId;
       delete mappedData.categoryId;

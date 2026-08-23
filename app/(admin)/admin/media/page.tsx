@@ -210,7 +210,13 @@ export default function MediaLibraryPage() {
 
                       {/* Image/File Preview */}
                       {item.resourceType === 'image' ? (
-                        <Image src={item.secureUrl || item.url} alt={filename} fill className="object-cover" />
+                        <Image 
+                          src={item.secureUrl || item.url} 
+                          alt={filename} 
+                          fill 
+                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+                          className="object-cover" 
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
                           <FileText size={48} className="text-slate-400" />

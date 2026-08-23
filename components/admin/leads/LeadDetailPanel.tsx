@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Mail, MessageCircle, Phone, MapPin, User, Calendar, Edit, Send } from 'lucide-react';
 import { updateLeadStatus, sendLeadEmail } from '@/lib/actions/admin-leads';
 import StatusPill from '@/components/admin/ui/StatusPill';
+import { AdminSelect } from '@/components/admin/ui/AdminSelect';
 import { LeadType } from '@/lib/types';
 
 export default function LeadDetailPanel({ lead }: { lead: LeadType }) {
@@ -130,21 +131,29 @@ export default function LeadDetailPanel({ lead }: { lead: LeadType }) {
             
             <div>
               <label className="block text-sm text-slate-500 mb-1" htmlFor="status-select">Change Status</label>
-              <select 
+              <AdminSelect 
                 id="status-select"
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={lead.status}
-                onChange={handleStatusChange}
-                disabled={isUpdatingStatus}
-              >
-                <option value="NEW">New</option>
-                <option value="CONTACTED">Contacted</option>
-                <option value="FOLLOW_UP">Follow Up</option>
-                <option value="QUALIFIED">Qualified</option>
-                <option value="CONVERTED">Converted</option>
-                <option value="CLOSED">Closed</option>
-                <option value="SPAM">Spam</option>
-              </select>
+                value={[
+                  { value: 'NEW', label: 'New' },
+                  { value: 'CONTACTED', label: 'Contacted' },
+                  { value: 'FOLLOW_UP', label: 'Follow Up' },
+                  { value: 'QUALIFIED', label: 'Qualified' },
+                  { value: 'CONVERTED', label: 'Converted' },
+                  { value: 'CLOSED', label: 'Closed' },
+                  { value: 'SPAM', label: 'Spam' }
+                ].find(o => o.value === lead.status) || null}
+                onChange={(opt: any) => handleStatusChange({ target: { value: opt ? opt.value : lead.status } } as any)}
+                isDisabled={isUpdatingStatus}
+                options={[
+                  { value: 'NEW', label: 'New' },
+                  { value: 'CONTACTED', label: 'Contacted' },
+                  { value: 'FOLLOW_UP', label: 'Follow Up' },
+                  { value: 'QUALIFIED', label: 'Qualified' },
+                  { value: 'CONVERTED', label: 'Converted' },
+                  { value: 'CLOSED', label: 'Closed' },
+                  { value: 'SPAM', label: 'Spam' }
+                ]}
+              />
             </div>
           </div>
         </div>

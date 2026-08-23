@@ -3,6 +3,7 @@
 import dbConnect from '@/lib/db';
 import { Lead } from '@/lib/models/lead';
 import { getSession } from '@/lib/auth';
+import { LeadCreateSchema } from '@/lib/validations/lead.schema';
 import { revalidatePath } from 'next/cache';
 
 async function checkAuth(allowedRoles: string[]) {
@@ -21,7 +22,8 @@ export async function getLeads() {
     const leads = await Lead.find()
       .populate('product', 'name')
       .populate('category', 'name')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
     return { success: true, data: JSON.parse(JSON.stringify(leads)) };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -30,10 +32,17 @@ export async function getLeads() {
 
 export async function createLead(data: any) {
   try {
-    await checkAuth(['SUPER_ADMIN', 'LEAD_MANAGER']);
+    // No auth check for createLead because public visitors use this!
+    
+    const parsed = LeadCreateSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
     
-    const lead = await Lead.create(data);
+    const lead = await Lead.create(validatedData);
     revalidatePath('/admin/leads');
     return { success: true, data: JSON.parse(JSON.stringify(lead)) };
   } catch (error: any) {
@@ -44,9 +53,17 @@ export async function createLead(data: any) {
 export async function updateLead(id: string, data: any) {
   try {
     await checkAuth(['SUPER_ADMIN', 'LEAD_MANAGER']);
+    
+    // We can reuse LeadCreateSchema or allow partials for update
+    const parsed = LeadCreateSchema.partial().safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
     
-    const lead = await Lead.findByIdAndUpdate(id, data, { new: true });
+    const lead = await Lead.findByIdAndUpdate(id, validatedData, { new: true }).lean();
     revalidatePath('/admin/leads');
     revalidatePath(`/admin/leads/${id}`);
     return { success: true, data: JSON.parse(JSON.stringify(lead)) };
@@ -82,7 +99,7 @@ export async function updateLeadStatus(id: string, status: string) {
     await checkAuth(['SUPER_ADMIN', 'LEAD_MANAGER']);
     await dbConnect();
     
-    const lead = await Lead.findByIdAndUpdate(id, { status }, { new: true });
+    const lead = await Lead.findByIdAndUpdate(id, { status }, { new: true }).lean();
     revalidatePath('/admin/leads');
     revalidatePath(`/admin/leads/${id}`);
     return { success: true, data: JSON.parse(JSON.stringify(lead)) };

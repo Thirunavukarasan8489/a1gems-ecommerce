@@ -6,6 +6,7 @@ import { createHomepageSection } from '@/lib/actions/cms.actions';
 import { Save, X, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { AdminSelect } from '@/components/admin/ui/AdminSelect';
 
 export default function HomepageSectionForm() {
   const router = useRouter();
@@ -79,17 +80,17 @@ export default function HomepageSectionForm() {
 
             <div className="space-y-1">
               <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Section Type <span className="text-red-500">*</span></label>
-              <select 
-                name="type" 
-                required
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="HERO_BANNER">Hero Banner</option>
-                <option value="PROMOTIONAL_BANNER">Promotional Banner</option>
-                <option value="FEATURED_CATEGORY">Featured Category</option>
-                <option value="TRUST_HIGHLIGHTS">Trust Highlights</option>
-                <option value="CUSTOM">Custom Section</option>
-              </select>
+              <AdminSelect
+                name="type"
+                defaultValue={{ value: 'HERO_BANNER', label: 'Hero Banner' }}
+                options={[
+                  { value: 'HERO_BANNER', label: 'Hero Banner' },
+                  { value: 'PROMOTIONAL_BANNER', label: 'Promotional Banner' },
+                  { value: 'FEATURED_CATEGORY', label: 'Featured Category' },
+                  { value: 'TRUST_HIGHLIGHTS', label: 'Trust Highlights' },
+                  { value: 'CUSTOM', label: 'Custom Section' }
+                ]}
+              />
             </div>
           </div>
         </div>

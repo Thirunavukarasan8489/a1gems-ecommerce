@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Save, ArrowLeft, UploadCloud } from 'lucide-react';
 import { createCategory, updateCategory } from '@/lib/actions/category.actions';
 import { uploadMedia } from '@/lib/actions/media.actions';
+import { AdminSelect } from '@/components/admin/ui/AdminSelect';
 import { toast } from 'react-hot-toast';
 
 export default function CategoryForm({ initialData }: { initialData?: any }) {
@@ -201,15 +202,18 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Visibility
               </label>
-              <select
+              <AdminSelect
                 name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              >
-                <option value="ACTIVE">Active (Visible)</option>
-                <option value="DRAFT">Draft (Hidden)</option>
-              </select>
+                value={[
+                  { value: 'ACTIVE', label: 'Active (Visible)' },
+                  { value: 'DRAFT', label: 'Draft (Hidden)' }
+                ].find(o => o.value === formData.status) || null}
+                onChange={(opt: any) => handleChange({ target: { name: 'status', value: opt ? opt.value : 'ACTIVE' } } as any)}
+                options={[
+                  { value: 'ACTIVE', label: 'Active (Visible)' },
+                  { value: 'DRAFT', label: 'Draft (Hidden)' }
+                ]}
+              />
             </div>
           </div>
 
