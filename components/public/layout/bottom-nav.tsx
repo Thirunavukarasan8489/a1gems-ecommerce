@@ -16,11 +16,16 @@ const tabs = [
 
 /**
  * Thumb-reachable primary floating navigation dock.
- * Built with luxury glassmorphism, animated active pill indicator, and spring transitions.
+ * Features a high-performance smooth sliding active tab indicator with spring physics.
  */
 export function BottomNav() {
   const pathname = usePathname();
   const { count, hydrated } = useCart();
+
+  const activeIndex = tabs.findIndex(({ href, exact }) =>
+    exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
+  );
+  const safeIndex = activeIndex !== -1 ? activeIndex : 0;
 
   return (
     <nav
@@ -35,13 +40,24 @@ export function BottomNav() {
         />
 
         <ul className="relative grid grid-cols-5 items-center">
+          {/* Smooth Sliding Gold Active Pill Indicator */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 w-[20%] p-0.5 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            style={{
+              transform: `translateX(${safeIndex * 100}%)`,
+            }}
+          >
+            <div className="h-full w-full rounded-full bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 shadow-[0_2px_14px_rgba(201,154,38,0.6)]" />
+          </div>
+
           {tabs.map(({ href, label, icon: Icon, exact }) => {
             const active = exact
               ? pathname === href
               : pathname === href || pathname.startsWith(`${href}/`);
 
             return (
-              <li key={href} className="relative">
+              <li key={href} className="relative z-10">
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}
@@ -52,14 +68,6 @@ export function BottomNav() {
                       : "text-plum-200 hover:text-gold-200"
                   )}
                 >
-                  {/* Animated Active Pill Background */}
-                  {active && (
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 shadow-[0_2px_14px_rgba(201,154,38,0.55)] transition-all duration-300 animate-[rise_0.25s_ease-out_both]"
-                    />
-                  )}
-
                   <span className="relative z-10 flex flex-col items-center gap-0.5">
                     <span className="relative">
                       <Icon
@@ -94,14 +102,6 @@ export function BottomNav() {
                       {label}
                     </span>
                   </span>
-
-                  {/* Active Indicator Accent Dot */}
-                  {active && (
-                    <span
-                      aria-hidden
-                      className="absolute -bottom-1 size-1 rounded-full bg-plum-950 shadow-[0_0_6px_#130b1b]"
-                    />
-                  )}
                 </Link>
               </li>
             );
