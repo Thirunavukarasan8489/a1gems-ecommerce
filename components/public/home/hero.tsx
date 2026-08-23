@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, MessageCircle } from "lucide-react";
-import { buttonStyles } from "@/components/public/ui/button";
-import { GemImage } from "@/components/public/ui/gem-image";
-import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
+import { buttonStyles } from "@/components/ui/button";
+import { GemImage } from "@/components/ui/gem-image";
+import { OrnamentalBg } from "@/components/ui/ornamental-bg";
 import { categories } from "@/lib/data/categories";
 import { stats } from "@/lib/data/content";
 import { whatsappLink } from "@/lib/data/nav";
 import { categoryTerms } from "@/lib/utils";
+
+const tilt = ["-rotate-4 lg:-translate-y-2", "rotate-0 -translate-y-6", "rotate-4 lg:-translate-y-1"];
 
 export function Hero() {
   return (
@@ -62,8 +64,11 @@ export function Hero() {
           </div>
 
           <dl className="mt-10 grid grid-cols-4 gap-3 border-t border-white/10 pt-7">
-            {stats.map((stat) => (
-              <div key={stat.label}>
+            {stats.map((stat, i) => (
+              <div
+                key={stat.label}
+                className={i > 0 ? "border-l border-white/10 pl-3" : ""}
+              >
                 <dt className="sr-only">{stat.label}</dt>
                 <dd>
                   <span className="block font-display text-xl font-semibold text-gold-300 tabular-nums sm:text-3xl">
@@ -78,9 +83,18 @@ export function Hero() {
           </dl>
         </div>
 
-        {/* Gem cluster. Mobile gets a compact three-up strip; desktop gets the
-            staggered arrangement with room to breathe. */}
-        <div className="mt-12 lg:mt-0">
+        {/* Gem cluster — fanned out like stones set on a display cushion, not a
+            flat 3-up grid. Each card gets a gold bezel and its own tilt. */}
+        <div className="relative mt-16 lg:mt-0">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(55% 55% at 50% 45%, rgba(221,182,58,.28), transparent 70%)",
+            }}
+          />
+
           <ul className="grid grid-cols-3 gap-3 lg:gap-5">
             {categories.slice(0, 3).map((cat, i) => {
               const terms = categoryTerms(cat.name);
@@ -88,26 +102,24 @@ export function Hero() {
                 <li
                   key={cat.slug}
                   className="animate-rise"
-                  style={{
-                    animationDelay: `${120 + i * 90}ms`,
-                    transform: `translateY(${i === 1 ? "-1.25rem" : "0"})`,
-                  }}
+                  style={{ animationDelay: `${120 + i * 90}ms` }}
                 >
                   <Link
                     href={`/collections/${cat.slug}`}
-                    className="group block overflow-hidden rounded-2xl ring-1 ring-white/12 transition-shadow duration-300 hover:ring-gold-400/50"
+                    className={`group block overflow-hidden rounded-2xl shadow-lg transition-transform duration-300 ease-out-soft hover:-translate-y-1.5 hover:rotate-0! ${tilt[i]}`}
                   >
                     <GemImage
                       color={cat.gemColor}
                       seed={i * 3}
-                      className="aspect-3/4 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
+                      framed
+                      className="aspect-3/4 w-full transition-transform duration-500 ease-out-soft group-hover:scale-105"
                     />
-                    <p className="bg-white/6 px-2 py-2.5 text-center leading-tight text-ivory-100 backdrop-blur-sm">
+                    <p className="bg-ivory-50 px-2 py-2.5 text-center leading-tight text-plum-900">
                       <span className="block font-display text-sm font-semibold sm:text-base">
                         {terms.primary}
                       </span>
                       {terms.secondary && (
-                        <span className="text-[0.5625rem] tracking-wide text-plum-300 uppercase">
+                        <span className="text-[0.5625rem] tracking-wide text-gold-700 uppercase">
                           {terms.secondary}
                         </span>
                       )}
