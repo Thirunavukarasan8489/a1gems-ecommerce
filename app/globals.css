@@ -115,6 +115,7 @@
   --animate-shimmer: shimmer 2.2s linear infinite;
   --animate-rise: rise 0.5s var(--ease-out-soft) both;
   --animate-marquee: marquee 26s linear infinite;
+  --animate-twinkle: twinkle 2.6s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -123,6 +124,18 @@
   }
   100% {
     background-position: 180% 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(25deg);
   }
 }
 
@@ -268,6 +281,34 @@
 
 @utility hairline {
   border-color: var(--color-hairline);
+}
+
+/* A light sweep across the primary CTA on hover — a catalogue-foil glint
+   rather than a permanent distracting animation. */
+@utility shine-sweep {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.55) 48%,
+      transparent 66%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.7s var(--ease-out-soft);
+  }
+  &:hover::after {
+    transform: translateX(120%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      display: none;
+    }
+  }
 }
 
 /* Loading placeholder for images and skeletons. */
