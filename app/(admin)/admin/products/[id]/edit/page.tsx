@@ -79,15 +79,17 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = React.use(params);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('basic');
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [categories, setCategories] = useState<{ label: string; value: string }[]>([]);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
-  const [coverFile, setCoverFile] = useState<{ file: File; previewUrl: string } | null>(null);
-  const [galleryFiles, setGalleryFiles] = useState<{ file: File; previewUrl: string; id: string }[]>([]);
+  const [coverFile, setCoverFile] = useState<{ file: File | null; previewUrl: string } | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<{ file?: File; previewUrl: string; id: string, isExisting: boolean }[]>([]);
+  const [validationErrors, setValidationErrors] = useState<{ field: string; message: string; tabId: string }[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const {
@@ -140,7 +142,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     Promise.all([
       getCategories(),
-      getProductById(params.id)
+      getProductById(resolvedParams.id)
     ]).then(([catRes, prodRes]) => {
       if (catRes.success && catRes.data) {
         setCategories(catRes.data.map((c: any) => ({ label: c.name, value: c._id })));
@@ -172,10 +174,21 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           metaDescription: prod.metaDescription || '',
           status: prod.status || 'ACTIVE',
         });
+
+        if (prod.primaryImage?.url) {
+          setCoverFile({ file: null, previewUrl: prod.primaryImage.url });
+        }
+        if (prod.gallery?.length > 0) {
+          setGalleryFiles(prod.gallery.map((g: any, i: number) => ({
+            file: null,
+            previewUrl: g.url,
+            id: `existing-${i}-${Math.random().toString(36).substring(7)}`
+          })));
+        }
       }
       setIsLoading(false);
     });
-  }, [params.id, reset]);
+  }, [resolvedParams.id, reset]);
 
   // Handle Cover Image Selection
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,7 +213,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     const newFiles = Array.from(files).map(file => ({
       file,
       previewUrl: URL.createObjectURL(file),
-      id: Math.random().toString(36).substring(7)
+      id: Math.random().toString(36).substring(7),
+      isExisting: false
     }));
 
     setGalleryFiles(prev => [...prev, ...newFiles]);
@@ -227,7 +241,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     const uploadAndSubmit = async () => {
       let finalPrimaryImage = data.primaryImage;
       
-      if (coverFile) {
+      if (coverFile?.file) {
         const formData = new FormData();
         formData.append('file', coverFile.file);
         const res = await uploadMedia(formData);
@@ -236,25 +250,31 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         } else {
           throw new Error(`Cover upload failed: ${res.error}`);
         }
-      } else if (!finalPrimaryImage?.url) {
+      } else if (!coverFile) {
         throw new Error('Cover image is required');
+      } else {
+        finalPrimaryImage = { url: coverFile.previewUrl, altText: data.primaryImage?.altText || '' };
       }
 
-      const finalGallery = [...(data.gallery || [])];
+      const finalGallery = [];
       
       for (let i = 0; i < galleryFiles.length; i++) {
-        const formData = new FormData();
-        formData.append('file', galleryFiles[i].file);
-        const res = await uploadMedia(formData);
-        if (res.success && res.data) {
-          finalGallery[i] = { url: res.data.secureUrl || res.data.url, altText: finalGallery[i]?.altText || '' };
+        if (galleryFiles[i].file) {
+          const formData = new FormData();
+          formData.append('file', galleryFiles[i].file as File);
+          const res = await uploadMedia(formData);
+          if (res.success && res.data) {
+            finalGallery.push({ url: res.data.secureUrl || res.data.url, altText: data.gallery?.[i]?.altText || '' });
+          } else {
+            throw new Error(`Gallery upload failed: ${res.error}`);
+          }
         } else {
-          throw new Error(`Gallery upload failed: ${res.error}`);
+          finalGallery.push({ url: galleryFiles[i].previewUrl, altText: data.gallery?.[i]?.altText || '' });
         }
       }
 
       const finalData = { ...data, primaryImage: finalPrimaryImage, gallery: finalGallery };
-      const res = await updateProduct(params.id, finalData);
+      const res = await updateProduct(resolvedParams.id, finalData);
       
       if (!res.success) {
         throw new Error(res.error || 'Failed to update product');
@@ -298,6 +318,36 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     purchase: ['purchaseType', 'whatsappEnabled'],
   };
 
+  const onInvalid = (formErrors: any) => {
+    const extractedErrs: { field: string; message: string; tabId: string }[] = [];
+    const getTabForField = (fieldName: string) => {
+      for (const tab of Object.keys(tabFields)) {
+        if (tabFields[tab].some(f => fieldName === f || fieldName.startsWith(f + '.'))) return tab;
+      }
+      return 'basic';
+    };
+    const traverseErrors = (obj: any, parentKey = '') => {
+      for (const key in obj) {
+        const fullKey = parentKey ? `${parentKey}.${key}` : key;
+        if (obj[key]?.message) {
+          extractedErrs.push({ field: fullKey, message: obj[key].message, tabId: getTabForField(fullKey) });
+        } else if (typeof obj[key] === 'object') {
+          traverseErrors(obj[key], fullKey);
+        }
+      }
+    };
+    traverseErrors(formErrors);
+    
+    // Explicit cover image validation check
+    if (!coverFile) {
+      extractedErrs.push({ field: 'Cover Image', message: 'Cover image is required', tabId: 'media' });
+    }
+    
+    if (extractedErrs.length > 0) {
+      setValidationErrors(extractedErrs);
+    }
+  };
+
   const handleNext = async () => {
     if (currentTabIndex < tabs.length - 1) {
       const currentTabId = tabs[currentTabIndex].id;
@@ -321,11 +371,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentTabIndex < tabs.length - 1) {
-      handleNext();
-    } else {
-      handleSubmit(onSubmit as any)(e);
-    }
+    handleSubmit(onSubmit as any, onInvalid)(e);
   };
 
   if (isLoading) {
@@ -362,12 +408,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           <AdminButton type="button" variant="outline" onClick={() => router.push('/admin/products')}>
             Cancel
           </AdminButton>
-          {currentTabIndex === tabs.length - 1 && (
-            <AdminButton onClick={handleSubmit(onSubmit as any)} isLoading={isSubmitting} className="gap-2">
-              <Save size={18} />
-              Save Changes
-            </AdminButton>
-          )}
+          <AdminButton onClick={handleSubmit(onSubmit as any, onInvalid)} isLoading={isSubmitting} className="gap-2">
+            <Save size={18} />
+            Save Changes
+          </AdminButton>
         </div>
       </div>
 
@@ -635,7 +679,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 {coverFile ? (
                   <div className="space-y-3 max-w-md">
                     <div className="relative w-48 h-48 rounded-xl border-2 border-blue-500 overflow-hidden shadow-md group">
-                      <Image src={coverFile.previewUrl} alt="Cover Preview" fill className="object-cover" />
+                      <Image src={coverFile.previewUrl} alt="Cover Preview" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                       <button
                         type="button"
                         onClick={() => {
@@ -691,7 +735,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   {galleryFiles.map((fileObj, idx) => (
                     <div key={fileObj.id} className="space-y-2">
                       <div className="relative aspect-square rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden group shadow-sm">
-                        <Image src={fileObj.previewUrl} alt={`Gallery Preview ${idx + 1}`} fill className="object-cover" />
+                        <Image src={fileObj.previewUrl} alt={`Gallery Preview ${idx + 1}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
                         <button
                           type="button"
                           onClick={() => removeGalleryImage(idx)}
@@ -818,7 +862,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   Next Step
                 </AdminButton>
               ) : (
-                <AdminButton onClick={handleSubmit(onSubmit as any)} isLoading={isSubmitting} className="gap-2">
+                <AdminButton onClick={handleSubmit(onSubmit as any, onInvalid)} isLoading={isSubmitting} className="gap-2">
                   <Save size={18} />
                   Save Changes
                 </AdminButton>
@@ -828,6 +872,47 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           </form>
         </div>
       </div>
+
+      {/* Validation Errors Modal */}
+      {validationErrors && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-red-50 dark:bg-red-900/20">
+              <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
+                <X size={18} /> Validation Errors
+              </h3>
+              <button onClick={() => setValidationErrors(null)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-4 max-h-96 overflow-y-auto">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">Please fix the following required fields before saving:</p>
+              <ul className="space-y-3">
+                {validationErrors.map((err, i) => (
+                  <li key={i} className="flex flex-col text-sm p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                    <span className="font-medium text-slate-800 dark:text-slate-200 capitalize">{err.field.replace(/\./g, ' ')}</span>
+                    <span className="text-red-600 dark:text-red-400 mt-1">{err.message}</span>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setValidationErrors(null);
+                        setActiveTab(err.tabId);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-blue-600 text-xs font-semibold text-left mt-2 hover:underline"
+                    >
+                      Go to {tabs.find(t => t.id === err.tabId)?.label.replace(/^\d+\.\s/, '')} Tab &rarr;
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/20 flex justify-end">
+              <AdminButton onClick={() => setValidationErrors(null)} variant="outline">Close</AdminButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

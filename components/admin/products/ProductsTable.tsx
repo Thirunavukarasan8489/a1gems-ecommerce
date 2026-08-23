@@ -2,7 +2,7 @@
 
 import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
@@ -84,6 +84,12 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
       header: 'Actions',
       cell: (item: ProductRow) => (
         <div className="flex items-center gap-2">
+          <Link
+            href={`/admin/products/${item._id}`}
+            className="p-1 text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+          >
+            <Eye size={16} />
+          </Link>
           <Link
             href={`/admin/products/${item._id}/edit`}
             className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"

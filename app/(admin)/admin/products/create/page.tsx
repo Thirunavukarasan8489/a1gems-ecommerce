@@ -88,6 +88,7 @@ export default function CreateProductPage() {
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [coverFile, setCoverFile] = useState<{ file: File; previewUrl: string } | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<{ file: File; previewUrl: string; id: string }[]>([]);
+  const [validationErrors, setValidationErrors] = useState<{ field: string; message: string; tabId: string }[] | null>(null);
 
   const {
     register,
@@ -264,6 +265,36 @@ export default function CreateProductPage() {
     purchase: ['purchaseType', 'whatsappEnabled'],
   };
 
+  const onInvalid = (formErrors: any) => {
+    const extractedErrs: { field: string; message: string; tabId: string }[] = [];
+    const getTabForField = (fieldName: string) => {
+      for (const tab of Object.keys(tabFields)) {
+        if (tabFields[tab].some(f => fieldName === f || fieldName.startsWith(f + '.'))) return tab;
+      }
+      return 'basic';
+    };
+    const traverseErrors = (obj: any, parentKey = '') => {
+      for (const key in obj) {
+        const fullKey = parentKey ? `${parentKey}.${key}` : key;
+        if (obj[key]?.message) {
+          extractedErrs.push({ field: fullKey, message: obj[key].message, tabId: getTabForField(fullKey) });
+        } else if (typeof obj[key] === 'object') {
+          traverseErrors(obj[key], fullKey);
+        }
+      }
+    };
+    traverseErrors(formErrors);
+    
+    // Explicit cover image validation check
+    if (!coverFile) {
+      extractedErrs.push({ field: 'Cover Image', message: 'Cover image is required', tabId: 'media' });
+    }
+    
+    if (extractedErrs.length > 0) {
+      setValidationErrors(extractedErrs);
+    }
+  };
+
   const handleNext = async () => {
     if (currentTabIndex < tabs.length - 1) {
       const currentTabId = tabs[currentTabIndex].id;
@@ -287,11 +318,7 @@ export default function CreateProductPage() {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentTabIndex < tabs.length - 1) {
-      handleNext();
-    } else {
-      handleSubmit(onSubmit as any)(e);
-    }
+    handleSubmit(onSubmit as any, onInvalid)(e);
   };
 
   return (
@@ -320,12 +347,10 @@ export default function CreateProductPage() {
           <AdminButton type="button" variant="outline" onClick={() => router.push('/admin/products')}>
             Cancel
           </AdminButton>
-          {currentTabIndex === tabs.length - 1 && (
-            <AdminButton onClick={handleSubmit(onSubmit as any)} isLoading={isSubmitting} className="gap-2">
-              <Save size={18} />
-              Publish Product
-            </AdminButton>
-          )}
+          <AdminButton onClick={handleSubmit(onSubmit as any, onInvalid)} isLoading={isSubmitting} className="gap-2">
+            <Save size={18} />
+            Publish Product
+          </AdminButton>
         </div>
       </div>
 
@@ -593,7 +618,7 @@ export default function CreateProductPage() {
                 {coverFile ? (
                   <div className="space-y-3 max-w-md">
                     <div className="relative w-48 h-48 rounded-xl border-2 border-blue-500 overflow-hidden shadow-md group">
-                      <Image src={coverFile.previewUrl} alt="Cover Preview" fill className="object-cover" />
+                      <Image src={coverFile.previewUrl} alt="Cover Preview" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                       <button
                         type="button"
                         onClick={() => {
@@ -649,7 +674,7 @@ export default function CreateProductPage() {
                   {galleryFiles.map((fileObj, idx) => (
                     <div key={fileObj.id} className="space-y-2">
                       <div className="relative aspect-square rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden group shadow-sm">
-                        <Image src={fileObj.previewUrl} alt={`Gallery Preview ${idx + 1}`} fill className="object-cover" />
+                        <Image src={fileObj.previewUrl} alt={`Gallery Preview ${idx + 1}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
                         <button
                           type="button"
                           onClick={() => removeGalleryImage(idx)}
@@ -776,7 +801,7 @@ export default function CreateProductPage() {
                   Next Step
                 </AdminButton>
               ) : (
-                <AdminButton onClick={handleSubmit(onSubmit as any)} isLoading={isSubmitting} className="gap-2">
+                <AdminButton onClick={handleSubmit(onSubmit as any, onInvalid)} isLoading={isSubmitting} className="gap-2">
                   <Save size={18} />
                   Publish Product
                 </AdminButton>
@@ -786,6 +811,47 @@ export default function CreateProductPage() {
           </form>
         </div>
       </div>
+
+      {/* Validation Errors Modal */}
+      {validationErrors && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-red-50 dark:bg-red-900/20">
+              <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
+                <X size={18} /> Validation Errors
+              </h3>
+              <button onClick={() => setValidationErrors(null)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-4 max-h-96 overflow-y-auto">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">Please fix the following required fields before saving:</p>
+              <ul className="space-y-3">
+                {validationErrors.map((err, i) => (
+                  <li key={i} className="flex flex-col text-sm p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                    <span className="font-medium text-slate-800 dark:text-slate-200 capitalize">{err.field.replace(/\./g, ' ')}</span>
+                    <span className="text-red-600 dark:text-red-400 mt-1">{err.message}</span>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setValidationErrors(null);
+                        setActiveTab(err.tabId);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-blue-600 text-xs font-semibold text-left mt-2 hover:underline"
+                    >
+                      Go to {tabs.find(t => t.id === err.tabId)?.label.replace(/^\d+\.\s/, '')} Tab &rarr;
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/20 flex justify-end">
+              <AdminButton onClick={() => setValidationErrors(null)} variant="outline">Close</AdminButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

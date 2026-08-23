@@ -16,6 +16,10 @@ export default withAuth(
     // Protection logic for /admin routes
     if (isProtectedRoute) {
       if (!token) {
+        // If it's a Server Action or API request, return 401 instead of redirecting (which causes 403)
+        if (req.headers.get('next-action') || req.headers.get('x-action') || pathname.startsWith('/api/')) {
+          return new NextResponse('Unauthorized', { status: 401 });
+        }
         return NextResponse.redirect(new URL('/admin/login', req.url));
       }
 

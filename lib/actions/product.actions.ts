@@ -6,6 +6,7 @@ import { Lead } from '@/lib/models/lead';
 import { Order } from '@/lib/models/order';
 import { getSession } from '@/lib/auth';
 import { logAuditAction } from '@/lib/actions/audit';
+import { deleteMediaByUrl } from '@/lib/actions/media.actions';
 import { revalidatePath } from 'next/cache';
 
 async function checkAuth(allowedRoles: string[]) {
@@ -156,8 +157,27 @@ export async function updateProduct(id: string, data: any) {
       }
     }
 
+    // Fetch old product to find orphaned images
+    const oldProduct = await Product.findById(id).lean();
+
     const product = await Product.findByIdAndUpdate(id, mappedData, { new: true });
     
+    // Clean up orphaned images asynchronously
+    if (oldProduct) {
+      const oldImages = new Set<string>();
+      if (oldProduct.primaryImage?.url) oldImages.add(oldProduct.primaryImage.url);
+      if (oldProduct.gallery) oldProduct.gallery.forEach((g: any) => { if (g.url) oldImages.add(g.url); });
+
+      const newImages = new Set<string>();
+      if (product.primaryImage?.url) newImages.add(product.primaryImage.url);
+      if (product.gallery) product.gallery.forEach((g: any) => { if (g.url) newImages.add(g.url); });
+
+      const orphanedImages = Array.from(oldImages).filter(url => !newImages.has(url));
+      
+      // Fire and forget
+      Promise.allSettled(orphanedImages.map(url => deleteMediaByUrl(url)));
+    }
+
     await logAuditAction({
       action: 'PRODUCT_UPDATED',
       entity: 'Product',
@@ -189,8 +209,21 @@ export async function deleteProduct(id: string) {
       throw new Error(`Cannot delete: Product is referenced in ${leadCount} lead(s).`);
     }
 
+    const productToDelete = await Product.findById(id).lean();
+    if (!productToDelete) throw new Error('Product not found');
+
     await Product.findByIdAndDelete(id);
     
+    // Clean up images asynchronously
+    const urlsToDelete = new Set<string>();
+    if (productToDelete.primaryImage?.url) urlsToDelete.add(productToDelete.primaryImage.url);
+    if (productToDelete.gallery) {
+      productToDelete.gallery.forEach((g: any) => { if (g.url) urlsToDelete.add(g.url); });
+    }
+    
+    // Fire and forget
+    Promise.allSettled(Array.from(urlsToDelete).map(url => deleteMediaByUrl(url)));
+
     await logAuditAction({
       action: 'PRODUCT_DELETED',
       entity: 'Product',
