@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const { loadEnvConfig } = require('@next/env');
 loadEnvConfig(process.cwd());
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/a1gems';
+const MONGODB_URI = process.env.MONGODB_URI;
 console.log(MONGODB_URI)
 // Fallback schema if User model doesn't exist yet
 const userSchema = new mongoose.Schema({
