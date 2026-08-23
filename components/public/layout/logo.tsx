@@ -20,9 +20,7 @@ export function Logo({
           aria-hidden
           className="absolute inset-0 rotate-45 rounded-[0.5rem] bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 shadow-gold transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:rotate-[135deg]"
         />
-        <span className="relative font-display text-sm font-bold text-plum-950">
-          A1
-        // </span>
+        </span>
       </span> */}
       <span className="relative grid shrink-0 place-items-center">
         <Image
@@ -37,7 +35,7 @@ export function Logo({
       <span className="flex flex-col leading-none">
         <span
           className={cn(
-            "font-display text-lg font-semibold tracking-tight",
+            "font-display text-base font-semibold tracking-tight sm:text-lg",
             onDark ? "text-ivory-100" : "text-plum-900",
           )}
         >
@@ -45,11 +43,11 @@ export function Logo({
         </span>
         <span
           className={cn(
-            "mt-0.5 text-[0.5625rem] font-semibold tracking-[0.22em] uppercase",
+            "mt-0.5 text-[0.5rem] font-semibold tracking-[0.2em] uppercase sm:text-[0.5625rem] sm:tracking-[0.22em]",
             onDark ? "text-gold-400" : "text-gold-700",
           )}
         >
-          Certified
+          Certified Gemstones
         </span>
       </span>
     </Link>

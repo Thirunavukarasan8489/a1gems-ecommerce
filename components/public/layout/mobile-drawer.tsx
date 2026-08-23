@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, MessageCircle, Phone, X } from "lucide-react";
@@ -12,8 +13,13 @@ import { categoryTerms } from "@/lib/utils";
 
 export function MobileDrawer() {
   const [open, setOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
   const panelRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close on route change so the drawer never survives a navigation. Adjusted
   // during render rather than in an effect, so the drawer is already gone on
@@ -50,13 +56,13 @@ export function MobileDrawer() {
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         aria-expanded={open}
-        className="grid size-10 place-items-center rounded-full text-plum-800 transition-colors hover:bg-plum-900/6 lg:hidden"
+        className="grid size-10 shrink-0 place-items-center rounded-full text-plum-800 transition-colors hover:bg-plum-900/6 lg:hidden"
       >
         <Menu size={22} strokeWidth={2} />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-60 lg:hidden">
+      {open && mounted && createPortal(
+        <div className="fixed inset-0 z-[100] lg:hidden">
           <button
             type="button"
             aria-label="Close menu"
@@ -71,7 +77,7 @@ export function MobileDrawer() {
             aria-modal="true"
             aria-label="Site menu"
             tabIndex={-1}
-            className="absolute inset-y-0 left-0 flex w-[86%] max-w-sm translate-x-0 flex-col bg-ivory-100 shadow-lg outline-none"
+            className="absolute inset-y-0 left-0 flex h-full w-[86%] max-w-sm translate-x-0 flex-col bg-ivory-100 shadow-2xl outline-none"
             style={{ animation: "drawer-in .3s var(--ease-out-soft) both" }}
           >
             <div className="flex items-center justify-between border-b border-ivory-300 px-4 py-3">
@@ -175,7 +181,8 @@ export function MobileDrawer() {
               </p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       <style>{`

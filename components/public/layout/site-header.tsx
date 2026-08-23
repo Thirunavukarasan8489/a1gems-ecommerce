@@ -20,7 +20,7 @@ export function SiteHeader() {
 
           <PrimaryNav />
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
             <a
               href={business.phoneHref}
               className="hidden items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium text-plum-800 transition-colors hover:bg-plum-900/6 xl:inline-flex"
