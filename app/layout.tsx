@@ -79,8 +79,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  // Never trap users at 100% — pinch-zoom is an accessibility requirement.
   maximumScale: 5,
+  viewportFit: "cover",
   themeColor: "#190a09",
 };
 

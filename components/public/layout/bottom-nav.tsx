@@ -49,7 +49,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary Mobile Navigation"
-      className="safe-b fixed bottom-3.5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-md lg:hidden"
+      className="fixed bottom-[calc(0.625rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-1.5rem)] max-w-md lg:hidden"
     >
       <div className="relative rounded-full border border-gold-500/30 bg-plum-950/92 p-1.5 shadow-[0_10px_35px_-5px_rgba(19,11,27,0.75)] backdrop-blur-xl ring-1 ring-white/10">
         {/* Ambient Subtle Gold Glow Ring */}

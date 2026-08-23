@@ -63,7 +63,7 @@ export function Hero() {
             </a>
           </div>
 
-          <dl className="mt-10 grid grid-cols-4 gap-3 border-t border-white/10 pt-7">
+          <dl className="mt-10 grid grid-cols-2 gap-x-4 gap-y-6 border-t border-white/10 pt-7 sm:grid-cols-4">
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
