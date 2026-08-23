@@ -16,21 +16,40 @@ const tabs = [
 
 /**
  * Thumb-reachable primary floating navigation dock.
- * Features a high-performance smooth sliding active tab indicator with spring physics.
+ * Features a high-performance smooth sliding active tab indicator with spring physics and full route matching.
  */
 export function BottomNav() {
   const pathname = usePathname();
   const { count, hydrated } = useCart();
 
+  const isTabActive = (href: string, exact?: boolean) => {
+    if (exact) return pathname === href;
+    if (href === "/products") {
+      return (
+        pathname === "/products" ||
+        pathname.startsWith("/products/") ||
+        pathname.startsWith("/collections/")
+      );
+    }
+    if (href === "/cart") {
+      return (
+        pathname === "/cart" ||
+        pathname.startsWith("/cart/") ||
+        pathname.startsWith("/checkout")
+      );
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   const activeIndex = tabs.findIndex(({ href, exact }) =>
-    exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
+    isTabActive(href, exact)
   );
   const safeIndex = activeIndex !== -1 ? activeIndex : 0;
 
   return (
     <nav
       aria-label="Primary Mobile Navigation"
-      className="safe-b fixed bottom-3.5 inset-x-3 z-50 max-w-md mx-auto sm:inset-x-6 lg:hidden"
+      className="safe-b fixed bottom-3.5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-md lg:hidden"
     >
       <div className="relative rounded-full border border-gold-500/30 bg-plum-950/92 p-1.5 shadow-[0_10px_35px_-5px_rgba(19,11,27,0.75)] backdrop-blur-xl ring-1 ring-white/10">
         {/* Ambient Subtle Gold Glow Ring */}
@@ -52,9 +71,7 @@ export function BottomNav() {
           </div>
 
           {tabs.map(({ href, label, icon: Icon, exact }) => {
-            const active = exact
-              ? pathname === href
-              : pathname === href || pathname.startsWith(`${href}/`);
+            const active = isTabActive(href, exact);
 
             return (
               <li key={href} className="relative z-10">
