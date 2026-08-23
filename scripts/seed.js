@@ -58,7 +58,6 @@ async function seed() {
       console.log('Project Admin already exists.');
     }
 
-    
   } catch (error) {
     console.error('Error seeding database:', error);
   } finally {
