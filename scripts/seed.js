@@ -3,10 +3,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 // Load environment variables if available
-// require('dotenv').config();
+const { loadEnvConfig } = require('@next/env');
+loadEnvConfig(process.cwd());
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/a1gems';
-
+console.log(MONGODB_URI)
 // Fallback schema if User model doesn't exist yet
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
