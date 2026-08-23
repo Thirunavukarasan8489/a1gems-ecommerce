@@ -96,7 +96,7 @@ export default function RootLayout({
       lang="en-IN"
       className={`${cormorant.variable} ${hind.variable} ${notoDevanagari.variable} h-full overflow-x-hidden antialiased`}
     >
-      <body className="flex min-h-full w-full max-w-full flex-col overflow-x-hidden">
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         <AuthProvider>
           <CartProvider>{children}</CartProvider>

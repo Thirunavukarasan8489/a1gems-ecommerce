@@ -189,20 +189,21 @@
    ========================================================================= */
 
 @layer base {
-  html,
+  html {
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    /* Sticky header height so in-page anchors are not hidden behind it. */
+    scroll-padding-top: 6.5rem;
+  }
+
   body {
+    width: 100%;
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
     /* Prevents horizontal-scroll rails from widening the document viewport on mobile */
     overflow-x: hidden;
-    max-width: 100vw;
-  }
-
-  html {
-    -webkit-text-size-adjust: 100%;
-    /* Sticky header height so in-page anchors are not hidden behind it. */
-    scroll-padding-top: 6.5rem;
   }
 
   h1,

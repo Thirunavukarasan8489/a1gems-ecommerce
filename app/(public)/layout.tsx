@@ -12,7 +12,7 @@ export default function PublicLayout({
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
+      <main className="flex-1 w-full overflow-x-hidden">{children}</main>
       <SiteFooter />
 
       {/* Clears the fixed mobile tab bar so the footer is fully scrollable to. */}
