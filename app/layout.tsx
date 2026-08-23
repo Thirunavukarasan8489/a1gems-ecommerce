@@ -1,8 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Hind, Noto_Sans_Devanagari } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Hind,
+  Noto_Sans_Devanagari,
+} from "next/font/google";
 import { CartProvider } from "@/components/public/cart/cart-provider";
 import AuthProvider from "@/components/shared/AuthProvider";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 // Display face for headings — tall, engraved-catalogue serif.
@@ -82,7 +86,11 @@ export const viewport: Viewport = {
 
 import { GoogleAnalytics } from "@/components/shared/analytics";
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en-IN"
