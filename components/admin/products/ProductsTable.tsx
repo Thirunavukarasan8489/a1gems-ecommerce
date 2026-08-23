@@ -5,6 +5,7 @@ import StatusBadge from '@/components/admin/ui/StatusBadge';
 import { Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { deleteProduct } from '@/lib/actions/product.actions';
+import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type ProductRow = {
   _id: string;
@@ -88,15 +89,11 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
           >
             <Edit size={16} />
           </Link>
-          <form action={async () => { await deleteProduct(item._id); }}>
-            <button
-              type="submit"
-              className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-              title="Delete product"
-            >
-              <Trash2 size={16} />
-            </button>
-          </form>
+          <DeleteConfirmButton 
+            entityId={item._id} 
+            entityName={item.name} 
+            deleteAction={deleteProduct} 
+          />
         </div>
       ),
     },

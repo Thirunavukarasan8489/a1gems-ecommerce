@@ -19,9 +19,10 @@ interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
   title?: string;
+  selectable?: boolean;
 }
 
-export default function DataTable<T>({ columns, data, title = "Data" }: DataTableProps<T>) {
+export default function DataTable<T>({ columns, data, title = "Data", selectable = false }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
 
@@ -85,9 +86,11 @@ export default function DataTable<T>({ columns, data, title = "Data" }: DataTabl
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-              <th className="px-5 py-3 w-12">
-                <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700" />
-              </th>
+              {selectable && (
+                <th className="px-5 py-3 w-12">
+                  <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700" />
+                </th>
+              )}
               {columns.map((col, i) => (
                 <th key={i} className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {col.header}
@@ -105,9 +108,11 @@ export default function DataTable<T>({ columns, data, title = "Data" }: DataTabl
             ) : (
               data.map((row, i) => (
                 <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                  <td className="px-5 py-4 whitespace-nowrap">
-                    <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700" />
-                  </td>
+                  {selectable && (
+                    <td className="px-5 py-4 whitespace-nowrap">
+                      <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700" />
+                    </td>
+                  )}
                   {columns.map((col, j) => (
                     <td key={j} className="px-5 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
                       {col.cell ? col.cell(row) : col.accessorKey ? String(row[col.accessorKey]) : null}

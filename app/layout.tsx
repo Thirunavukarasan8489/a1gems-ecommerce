@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Hind, Noto_Sans_Devanagari } from "next/font/google";
 import { CartProvider } from "@/components/public/cart/cart-provider";
 import AuthProvider from "@/components/shared/AuthProvider";
+import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 
 // Display face for headings — tall, engraved-catalogue serif.
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthProvider>
           <CartProvider>{children}</CartProvider>
         </AuthProvider>
+        <Toaster position="top-right" />
       </body>
     </html>
   );

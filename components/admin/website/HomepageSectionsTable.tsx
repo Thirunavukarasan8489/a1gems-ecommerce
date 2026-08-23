@@ -2,8 +2,10 @@
 
 import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import Link from 'next/link';
+import { deleteSection } from '@/lib/actions/website.actions';
+import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type HomepageSectionRow = {
   _id: string;
@@ -61,13 +63,11 @@ export default function HomepageSectionsTable({ sections }: { sections: Homepage
           >
             <Edit size={16} />
           </Link>
-          <button
-            type="button"
-            className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-            title="Delete section"
-          >
-            <Trash2 size={16} />
-          </button>
+          <DeleteConfirmButton 
+            entityId={item._id} 
+            entityName={item.name} 
+            deleteAction={deleteSection} 
+          />
         </div>
       ),
     },

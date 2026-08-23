@@ -2,8 +2,10 @@
 
 import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import Link from 'next/link';
+import { deleteGuide } from '@/lib/actions/guide.actions';
+import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type GuideRow = {
   _id: string;
@@ -55,13 +57,11 @@ export default function GuidesTable({ guides }: { guides: GuideRow[] }) {
           >
             <Edit size={16} />
           </Link>
-          <button
-            type="button"
-            className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-            title="Delete guide"
-          >
-            <Trash2 size={16} />
-          </button>
+          <DeleteConfirmButton 
+            entityId={item._id} 
+            entityName={item.title} 
+            deleteAction={deleteGuide} 
+          />
         </div>
       ),
     },

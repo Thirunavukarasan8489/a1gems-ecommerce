@@ -5,15 +5,14 @@ import { useRouter } from 'next/navigation';
 import { createHomepageSection } from '@/lib/actions/cms.actions';
 import { Save, X, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 export default function HomepageSectionForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
-    setError('');
 
     const data = {
       name: formData.get('name'),
@@ -31,12 +30,15 @@ export default function HomepageSectionForm() {
     try {
       const result = await createHomepageSection(data);
       if (result.success) {
-        router.push('/admin/website/homepage');
+        toast.success('Section created successfully');
+        setTimeout(() => {
+          router.push('/admin/website/homepage');
+        }, 1500);
       } else {
-        setError(result.error || 'Failed to create section');
+        toast.error(result.error || 'Failed to create section');
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      toast.error(err.message || 'An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -57,13 +59,7 @@ export default function HomepageSectionForm() {
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg text-sm border border-red-200 dark:border-red-800">
-          {error}
-        </div>
-      )}
-
-      <form action={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 space-y-8">
+      <form action={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden p-6 space-y-8">
         
         {/* Core Info */}
         <div className="space-y-4">

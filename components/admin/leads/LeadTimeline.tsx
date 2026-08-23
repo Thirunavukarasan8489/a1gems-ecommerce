@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Clock, Plus, User } from 'lucide-react';
 import { addLeadNote } from '@/lib/actions/admin-leads';
+import { toast } from 'react-hot-toast';
 
 interface Note {
   _id: string;
@@ -14,21 +15,20 @@ interface Note {
 export default function LeadTimeline({ leadId, notes = [] }: { leadId: string, notes: Note[] }) {
   const [newNote, setNewNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote.trim()) return;
     
     setIsSubmitting(true);
-    setError('');
     
     const result = await addLeadNote(leadId, newNote);
     
     if (result.success) {
+      toast.success('Note added successfully');
       setNewNote('');
     } else {
-      setError(result.error || 'Failed to add note');
+      toast.error(result.error || 'Failed to add note');
     }
     
     setIsSubmitting(false);
@@ -52,7 +52,6 @@ export default function LeadTimeline({ leadId, notes = [] }: { leadId: string, n
             onChange={(e) => setNewNote(e.target.value)}
             className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex justify-end">
             <button 
               type="submit" 

@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { createGuide } from '@/lib/actions/content.actions';
 import { Save, ArrowLeft, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 export default function GuideForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
   const [slug, setSlug] = useState('');
 
   const generateSlug = (title: string) => {
@@ -25,7 +25,6 @@ export default function GuideForm() {
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
-    setError('');
 
     const data = {
       title: formData.get('title'),
@@ -43,12 +42,15 @@ export default function GuideForm() {
     try {
       const result = await createGuide(data);
       if (result.success) {
-        router.push('/admin/content/guides');
+        toast.success('Guide created successfully');
+        setTimeout(() => {
+          router.push('/admin/content/guides');
+        }, 1500);
       } else {
-        setError(result.error || 'Failed to create guide');
+        toast.error(result.error || 'Failed to create guide');
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      toast.error(err.message || 'An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -68,12 +70,6 @@ export default function GuideForm() {
           <p className="text-sm text-slate-500 dark:text-slate-400">Add an educational article to the knowledge base.</p>
         </div>
       </div>
-
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg text-sm border border-red-200 dark:border-red-800">
-          {error}
-        </div>
-      )}
 
       <form action={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 space-y-8">
         

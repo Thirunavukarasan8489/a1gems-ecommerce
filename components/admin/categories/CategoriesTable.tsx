@@ -2,9 +2,10 @@
 
 import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import Link from 'next/link';
 import { deleteCategory } from '@/lib/actions/category.actions';
+import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type CategoryRow = {
   _id: string;
@@ -48,15 +49,11 @@ export default function CategoriesTable({ categories }: { categories: CategoryRo
           >
             <Edit size={16} />
           </Link>
-          <form action={async () => { await deleteCategory(item._id); }}>
-            <button
-              type="submit"
-              className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-              title="Delete category"
-            >
-              <Trash2 size={16} />
-            </button>
-          </form>
+          <DeleteConfirmButton 
+            entityId={item._id} 
+            entityName={item.name} 
+            deleteAction={deleteCategory} 
+          />
         </div>
       ),
     },

@@ -2,6 +2,7 @@
 
 import dbConnect from '@/lib/db';
 import { Category } from '@/lib/models/category';
+import { Product } from '@/lib/models/product';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
@@ -26,10 +27,30 @@ export async function getCategories() {
   }
 }
 
+export async function getCategoryById(id: string) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
+    await dbConnect();
+    const category = await Category.findById(id);
+    if (!category) return { success: false, error: 'Category not found' };
+    return { success: true, data: JSON.parse(JSON.stringify(category)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 export async function createCategory(data: any) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
     await dbConnect();
+    
+    if (!data.name) {
+      return { success: false, error: 'Name is required' };
+    }
+    
+    if (!data.slug && data.name) {
+      data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    }
     
     // Check if slug exists
     const existing = await Category.findOne({ slug: data.slug });
@@ -50,6 +71,14 @@ export async function updateCategory(id: string, data: any) {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
     await dbConnect();
     
+    if (!data.name) {
+      return { success: false, error: 'Name is required' };
+    }
+
+    if (!data.slug && data.name) {
+      data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    }
+    
     const category = await Category.findByIdAndUpdate(id, data, { new: true });
     revalidatePath('/admin/categories');
     return { success: true, data: JSON.parse(JSON.stringify(category)) };
@@ -62,6 +91,15 @@ export async function deleteCategory(id: string) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
     await dbConnect();
+    
+    // Check if any products are using this category
+    const productCount = await Product.countDocuments({ category: id });
+    if (productCount > 0) {
+      return { 
+        success: false, 
+        error: `Cannot delete category: it is currently used by ${productCount} product(s). Please reassign or delete them first.` 
+      };
+    }
     
     await Category.findByIdAndDelete(id);
     revalidatePath('/admin/categories');

@@ -4,36 +4,26 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Save, ArrowLeft, UploadCloud } from 'lucide-react';
-import { createCategory } from '@/lib/actions/category.actions';
+import { createCategory, updateCategory } from '@/lib/actions/category.actions';
 import { uploadMedia } from '@/lib/actions/media.actions';
+import { toast } from 'react-hot-toast';
 
-export default function CategoryForm() {
+export default function CategoryForm({ initialData }: { initialData?: any }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
-    name: '',
-    slug: '',
-    description: '',
-    status: 'ACTIVE',
-    metaTitle: '',
-    metaDescription: '',
-    image: '',
+    name: initialData?.name || '',
+    description: initialData?.description || '',
+    status: initialData?.status || 'ACTIVE',
+    metaTitle: initialData?.metaTitle || '',
+    metaDescription: initialData?.metaDescription || '',
+    image: initialData?.image || '',
   });
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState('');
+  const [imagePreview, setImagePreview] = useState(initialData?.image || '');
 
-  // Auto-generate slug from name
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
-    }));
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -54,7 +44,6 @@ export default function CategoryForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError('');
 
     try {
       let finalImageUrl = formData.image;
@@ -78,15 +67,26 @@ export default function CategoryForm() {
         image: finalImageUrl,
       };
 
-      const result = await createCategory(categoryData);
-      if (result.success) {
-        router.push('/admin/categories');
-      } else {
-        setError(result.error || 'Failed to create category');
+      const savePromise = initialData?._id 
+        ? updateCategory(initialData._id, categoryData) 
+        : createCategory(categoryData);
+
+      toast.promise(savePromise.then((res) => {
+        if (!res.success) throw new Error(res.error);
+        return res;
+      }), {
+        loading: 'Saving...',
+        success: initialData ? 'Category updated successfully' : 'Category created successfully',
+        error: (err) => err.message || 'Failed to save category',
+      }).then(() => {
+        setTimeout(() => {
+          router.push('/admin/categories');
+        }, 1000);
+      }).catch(() => {
         setIsSubmitting(false);
-      }
+      });
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      toast.error(err.message || 'An unexpected error occurred');
       setIsSubmitting(false);
     }
   };
@@ -103,27 +103,24 @@ export default function CategoryForm() {
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Create Category</h1>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
+              {initialData ? 'Edit Category' : 'Create Category'}
+            </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Add a new product category to the catalogue
+              {initialData ? 'Update the category details' : 'Add a new product category to your catalogue'}
             </p>
           </div>
         </div>
+        
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-5 py-2.5 rounded-md text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <Save size={16} />
-          {isSubmitting ? 'Saving...' : 'Save Category'}
+          <Save className="w-4 h-4" />
+          {isSubmitting ? 'Saving...' : initialData ? 'Update Category' : 'Save Category'}
         </button>
       </div>
-
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-sm text-red-700 dark:text-red-400">
-          {error}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Details */}
@@ -140,26 +137,12 @@ export default function CategoryForm() {
                   name="name"
                   required
                   value={formData.name}
-                  onChange={handleNameChange}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                   placeholder="e.g. Ruby Rings"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Slug *
-                </label>
-                <input
-                  type="text"
-                  name="slug"
-                  required
-                  value={formData.slug}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                  placeholder="e.g. ruby-rings"
-                />
-              </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
