@@ -4,7 +4,7 @@ import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
 import { Edit } from 'lucide-react';
 import Link from 'next/link';
-import { deleteSection } from '@/lib/actions/website.actions';
+import { deleteHomepageSection } from '@/lib/actions/cms.actions';
 import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type HomepageSectionRow = {
@@ -66,7 +66,7 @@ export default function HomepageSectionsTable({ sections }: { sections: Homepage
           <DeleteConfirmButton 
             entityId={item._id} 
             entityName={item.name} 
-            deleteAction={deleteSection} 
+            deleteAction={deleteHomepageSection} 
           />
         </div>
       ),

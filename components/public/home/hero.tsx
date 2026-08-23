@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, MessageCircle } from "lucide-react";
-import { buttonStyles } from "@/components/ui/button";
-import { GemImage } from "@/components/ui/gem-image";
-import { OrnamentalBg } from "@/components/ui/ornamental-bg";
+import { buttonStyles } from "@/components/public/ui/button";
+import { GemImage } from "@/components/public/ui/gem-image";
+import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 import { categories } from "@/lib/data/categories";
 import { stats } from "@/lib/data/content";
 import { whatsappLink } from "@/lib/data/nav";

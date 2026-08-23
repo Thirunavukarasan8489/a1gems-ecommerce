@@ -4,7 +4,7 @@ import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
 import { Edit } from 'lucide-react';
 import Link from 'next/link';
-import { deleteGuide } from '@/lib/actions/guide.actions';
+import { deleteGuide } from '@/lib/actions/content.actions';
 import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type GuideRow = {

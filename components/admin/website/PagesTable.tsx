@@ -4,7 +4,7 @@ import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
 import { Edit } from 'lucide-react';
 import Link from 'next/link';
-import { deletePage } from '@/lib/actions/website.actions';
+import { deleteContentPage } from '@/lib/actions/content.actions';
 import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
 type ContentPageRow = {
@@ -59,7 +59,7 @@ export default function PagesTable({ pages }: { pages: ContentPageRow[] }) {
           <DeleteConfirmButton 
             entityId={item._id} 
             entityName={item.title} 
-            deleteAction={deletePage} 
+            deleteAction={deleteContentPage} 
           />
         </div>
       ),
