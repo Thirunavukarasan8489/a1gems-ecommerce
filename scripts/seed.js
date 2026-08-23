@@ -2,16 +2,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+// Load environment variables if available
 const { loadEnvConfig } = require('@next/env');
 loadEnvConfig(process.cwd());
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  console.error("Error: MONGODB_URI environment variable is missing in .env.local");
-  process.exit(1);
-}
-
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/a1gems';
+console.log(MONGODB_URI)
 // Fallback schema if User model doesn't exist yet
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },

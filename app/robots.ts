@@ -1,12 +1,12 @@
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/admin/', '/api/'],
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/admin/", "/api/"],
     },
-    sitemap: 'https://a1gems.in/sitemap.xml',
+    sitemap: "https://a1gems-ecommerce.vercel.app//sitemap.xml",
   };
 }
