@@ -1,6 +1,7 @@
 import { getLeads } from '@/lib/actions/admin-leads';
 import LeadsTableClient from '@/components/admin/leads/LeadsTableClient';
 import { LeadType } from '@/lib/types';
+import { AdminButton } from '@/components/admin/ui/AdminButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +16,9 @@ export default async function LeadsPage() {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Lead Management</h1>
           <p className="text-sm text-slate-500 mt-1">Manage and track customer enquiries</p>
         </div>
-        <button className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-md text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors">
+        <AdminButton variant="secondary">
           Add Lead
-        </button>
+        </AdminButton>
       </div>
 
       {result.success === false && (

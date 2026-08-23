@@ -74,10 +74,10 @@ export async function updateCategory(id: string, data: any) {
     if (!data.name) {
       return { success: false, error: 'Name is required' };
     }
-
-    if (!data.slug && data.name) {
-      data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    }
+    
+    // We don't want to accidentally overwrite an existing slug on update
+    // If we wanted to, we would check if the name changed, but it's safer
+    // to leave the slug alone unless explicitly requested.
     
     const category = await Category.findByIdAndUpdate(id, data, { new: true });
     revalidatePath('/admin/categories');

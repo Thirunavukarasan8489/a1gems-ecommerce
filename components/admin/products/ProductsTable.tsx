@@ -12,10 +12,11 @@ type ProductRow = {
   name: string;
   slug: string;
   category?: { name: string } | null;
-  pricing?: { sellingPrice?: number };
-  inventory?: { stockQuantity?: number; stockStatus?: string };
+  basePrice?: number;
+  stockQuantity?: number;
+  stockStatus?: string;
   status?: string;
-  images?: { primary?: string };
+  primaryImage?: { url: string; altText?: string };
 };
 
 export default function ProductsTable({ products }: { products: ProductRow[] }) {
@@ -25,9 +26,9 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
       cell: (item: ProductRow) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
-            {item.images?.primary ? (
+            {item.primaryImage?.url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.images.primary} alt={item.name} className="w-full h-full object-cover" />
+              <img src={item.primaryImage.url} alt={item.primaryImage.altText || item.name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No img</div>
             )}
@@ -49,8 +50,8 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
       header: 'Price',
       cell: (item: ProductRow) => (
         <span className="font-medium text-slate-700 dark:text-slate-300">
-          {item.pricing?.sellingPrice != null
-            ? `₹${item.pricing.sellingPrice.toLocaleString('en-IN')}`
+          {item.basePrice != null
+            ? `₹${item.basePrice.toLocaleString('en-IN')}`
             : '—'}
         </span>
       ),
@@ -58,7 +59,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
     {
       header: 'Stock',
       cell: (item: ProductRow) => {
-        const qty = item.inventory?.stockQuantity ?? 0;
+        const qty = item.stockQuantity ?? 0;
         return (
           <span className={qty < 5 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-slate-700 dark:text-slate-300'}>
             {qty}
@@ -69,7 +70,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
     {
       header: 'Status',
       cell: (item: ProductRow) => {
-        const stockStatus = item.inventory?.stockStatus ?? 'IN_STOCK';
+        const stockStatus = item.stockStatus ?? 'IN_STOCK';
         const status = item.status ?? 'ACTIVE';
         let label = 'Active';
         let variant: 'success' | 'warning' | 'danger' | 'neutral' = 'success';

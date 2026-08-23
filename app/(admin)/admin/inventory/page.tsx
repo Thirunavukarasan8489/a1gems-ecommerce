@@ -338,7 +338,7 @@ export default function InventoryPage() {
                     onClick={() => setAdjustType('ADD')}
                     className={`py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-1.5 transition-all ${
                       adjustType === 'ADD'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        ? 'bg-green-50 text-green-700 border-green-600 dark:bg-green-900/30 dark:text-green-300'
                         : 'border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-50'
                     }`}
                   >

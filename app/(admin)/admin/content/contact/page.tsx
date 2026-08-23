@@ -45,7 +45,7 @@ export default function ContactContentPage() {
       </div>
 
       {savedSuccess && (
-        <div className="p-4 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium">
+        <div className="p-4 bg-green-50 text-green-700 border border-green-200 rounded-xl text-sm font-medium">
           Contact details updated successfully!
         </div>
       )}

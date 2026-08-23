@@ -158,7 +158,7 @@ export default async function AdminDashboard() {
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">Monthly revenue trajectory (INR)</p>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 rounded-full">
+            <span className="text-xs font-semibold px-2.5 py-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 rounded-full">
               +18.4% YoY
             </span>
           </div>

@@ -47,9 +47,14 @@ const ProductSchema = new mongoose.Schema(
     certification: { type: String },
     
     // Images
-    primaryImage: { type: String }, // Cloudinary URL
-    gallery: [{ type: String }],
-    altText: { type: String },
+    primaryImage: { 
+      url: { type: String },
+      altText: { type: String }
+    }, // Cloudinary URL + Alt Text
+    gallery: [{ 
+      url: { type: String },
+      altText: { type: String }
+    }],
     
     // SEO
     metaTitle: { type: String },

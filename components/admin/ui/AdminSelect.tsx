@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import Select, { Props as SelectProps, GroupBase } from 'react-select';
 
 export interface AdminSelectOption {
@@ -30,6 +30,8 @@ export function AdminSelect<
   className,
   ...props
 }: AdminSelectCustomProps<Option, IsMulti, Group>) {
+  const id = useId();
+
   return (
     <div className="w-full space-y-1.5">
       {label && (
@@ -38,6 +40,7 @@ export function AdminSelect<
         </label>
       )}
       <Select
+        instanceId={props.instanceId || props.name || id}
         unstyled
         className={`w-full ${className || ''}`}
         classNames={{
