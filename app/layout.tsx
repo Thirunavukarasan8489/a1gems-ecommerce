@@ -36,7 +36,7 @@ const notoDevanagari = Noto_Sans_Devanagari({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://a1gems.in"),
+  metadataBase: new URL("https://a1gems-ecommerce.vercel.app/"),
   title: {
     default: "A1 Gems — Certified Natural Gemstones",
     template: "%s · A1 Gems",
