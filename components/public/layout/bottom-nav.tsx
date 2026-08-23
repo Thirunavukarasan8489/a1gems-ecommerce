@@ -15,9 +15,8 @@ const tabs = [
 ];
 
 /**
- * Thumb-reachable primary navigation. Most of this store's traffic is mobile,
- * so the five highest-intent destinations live at the bottom of the screen
- * rather than behind the hamburger.
+ * Thumb-reachable primary floating navigation dock.
+ * Built with luxury glassmorphism, animated active pill indicator, and spring transitions.
  */
 export function BottomNav() {
   const pathname = usePathname();
@@ -25,49 +24,90 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label="Primary"
-      className="safe-b fixed inset-x-0 bottom-0 z-50 border-t border-ivory-300 bg-ivory-50/92 backdrop-blur-md lg:hidden"
+      aria-label="Primary Mobile Navigation"
+      className="safe-b fixed bottom-3.5 inset-x-3 z-50 max-w-md mx-auto sm:inset-x-6 lg:hidden"
     >
-      <ul className="grid grid-cols-5">
-        {tabs.map(({ href, label, icon: Icon, exact }) => {
-          const active = exact
-            ? pathname === href
-            : pathname === href || pathname.startsWith(`${href}/`);
+      <div className="relative rounded-full border border-gold-500/30 bg-plum-950/92 p-1.5 shadow-[0_10px_35px_-5px_rgba(19,11,27,0.75)] backdrop-blur-xl ring-1 ring-white/10">
+        {/* Ambient Subtle Gold Glow Ring */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-0.5 rounded-full bg-gradient-to-r from-gold-500/20 via-gold-400/30 to-gold-600/20 opacity-75 blur-sm"
+        />
 
-          return (
-            <li key={href}>
-              <Link
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "relative flex h-16 flex-col items-center justify-center gap-1 text-[0.625rem] font-semibold tracking-wide transition-colors",
-                  active ? "text-plum-950" : "text-plum-500",
-                )}
-              >
-                <span className="relative">
-                  <Icon
-                    size={21}
-                    strokeWidth={active ? 2.4 : 1.9}
-                    className={active ? "text-gold-600" : undefined}
-                  />
-                  {href === "/cart" && hydrated && count > 0 && (
-                    <span className="absolute -top-1.5 -right-2 grid min-w-4 place-items-center rounded-full bg-gold-500 px-1 text-[0.5625rem] font-bold text-plum-950 tabular-nums">
-                      {count > 9 ? "9+" : count}
-                    </span>
+        <ul className="relative grid grid-cols-5 items-center">
+          {tabs.map(({ href, label, icon: Icon, exact }) => {
+            const active = exact
+              ? pathname === href
+              : pathname === href || pathname.startsWith(`${href}/`);
+
+            return (
+              <li key={href} className="relative">
+                <Link
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "group relative flex flex-col items-center justify-center rounded-full py-2 px-1 text-[0.625rem] font-medium tracking-wide transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-95",
+                    active
+                      ? "text-plum-950 font-bold"
+                      : "text-plum-200 hover:text-gold-200"
                   )}
-                </span>
-                {label}
-                {active && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-gold-500"
-                  />
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                >
+                  {/* Animated Active Pill Background */}
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 shadow-[0_2px_14px_rgba(201,154,38,0.55)] transition-all duration-300 animate-[rise_0.25s_ease-out_both]"
+                    />
+                  )}
+
+                  <span className="relative z-10 flex flex-col items-center gap-0.5">
+                    <span className="relative">
+                      <Icon
+                        size={19}
+                        strokeWidth={active ? 2.5 : 1.9}
+                        className={cn(
+                          "transition-transform duration-300",
+                          active
+                            ? "scale-110 -translate-y-0.5 text-plum-950"
+                            : "group-hover:scale-110 group-hover:text-gold-300 text-plum-200"
+                        )}
+                      />
+                      {href === "/cart" && hydrated && count > 0 && (
+                        <span
+                          className={cn(
+                            "absolute -top-1.5 -right-2.5 grid min-w-4.5 h-4.5 place-items-center rounded-full px-1 text-[0.5625rem] font-bold tabular-nums shadow-sm transition-all duration-300",
+                            active
+                              ? "bg-plum-950 text-gold-300 ring-1 ring-gold-400"
+                              : "bg-gold-400 text-plum-950 ring-2 ring-plum-950 animate-pulse"
+                          )}
+                        >
+                          {count > 9 ? "9+" : count}
+                        </span>
+                      )}
+                    </span>
+                    <span
+                      className={cn(
+                        "leading-none transition-colors duration-200",
+                        active ? "text-plum-950" : "text-plum-200"
+                      )}
+                    >
+                      {label}
+                    </span>
+                  </span>
+
+                  {/* Active Indicator Accent Dot */}
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-1 size-1 rounded-full bg-plum-950 shadow-[0_0_6px_#130b1b]"
+                    />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 }
