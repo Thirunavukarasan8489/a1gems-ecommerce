@@ -1,3 +1,5 @@
+import { AdminButton } from '@/components/admin/ui/AdminButton';
+
 export default function WebsiteCMSPage() {
   const sections = [
     { id: '1', type: 'HERO', enabled: true, order: 1 },
@@ -10,7 +12,7 @@ export default function WebsiteCMSPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">Homepage CMS</h1>
-        <button className="px-4 py-2 bg-slate-900 text-white rounded-md text-sm">Save Changes</button>
+        <AdminButton>Save Changes</AdminButton>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg p-6">
@@ -38,7 +40,7 @@ export default function WebsiteCMSPage() {
                   <input type="checkbox" defaultChecked={section.enabled} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
                   <span className="text-sm text-slate-600">Enabled</span>
                 </label>
-                <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit Config</button>
+                <AdminButton variant="ghost" size="sm">Edit Config</AdminButton>
               </div>
             </div>
           ))}

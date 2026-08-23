@@ -12,15 +12,20 @@ import { cn } from "@/lib/utils";
 export function ProductGallery({
   color,
   count,
+  images,
   name,
 }: {
   color: string;
-  count: number;
+  count?: number;
+  images?: { url: string; altText?: string }[];
   name: string;
 }) {
   const [active, setActive] = React.useState(0);
   const trackRef = React.useRef<HTMLUListElement>(null);
-  const slides = Array.from({ length: Math.max(1, count) }, (_, i) => i);
+  
+  const hasImages = images && images.length > 0;
+  const numSlides = hasImages ? images.length : Math.max(1, count || 1);
+  const slides = Array.from({ length: numSlides }, (_, i) => i);
 
   React.useEffect(() => {
     const track = trackRef.current;
@@ -64,11 +69,20 @@ export function ProductGallery({
             data-index={i}
             className="w-full shrink-0 snap-center px-4 sm:px-0"
           >
-            <GemImage
-              color={color}
-              seed={i * 7 + 3}
-              className="aspect-square w-full sm:rounded-2xl"
-            />
+            {hasImages ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={images[i].url}
+                alt={images[i].altText || `${name} — view ${i + 1} of ${slides.length}`}
+                className="aspect-square w-full sm:rounded-2xl object-cover"
+              />
+            ) : (
+              <GemImage
+                color={color}
+                seed={i * 7 + 3}
+                className="aspect-square w-full sm:rounded-2xl"
+              />
+            )}
             <span className="sr-only">
               {name} — view {i + 1} of {slides.length}
             </span>

@@ -24,7 +24,7 @@ import Image from 'next/image';
 import { AdminButton } from '@/components/admin/ui/AdminButton';
 import { AdminInput } from '@/components/admin/ui/AdminInput';
 import { AdminSelect } from '@/components/admin/ui/AdminSelect';
-import { createProduct } from '@/lib/actions/product.actions';
+import { updateProduct, getProductById } from '@/lib/actions/product.actions';
 import { getCategories } from '@/lib/actions/category.actions';
 import { uploadMedia } from '@/lib/actions/media.actions';
 import { toast } from 'react-hot-toast';
@@ -79,7 +79,7 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-export default function CreateProductPage() {
+export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('basic');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -88,6 +88,7 @@ export default function CreateProductPage() {
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [coverFile, setCoverFile] = useState<{ file: File; previewUrl: string } | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<{ file: File; previewUrl: string; id: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {
     register,
@@ -95,6 +96,7 @@ export default function CreateProductPage() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     trigger,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
@@ -136,12 +138,44 @@ export default function CreateProductPage() {
   const gallery = useWatch({ control, name: 'gallery' }) || [];
 
   useEffect(() => {
-    getCategories().then(res => {
-      if (res.success && res.data) {
-        setCategories(res.data.map((c: any) => ({ label: c.name, value: c._id })));
+    Promise.all([
+      getCategories(),
+      getProductById(params.id)
+    ]).then(([catRes, prodRes]) => {
+      if (catRes.success && catRes.data) {
+        setCategories(catRes.data.map((c: any) => ({ label: c.name, value: c._id })));
       }
+      if (prodRes.success && prodRes.data) {
+        const prod = prodRes.data;
+        reset({
+          name: prod.name,
+          categoryId: prod.category?._id || prod.category || '',
+          shortDescription: prod.shortDescription || '',
+          description: prod.description || '',
+          basePrice: prod.basePrice || 0,
+          baseSku: prod.baseSku || '',
+          stockQuantity: prod.stockQuantity || 0,
+          lowStockThreshold: prod.lowStockThreshold || 5,
+          hasVariants: prod.hasVariants || false,
+          variants: prod.variants || [],
+          purchaseType: prod.purchaseType || 'BUY_ENQUIRE',
+          whatsappEnabled: prod.whatsappEnabled || false,
+          material: prod.material || '',
+          stone: prod.stone || '',
+          size: prod.size || '',
+          weight: prod.weight || '',
+          origin: prod.origin || '',
+          certification: prod.certification || '',
+          primaryImage: prod.primaryImage || { url: '', altText: '' },
+          gallery: prod.gallery || [],
+          metaTitle: prod.metaTitle || '',
+          metaDescription: prod.metaDescription || '',
+          status: prod.status || 'ACTIVE',
+        });
+      }
+      setIsLoading(false);
     });
-  }, []);
+  }, [params.id, reset]);
 
   // Handle Cover Image Selection
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,10 +254,10 @@ export default function CreateProductPage() {
       }
 
       const finalData = { ...data, primaryImage: finalPrimaryImage, gallery: finalGallery };
-      const res = await createProduct(finalData);
+      const res = await updateProduct(params.id, finalData);
       
       if (!res.success) {
-        throw new Error(res.error || 'Failed to create product');
+        throw new Error(res.error || 'Failed to update product');
       }
       return res;
     };
@@ -232,8 +266,8 @@ export default function CreateProductPage() {
       uploadAndSubmit(),
       {
         loading: 'Uploading media and saving product...',
-        success: 'Product created successfully!',
-        error: (err) => err.message || 'Failed to create product.',
+        success: 'Product updated successfully!',
+        error: (err) => err.message || 'Failed to update product.',
       }
     ).then(() => {
       setTimeout(() => {
@@ -294,6 +328,14 @@ export default function CreateProductPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-16">
       
@@ -309,7 +351,7 @@ export default function CreateProductPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <Package className="w-6 h-6 text-blue-600" />
-              Create Product
+              Edit Product
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Unique slug is automatically generated in the backend from product title.
@@ -323,7 +365,7 @@ export default function CreateProductPage() {
           {currentTabIndex === tabs.length - 1 && (
             <AdminButton onClick={handleSubmit(onSubmit as any)} isLoading={isSubmitting} className="gap-2">
               <Save size={18} />
-              Publish Product
+              Save Changes
             </AdminButton>
           )}
         </div>
@@ -778,7 +820,7 @@ export default function CreateProductPage() {
               ) : (
                 <AdminButton onClick={handleSubmit(onSubmit as any)} isLoading={isSubmitting} className="gap-2">
                   <Save size={18} />
-                  Publish Product
+                  Save Changes
                 </AdminButton>
               )}
             </div>

@@ -2,6 +2,8 @@
 
 import dbConnect from '@/lib/db';
 import { Product } from '@/lib/models/product';
+import { Lead } from '@/lib/models/lead';
+import { Order } from '@/lib/models/order';
 import { getSession } from '@/lib/auth';
 import { logAuditAction } from '@/lib/actions/audit';
 import { revalidatePath } from 'next/cache';
@@ -176,6 +178,17 @@ export async function deleteProduct(id: string) {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
     await dbConnect();
     
+    // Check references
+    const orderCount = await Order.countDocuments({ 'items.productId': id });
+    if (orderCount > 0) {
+      throw new Error(`Cannot delete: Product is referenced in ${orderCount} order(s).`);
+    }
+
+    const leadCount = await Lead.countDocuments({ product: id });
+    if (leadCount > 0) {
+      throw new Error(`Cannot delete: Product is referenced in ${leadCount} lead(s).`);
+    }
+
     await Product.findByIdAndDelete(id);
     
     await logAuditAction({

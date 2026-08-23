@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { UserCog, Plus, Trash2, Shield, Lock, Mail, User as UserIcon, Check, X } from 'lucide-react';
+import { UserCog, Plus, Trash2, Shield, Lock, Mail, User as UserIcon, Check, X, Edit } from 'lucide-react';
 import { AdminButton } from '@/components/admin/ui/AdminButton';
 import { AdminInput } from '@/components/admin/ui/AdminInput';
+import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 import { getAdminUsers, createAdminUser, deleteAdminUser, updateAdminUser } from '@/lib/actions/user.actions';
 
 const SCREEN_PERMISSIONS = [
@@ -90,13 +91,13 @@ export default function AdminUsersPage() {
     setSubmitting(false);
   };
 
-  const handleDeleteUser = async (id: string, userName: string) => {
-    if (!confirm(`Are you sure you want to remove admin access for ${userName}?`)) return;
+  const handleDeleteUser = async (id: string) => {
     const res = await deleteAdminUser(id);
     if (res.success) {
       setUsers(users.filter(u => u._id !== id));
+      return { success: true };
     } else {
-      alert(res.error || 'Failed to delete user');
+      return { success: false, error: res.error || 'Failed to delete user' };
     }
   };
 
@@ -165,7 +166,7 @@ export default function AdminUsersPage() {
                           ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'
                           : u.role === 'CONTENT_MANAGER'
                           ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                          : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                       }`}>
                         {u.role.replace('_', ' ')}
                       </span>
@@ -188,18 +189,16 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Active
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400">
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span> Active
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => handleDeleteUser(u._id, u.name)}
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                        title="Delete User"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <DeleteConfirmButton
+                        entityId={u._id}
+                        entityName={u.name}
+                        deleteAction={handleDeleteUser}
+                      />
                     </td>
                   </tr>
                 ))
