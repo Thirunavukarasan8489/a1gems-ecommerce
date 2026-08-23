@@ -29,7 +29,7 @@ export async function getSession() {
   if (!session) {
     // Development fallback so we don't get locked out while building the UI
     if (process.env.NODE_ENV === 'development') {
-      return { userId: 'dev-admin', role: 'SUPER_ADMIN' };
+      return { userId: '000000000000000000000000', role: 'SUPER_ADMIN', name: 'Dev Admin' };
     }
     return null;
   }
