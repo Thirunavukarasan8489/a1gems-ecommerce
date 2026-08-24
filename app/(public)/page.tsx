@@ -47,7 +47,7 @@ export default function HomePage() {
       <FeaturedCategories />
       <RashiFinder />
 
-      <section className="shell gutter pb-12 sm:pb-16 lg:pb-20">
+      <section className="shell gutter py-12 sm:py-16 lg:py-20">
         <SectionHeading
           eyebrow="Handpicked"
           title="Featured this month"

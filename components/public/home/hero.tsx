@@ -20,8 +20,7 @@ export function Hero() {
           <p className="inline-flex items-center gap-2 rounded-full border border-gold-500/30 bg-gold-500/10 px-3.5 py-1.5 text-[0.6875rem] font-semibold tracking-[0.14em] uppercase">
             <BadgeCheck size={14} className="text-gold-400" />
             <span className="text-foil">
-              GIA · IGI · GRS · SSEF{" "}
-              <span className="font-devanagari">प्रमाणित</span>
+              GIA · IGI · GRS · SSEF
             </span>
           </p>
 

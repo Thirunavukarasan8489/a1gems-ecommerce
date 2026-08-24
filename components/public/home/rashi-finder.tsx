@@ -83,9 +83,7 @@ export function RashiFinder() {
               {/* <p className="font-devanagari text-xl leading-none">
                 {rashi.devanagari}
               </p> */}
-              <p className="text-xl leading-none">
-                {rashi.transliteration}
-              </p>
+              <p className="text-xl leading-none">{rashi.transliteration}</p>
               <p className="mt-1.5 text-sm text-plum-300">
                 {rashi.english} · {rashi.dateRange}
               </p>
