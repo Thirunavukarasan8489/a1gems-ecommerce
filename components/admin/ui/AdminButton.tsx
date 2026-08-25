@@ -9,14 +9,14 @@ export interface AdminButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
 const AdminButton = React.forwardRef<HTMLButtonElement, AdminButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', isLoading = false, children, disabled, ...props }, ref) => {
     
-    const baseStyles = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50"
+    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]"
     
     const variants = {
-      primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
-      secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700",
-      danger: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
-      ghost: "hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50",
-      outline: "border border-slate-200 bg-transparent hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800",
+      primary: "bg-plum-900 text-ivory-100 hover:bg-plum-800 shadow-xs border border-plum-950 font-semibold",
+      secondary: "bg-ivory-200 text-plum-900 hover:bg-ivory-300 dark:bg-plum-800 dark:text-ivory-100 dark:hover:bg-plum-700 border border-ivory-300 dark:border-plum-700",
+      danger: "bg-red-600 text-white hover:bg-red-700 shadow-xs",
+      ghost: "hover:bg-ivory-200 hover:text-plum-900 dark:hover:bg-plum-800 dark:hover:text-ivory-100 text-plum-700 dark:text-plum-300",
+      outline: "border border-ivory-300 bg-transparent text-plum-900 hover:bg-ivory-100 dark:border-plum-700 dark:text-ivory-100 dark:hover:bg-plum-800",
     }
     
     const sizes = {

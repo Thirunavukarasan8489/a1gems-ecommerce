@@ -23,11 +23,11 @@ const AdminInput = React.forwardRef<HTMLInputElement, AdminInputProps>(
           )}
           <input
             type={type}
-            className={`block w-full rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 sm:text-sm transition-colors
+            className={`block w-full rounded-lg bg-white dark:bg-plum-950 text-plum-900 dark:text-ivory-100 placeholder-plum-400 focus:outline-none focus:ring-2 sm:text-sm transition-colors
               ${icon ? 'pl-10' : 'pl-3'} pr-3 py-2.5 
               ${error 
                 ? 'border border-red-500 focus:ring-red-500 focus:border-red-500' 
-                : 'border border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
+                : 'border border-ivory-300 dark:border-plum-700 focus:ring-gold-500 focus:border-gold-500'
               } 
               ${className}
             `}

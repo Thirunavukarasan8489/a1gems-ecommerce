@@ -106,20 +106,20 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIs
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden" 
+          className="fixed inset-0 bg-plum-950/60 backdrop-blur-xs z-40 md:hidden" 
           onClick={() => setIsOpen && setIsOpen(false)}
         />
       )}
       
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col h-full overflow-y-auto transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex items-center justify-center">
-          <h1 className="text-xl font-bold text-slate-800 dark:text-white">A1 GEMS <span className="text-sm font-normal text-slate-500">Admin</span></h1>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-plum-950 text-ivory-100 flex flex-col h-full overflow-y-auto transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-4 border-b border-plum-900/60 flex items-center justify-center">
+          <h1 className="text-xl font-display font-bold text-ivory-100 tracking-wider">A1 GEMS <span className="text-xs font-sans font-semibold text-gold-400 uppercase tracking-widest ml-1 bg-gold-500/10 px-2 py-0.5 rounded-full border border-gold-500/20">Admin</span></h1>
         </div>
 
         <nav className="flex-1 p-4 space-y-6">
           {sidebarGroups.map((group) => (
           <div key={group.title}>
-            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            <h2 className="text-[0.65rem] font-semibold text-gold-500/70 uppercase tracking-[0.14em] mb-2">
               {group.title}
             </h2>
             <ul className="space-y-1">
@@ -131,13 +131,13 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIs
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
                         isActive
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 font-medium'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                          ? 'bg-gold-500/15 text-gold-300 font-semibold border-l-2 border-gold-400 ring-1 ring-gold-400/20'
+                          : 'text-plum-200 hover:bg-plum-900/60 hover:text-gold-200'
                       }`}
                     >
-                      <Icon size={18} className={isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'} />
+                      <Icon size={18} className={isActive ? 'text-gold-400' : 'text-plum-300/70'} />
                       {item.name}
                     </Link>
                   </li>

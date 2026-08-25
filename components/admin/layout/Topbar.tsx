@@ -32,24 +32,24 @@ export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
   };
 
   return (
-    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-6 shadow-sm z-10">
+    <header className="h-16 bg-white/95 dark:bg-plum-900/95 border-b border-ivory-300 dark:border-plum-800 flex items-center justify-between px-4 md:px-6 shadow-xs backdrop-blur-md z-10">
       
       {/* Left side: Search & Mobile Menu */}
       <div className="flex-1 flex items-center gap-2">
         <button 
           onClick={onMenuClick}
-          className="md:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
+          className="md:hidden p-2 -ml-2 text-plum-700 dark:text-plum-200 hover:bg-ivory-200 dark:hover:bg-plum-800 rounded-lg transition-colors"
         >
           <Menu size={24} />
         </button>
         <div className="relative w-full max-w-xs hidden sm:block">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search size={18} className="text-slate-400" />
+            <Search size={18} className="text-plum-400 dark:text-plum-400" />
           </span>
           <input
             type="text"
             placeholder="Search (CMD+K)"
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-200 transition-colors"
+            className="w-full pl-10 pr-4 py-2 bg-ivory-100 dark:bg-plum-950 border border-ivory-300 dark:border-plum-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/50 text-plum-900 dark:text-ivory-100 placeholder-plum-400 transition-colors"
           />
         </div>
       </div>
@@ -58,40 +58,40 @@ export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
       <div className="flex items-center gap-4">
         
 
-        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+        <div className="h-6 w-px bg-ivory-300 dark:bg-plum-800 mx-1"></div>
 
         {/* Theme Toggle */}
         <button 
           onClick={toggleDark}
-          className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+          className="p-2 text-plum-600 dark:text-plum-300 hover:bg-ivory-200 dark:hover:bg-plum-800 rounded-full transition-colors"
         >
           {isDark ? <Sun size={20} /> : <Moon size={20} />}
         </button>
 
         {/* Notifications */}
-        <button className="relative p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+        <button className="relative p-2 text-plum-600 dark:text-plum-300 hover:bg-ivory-200 dark:hover:bg-plum-800 rounded-full transition-colors">
           <Bell size={20} />
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-gold-500 border-2 border-white dark:border-plum-900 rounded-full"></span>
         </button>
 
         {/* Profile */}
         <div className="relative" ref={profileRef}>
           <button 
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full pr-3 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+            className="flex items-center gap-2 p-1 hover:bg-ivory-200 dark:hover:bg-plum-800 rounded-full pr-3 transition-colors border border-transparent hover:border-ivory-300 dark:hover:border-plum-700"
           >
-            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300">
+            <div className="w-8 h-8 bg-gold-500/15 dark:bg-gold-500/20 rounded-full flex items-center justify-center text-gold-600 dark:text-gold-300 border border-gold-500/30">
               <UserIcon size={16} />
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-none">
+              <p className="text-sm font-medium text-plum-900 dark:text-ivory-100 leading-none">
                 {session?.user?.name || 'Admin User'}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 capitalize">
+              <p className="text-xs text-gold-700 dark:text-gold-400 mt-1 capitalize font-semibold">
                 {((session as any)?.role as string)?.replace('_', ' ').toLowerCase() || 'Super Admin'}
               </p>
             </div>
-            <ChevronDown size={14} className="text-slate-400 hidden md:block" />
+            <ChevronDown size={14} className="text-plum-400 hidden md:block" />
           </button>
 
           {/* Dropdown Menu */}
