@@ -140,7 +140,7 @@ export async function createProduct(data: any) {
       action: 'PRODUCT_CREATED',
       entity: 'Product',
       entityId: product._id.toString(),
-      metadata: { name: product.name, sku: product.baseSku, slug: product.slug }
+      metadata: { name: product.name, slug: product.slug }
     });
 
     revalidatePath('/admin/products');
