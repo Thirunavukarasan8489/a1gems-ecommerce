@@ -299,7 +299,7 @@ export default async function ProductDetailPage(
       </div>
 
       {related.length > 0 && (
-        <section className="shell gutter py-12 sm:py-16">
+        <section className="relative w-full max-w-full overflow-hidden shell gutter py-12 sm:py-16">
           <SectionHeading
             eyebrow="You may also like"
             title="Similar stones"

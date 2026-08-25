@@ -58,7 +58,7 @@ export function ProductGallery({
   };
 
   return (
-    <div>
+    <div className="relative w-full max-w-full overflow-hidden">
       <ul
         ref={trackRef}
         className="no-scrollbar -mx-4 flex snap-x snap-mandatory overflow-x-auto sm:mx-0 sm:rounded-2xl"
