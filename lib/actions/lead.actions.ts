@@ -2,6 +2,8 @@
 
 import dbConnect from '@/lib/db';
 import { Lead } from '@/lib/models/lead';
+import { Product } from '@/lib/models/product';
+import { Category } from '@/lib/models/category';
 import { getSession } from '@/lib/auth';
 import { LeadCreateSchema } from '@/lib/validations/lead.schema';
 import { revalidatePath } from 'next/cache';

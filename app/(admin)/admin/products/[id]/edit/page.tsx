@@ -433,7 +433,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
         {/* Form Content Area */}
         <div className="flex-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 lg:p-8">
-          <form id="product-form" className="space-y-6" onSubmit={handleFormSubmit}>
+          <form 
+            id="product-form" 
+            className="space-y-6" 
+            onSubmit={handleFormSubmit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.target as any).tagName === 'INPUT') {
+                e.preventDefault();
+              }
+            }}
+          >
             
             {/* 1. BASIC INFO */}
             <div className={activeTab === 'basic' ? 'space-y-5' : 'hidden'}>
@@ -801,7 +810,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   Next Step
                 </AdminButton>
               ) : (
-                <AdminButton onClick={handleSubmit(onSubmit as any, onInvalid)} isLoading={isSubmitting} className="gap-2">
+                <AdminButton type="submit" isLoading={isSubmitting} className="gap-2">
                   <Save size={18} />
                   Save Changes
                 </AdminButton>

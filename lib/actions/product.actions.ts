@@ -2,6 +2,7 @@
 
 import dbConnect from '@/lib/db';
 import { Product } from '@/lib/models/product';
+import { Category } from '@/lib/models/category';
 import { Lead } from '@/lib/models/lead';
 import { Order } from '@/lib/models/order';
 import { getSession } from '@/lib/auth';
