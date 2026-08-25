@@ -7,6 +7,7 @@ import { Product } from '@/lib/models/product';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
+import { ReturnCreateSchema, ReturnProcessSchema } from '@/lib/validations/return.schema';
 
 // Helper to check auth
 async function checkAuth(allowedRoles: string[]) {
@@ -58,15 +59,22 @@ export async function createReturn(data: {
 }) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+
+    const parsed = ReturnCreateSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
 
     const returnNumber = await generateReturnNumber();
     
     const returnReq = await ReturnRequest.create({
       returnNumber,
-      orderId: data.orderId,
-      items: data.items,
-      reason: data.reason,
+      orderId: validatedData.orderId,
+      items: validatedData.items,
+      reason: validatedData.reason,
       status: 'PENDING_INSPECTION'
     });
 
@@ -81,6 +89,13 @@ export async function createReturn(data: {
 export async function processReturn(id: string, status: string, refundAmount: number, adminNotes?: string) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+
+    const parsed = ReturnProcessSchema.safeParse({ status, refundAmount, adminNotes });
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
 
     const session = await mongoose.startSession();
@@ -91,7 +106,7 @@ export async function processReturn(id: string, status: string, refundAmount: nu
       if (!returnReq) throw new Error('Return request not found');
 
       // If moving to APPROVED or REFUNDED, we must restock the items
-      if (['APPROVED', 'REFUNDED'].includes(status) && returnReq.status === 'PENDING_INSPECTION') {
+      if (['APPROVED', 'REFUNDED'].includes(validatedData.status) && returnReq.status === 'PENDING_INSPECTION') {
         for (const item of returnReq.items) {
           if (!item.productId) continue;
           const product = await Product.findById(item.productId).session(session);
@@ -108,11 +123,20 @@ export async function processReturn(id: string, status: string, refundAmount: nu
         await Order.findByIdAndUpdate(returnReq.orderId, { orderStatus: 'RETURNED' }, { session });
       }
 
-      returnReq.status = status;
-      returnReq.refundAmount = refundAmount;
-      if (adminNotes) returnReq.adminNotes = adminNotes;
-
+      returnReq.status = validatedData.status;
+      returnReq.refundAmount = validatedData.refundAmount;
+      if (validatedData.adminNotes) {
+        returnReq.adminNotes = validatedData.adminNotes;
+      }
+      
       await returnReq.save({ session });
+
+      // If refund is issued, mark order as well
+      if (validatedData.status === 'REFUNDED') {
+        await Order.findByIdAndUpdate(returnReq.orderId, {
+          orderStatus: 'RETURNED'
+        }, { session });
+      }
 
       await session.commitTransaction();
       session.endSession();

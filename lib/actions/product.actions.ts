@@ -44,12 +44,30 @@ export async function generateUniqueProductSlug(name: string, excludeId?: string
   }
 }
 
-export async function getProducts() {
+export async function getProducts(page = 1, limit = 50) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
     await dbConnect();
-    const products = await Product.find().populate('category', 'name').sort({ createdAt: -1 }).lean();
-    return { success: true, data: JSON.parse(JSON.stringify(products)) };
+    const skip = (page - 1) * limit;
+    const products = await Product.find()
+      .populate('category', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select('-__v')
+      .lean();
+    
+    const totalCount = await Product.countDocuments();
+    return { 
+      success: true, 
+      data: JSON.parse(JSON.stringify(products)),
+      pagination: {
+        totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
@@ -90,25 +108,26 @@ export async function createProduct(data: any) {
     };
     delete mappedData.categoryId;
 
-    // If variants enabled, compute aggregate stock and default base price if needed
+    // If variants enabled, format names and compute aggregate stock/status
+    let totalStock = 0;
+    let isLowStock = false;
+
     if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
-      const totalVariantStock = mappedData.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
-      mappedData.stockQuantity = totalVariantStock;
-      
-      if (!mappedData.basePrice || mappedData.basePrice === 0) {
-        mappedData.basePrice = Number(mappedData.variants[0].price) || 0;
-      }
-      if (!mappedData.baseSku || mappedData.baseSku === '') {
-        mappedData.baseSku = mappedData.variants[0].sku || `${slug.substring(0, 8).toUpperCase()}-BASE`;
-      }
+      mappedData.variants = mappedData.variants.map((v: any) => {
+        v.name = `${v.caratApprox || '0'} Carat - ${v.size || 'N/A'}`;
+        const vStock = Number(v.stock) || 0;
+        const vThreshold = Number(v.lowStockThreshold) || 5;
+        totalStock += vStock;
+        if (vStock > 0 && vStock <= vThreshold) {
+          isLowStock = true;
+        }
+        return v;
+      });
     }
 
-    // Determine stockStatus
-    const threshold = Number(mappedData.lowStockThreshold) || 5;
-    const currentStock = Number(mappedData.stockQuantity) || 0;
-    if (currentStock === 0) {
+    if (totalStock === 0) {
       mappedData.stockStatus = 'OUT_OF_STOCK';
-    } else if (currentStock <= threshold) {
+    } else if (isLowStock) {
       mappedData.stockStatus = 'LOW_STOCK';
     } else {
       mappedData.stockStatus = 'IN_STOCK';
@@ -154,22 +173,29 @@ export async function updateProduct(id: string, data: any) {
       mappedData.slug = await generateUniqueProductSlug(mappedData.name, id);
     }
     
-    // If variants enabled, compute aggregate stock
+    // If variants enabled, format names and compute aggregate stock/status
+    let totalStock = 0;
+    let isLowStock = false;
+
     if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
-      mappedData.stockQuantity = mappedData.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      mappedData.variants = mappedData.variants.map((v: any) => {
+        v.name = `${v.caratApprox || '0'} Carat - ${v.size || 'N/A'}`;
+        const vStock = Number(v.stock) || 0;
+        const vThreshold = Number(v.lowStockThreshold) || 5;
+        totalStock += vStock;
+        if (vStock > 0 && vStock <= vThreshold) {
+          isLowStock = true;
+        }
+        return v;
+      });
     }
 
-    // Re-evaluate stockStatus
-    if (mappedData.stockQuantity !== undefined) {
-      const threshold = Number(mappedData.lowStockThreshold) || 5;
-      const currentStock = Number(mappedData.stockQuantity) || 0;
-      if (currentStock === 0) {
-        mappedData.stockStatus = 'OUT_OF_STOCK';
-      } else if (currentStock <= threshold) {
-        mappedData.stockStatus = 'LOW_STOCK';
-      } else {
-        mappedData.stockStatus = 'IN_STOCK';
-      }
+    if (totalStock === 0) {
+      mappedData.stockStatus = 'OUT_OF_STOCK';
+    } else if (isLowStock) {
+      mappedData.stockStatus = 'LOW_STOCK';
+    } else {
+      mappedData.stockStatus = 'IN_STOCK';
     }
 
     // Fetch old product to find orphaned images

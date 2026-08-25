@@ -6,6 +6,7 @@ import { getSession } from '@/lib/auth';
 import { logAuditAction } from '@/lib/actions/audit';
 import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
+import { AdminUserCreateSchema, AdminUserUpdateSchema } from '@/lib/validations/user.schema';
 
 async function checkSuperAdmin() {
   const session = await getSession();
@@ -37,21 +38,28 @@ export async function createAdminUser(data: {
 }) {
   try {
     await checkSuperAdmin();
+
+    const parsed = AdminUserCreateSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
 
-    const existing = await User.findOne({ email: data.email.toLowerCase().trim() });
+    const existing = await User.findOne({ email: validatedData.email.toLowerCase().trim() });
     if (existing) {
       return { success: false, error: 'An admin user with this email already exists' };
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
     const newUser = await User.create({
-      name: data.name.trim(),
-      email: data.email.toLowerCase().trim(),
+      name: validatedData.name.trim(),
+      email: validatedData.email.toLowerCase().trim(),
       password: hashedPassword,
-      role: data.role,
-      screenPermissions: data.screenPermissions || [],
+      role: validatedData.role,
+      screenPermissions: validatedData.screenPermissions || [],
       isActive: true,
     });
 
@@ -91,11 +99,18 @@ export async function updateAdminUser(
 ) {
   try {
     await checkSuperAdmin();
+
+    const parsed = AdminUserUpdateSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
 
-    const updatePayload: any = { ...data };
-    if (data.password) {
-      updatePayload.password = await bcrypt.hash(data.password, 10);
+    const updatePayload: any = { ...validatedData };
+    if (validatedData.password) {
+      updatePayload.password = await bcrypt.hash(validatedData.password, 10);
     }
 
     const updatedUser = await User.findByIdAndUpdate(id, updatePayload, { new: true })

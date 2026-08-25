@@ -6,6 +6,7 @@ import { Order } from '@/lib/models/order';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
+import { PaymentCreateSchema, PaymentUpdateSchema } from '@/lib/validations/payment.schema';
 
 // Helper to check auth
 async function checkAuth(allowedRoles: string[]) {
@@ -25,13 +26,17 @@ const generatePaymentNumber = async () => {
   return `PAY-${new Date().getFullYear()}${(new Date().getMonth() + 1).toString().padStart(2, '0')}-${(count + 1).toString().padStart(4, '0')}`;
 };
 
-export async function getPayments() {
+export async function getPayments(page = 1, limit = 50) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
     await dbConnect();
+    const skip = (page - 1) * limit;
     const payments = await Payment.find()
       .populate('orderId', 'orderNumber customerName total')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
     return { success: true, data: JSON.parse(JSON.stringify(payments)) };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -60,6 +65,13 @@ export async function createPayment(data: {
 }) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    
+    const parsed = PaymentCreateSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
 
     const paymentNumber = await generatePaymentNumber();
@@ -72,16 +84,16 @@ export async function createPayment(data: {
       // Create payment
       const payment = await Payment.create([{
         paymentNumber,
-        orderId: data.orderId,
-        method: data.method,
-        amount: data.amount,
-        transactionId: data.transactionId,
-        notes: data.notes,
+        orderId: validatedData.orderId,
+        method: validatedData.method,
+        amount: validatedData.amount,
+        transactionId: validatedData.transactionId,
+        notes: validatedData.notes,
         status: 'COMPLETED' // Usually manual recording implies it's completed
       }], { session });
 
-      if (data.updateOrderStatus) {
-        await Order.findByIdAndUpdate(data.orderId, {
+      if (validatedData.updateOrderStatus) {
+        await Order.findByIdAndUpdate(validatedData.orderId, {
           paymentStatus: 'CONFIRMED' // Mark parent order as paid
         }, { session });
       }
@@ -105,9 +117,16 @@ export async function createPayment(data: {
 export async function updatePaymentStatus(id: string, status: string, syncOrder: boolean = true) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+
+    const parsed = PaymentUpdateSchema.safeParse({ status });
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedStatus = parsed.data.status;
+
     await dbConnect();
 
-    const updateData: any = { status };
+    const updateData: any = { status: validatedStatus };
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -118,8 +137,8 @@ export async function updatePaymentStatus(id: string, status: string, syncOrder:
 
       if (syncOrder) {
         let orderPaymentStatus = 'PENDING';
-        if (status === 'COMPLETED') orderPaymentStatus = 'CONFIRMED';
-        if (status === 'FAILED') orderPaymentStatus = 'FAILED';
+        if (validatedStatus === 'COMPLETED') orderPaymentStatus = 'CONFIRMED';
+        if (validatedStatus === 'FAILED') orderPaymentStatus = 'FAILED';
         // Note: REFUNDED doesn't exist directly on order.paymentStatus usually, but can be managed.
         if (orderPaymentStatus !== 'PENDING') {
           await Order.findByIdAndUpdate(payment.orderId, { paymentStatus: orderPaymentStatus }, { session });

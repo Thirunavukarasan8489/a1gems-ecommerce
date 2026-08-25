@@ -7,16 +7,18 @@ import Link from 'next/link';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
 
+import Image from 'next/image';
+
 type ProductRow = {
   _id: string;
   name: string;
   slug: string;
   category?: { name: string } | null;
-  basePrice?: number;
   stockQuantity?: number;
   stockStatus?: string;
   status?: string;
   primaryImage?: { url: string; altText?: string };
+  variants?: { price?: number }[];
 };
 
 export default function ProductsTable({ products }: { products: ProductRow[] }) {
@@ -27,8 +29,13 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
             {item.primaryImage?.url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.primaryImage.url} alt={item.primaryImage.altText || item.name} className="w-full h-full object-cover" />
+              <Image 
+                src={item.primaryImage.url} 
+                alt={item.primaryImage.altText || item.name} 
+                width={40} 
+                height={40} 
+                className="w-full h-full object-cover" 
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No img</div>
             )}
@@ -48,13 +55,26 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
     },
     {
       header: 'Price',
-      cell: (item: ProductRow) => (
-        <span className="font-medium text-slate-700 dark:text-slate-300">
-          {item.basePrice != null
-            ? `₹${item.basePrice.toLocaleString('en-IN')}`
-            : '—'}
-        </span>
-      ),
+      cell: (item: ProductRow) => {
+        let priceText = '—';
+        if (item.variants && item.variants.length > 0) {
+          const prices = item.variants.map((v: any) => Number(v.price) || 0).filter(p => p > 0);
+          if (prices.length > 0) {
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            if (minPrice === maxPrice) {
+              priceText = `₹${minPrice.toLocaleString('en-IN')}`;
+            } else {
+              priceText = `₹${minPrice.toLocaleString('en-IN')} - ₹${maxPrice.toLocaleString('en-IN')}`;
+            }
+          }
+        }
+        return (
+          <span className="font-medium text-slate-700 dark:text-slate-300">
+            {priceText}
+          </span>
+        );
+      },
     },
     {
       header: 'Stock',

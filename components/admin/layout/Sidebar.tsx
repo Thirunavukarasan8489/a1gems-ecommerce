@@ -72,7 +72,6 @@ const sidebarGroups = [
     title: 'CONTENT',
     items: [
       { name: 'Gemstone Guides', href: '/admin/content/guides', icon: BookOpen },
-      { name: 'About & Sections', href: '/admin/content', icon: FileText },
       { name: 'Contact Us', href: '/admin/content/contact', icon: PhoneCall },
     ],
   },

@@ -15,16 +15,31 @@ async function checkAuth(allowedRoles: string[]) {
   return session;
 }
 
-export async function getLeads() {
+export async function getLeads(page = 1, limit = 50) {
   try {
     await checkAuth(['SUPER_ADMIN', 'LEAD_MANAGER']);
     await dbConnect();
+    const skip = (page - 1) * limit;
     const leads = await Lead.find()
       .populate('product', 'name')
       .populate('category', 'name')
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select('-__v')
       .lean();
-    return { success: true, data: JSON.parse(JSON.stringify(leads)) };
+    
+    const totalCount = await Lead.countDocuments();
+    return { 
+      success: true, 
+      data: JSON.parse(JSON.stringify(leads)),
+      pagination: {
+        totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

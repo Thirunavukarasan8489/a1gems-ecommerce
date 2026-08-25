@@ -1,10 +1,13 @@
 import { z } from 'zod';
 
 export const VariantSchema = z.object({
-  name: z.string().min(1, 'Variant name is required'),
-  sku: z.string().min(1, 'Variant SKU is required'),
-  price: z.coerce.number().min(0),
+  name: z.string().optional(),
+  caratApprox: z.coerce.number().optional(),
+  size: z.string().optional(),
+  price: z.coerce.number().min(0, 'Selling Price is required'),
+  comparePrice: z.coerce.number().optional(),
   stock: z.coerce.number().int().min(0).default(0),
+  lowStockThreshold: z.coerce.number().int().min(0).default(5),
 });
 
 export const ImageSchema = z.object({
@@ -20,16 +23,10 @@ export const ProductSchema = z.object({
   shortDescription: z.string().optional(),
   description: z.string().optional(),
   
-  basePrice: z.coerce.number().min(0, 'Base price must be a positive number'),
-  comparePrice: z.coerce.number().optional().nullable(),
-  baseSku: z.string().min(1, 'SKU is required'),
-  stockQuantity: z.coerce.number().int().min(0).default(0),
-  
-  hasVariants: z.boolean().default(false),
+  hasVariants: z.boolean().default(true),
   variants: z.array(VariantSchema).optional(),
   
   reservedQuantity: z.coerce.number().int().min(0).default(0),
-  lowStockThreshold: z.coerce.number().int().min(0).default(5),
   stockStatus: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK']).default('IN_STOCK'),
   status: z.enum(['ACTIVE', 'DRAFT']).default('DRAFT'),
   

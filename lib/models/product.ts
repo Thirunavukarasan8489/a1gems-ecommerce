@@ -9,24 +9,22 @@ const ProductSchema = new mongoose.Schema(
     shortDescription: { type: String },
     description: { type: String },
     
-    // Pricing & Inventory (Base)
-    basePrice: { type: Number, required: true },
-    comparePrice: { type: Number },
-    baseSku: { type: String, required: true, unique: true },
-    stockQuantity: { type: Number, required: true, default: 0 },
+    // Pricing & Inventory (Removed Base pricing/stock as per requirements)
     
     // Variants
-    hasVariants: { type: Boolean, default: false },
+    hasVariants: { type: Boolean, default: true },
     variants: [{
       name: { type: String, required: true },
-      sku: { type: String, required: true },
+      caratApprox: { type: Number },
+      size: { type: String },
       price: { type: Number, required: true },
+      comparePrice: { type: Number },
       stock: { type: Number, required: true, default: 0 },
+      lowStockThreshold: { type: Number, default: 5 },
     }],
     
     // Inventory
     reservedQuantity: { type: Number, required: true, default: 0 },
-    lowStockThreshold: { type: Number, default: 5 },
     stockStatus: { type: String, enum: ['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'], default: 'IN_STOCK' },
     status: { type: String, enum: ['ACTIVE', 'DRAFT'], default: 'DRAFT' },
     

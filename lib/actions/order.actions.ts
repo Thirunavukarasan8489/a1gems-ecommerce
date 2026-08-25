@@ -7,6 +7,7 @@ import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import { logAuditAction } from '@/lib/actions/audit';
+import { OrderCreateSchema, OrderUpdateSchema } from '@/lib/validations/order.schema';
 
 // Helper to check auth
 async function checkAuth(allowedRoles: string[]) {
@@ -21,15 +22,32 @@ async function checkAuth(allowedRoles: string[]) {
   return session;
 }
 
-export async function getOrders() {
+export async function getOrders(page = 1, limit = 50) {
   try {
     const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
     if (!isAuth) return { success: false, error: 'Unauthorized' };
 
     await dbConnect();
-    const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+    const skip = (page - 1) * limit;
+    const orders = await Order.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select('-__v')
+      .lean();
 
-    return { success: true, data: JSON.parse(JSON.stringify(orders)) };
+    const totalCount = await Order.countDocuments({});
+
+    return { 
+      success: true, 
+      data: JSON.parse(JSON.stringify(orders)),
+      pagination: {
+        totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    };
   } catch (error: any) {
     console.error('Error fetching orders:', error);
     return { success: false, error: error.message };
@@ -57,6 +75,12 @@ export async function createOrder(data: any) {
     const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
     if (!isAuth) return { success: false, error: 'Unauthorized' };
 
+    const parsed = OrderCreateSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const validatedData = parsed.data;
+
     await dbConnect();
     
     // We must use a MongoDB transaction since we're modifying Order and Product stock
@@ -69,16 +93,15 @@ export async function createOrder(data: any) {
       const orderNumber = `ORD-${new Date().getFullYear()}-${(count + 1).toString().padStart(4, '0')}`;
       
       const orderPayload = {
-        ...data,
+        ...validatedData,
         orderNumber,
-        purchaseType: data.purchaseType || 'PERSONAL',
       };
 
       // 2. Create the Order
       const newOrder = await Order.create([orderPayload], { session });
 
       // 3. Update Product Inventory
-      for (const item of data.items) {
+      for (const item of validatedData.items) {
         if (!item.productId) continue;
         
         const product = await Product.findById(item.productId).session(session);
@@ -116,16 +139,21 @@ export async function updateOrderStatus(id: string, updateData: { orderStatus?: 
     const isAuth = await checkAuth(['Super Admin', 'Content Manager', 'Lead Manager']);
     if (!isAuth) return { success: false, error: 'Unauthorized' };
 
+    const parsed = OrderUpdateSchema.safeParse(updateData);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+
     await dbConnect();
     
-    const order = await Order.findByIdAndUpdate(id, updateData, { new: true }).lean();
+    const order = await Order.findByIdAndUpdate(id, parsed.data, { new: true }).lean();
     if (!order) return { success: false, error: 'Order not found' };
 
     await logAuditAction({
       action: 'ORDER_STATUS_UPDATED',
       entity: 'Order',
       entityId: id,
-      metadata: updateData
+      metadata: parsed.data
     });
 
     revalidatePath('/admin/orders');

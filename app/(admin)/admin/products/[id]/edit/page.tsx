@@ -30,10 +30,12 @@ import { uploadMedia } from '@/lib/actions/media.actions';
 import { toast } from 'react-hot-toast';
 
 const variantSchema = z.object({
-  name: z.string().min(1, 'Variant name is required'),
-  sku: z.string().min(1, 'SKU is required'),
-  price: z.coerce.number().min(0, 'Price must be positive'),
+  caratApprox: z.coerce.number().optional(),
+  size: z.string().optional(),
+  price: z.coerce.number().min(0, 'Selling Price is required'),
+  comparePrice: z.coerce.number().optional(),
   stock: z.coerce.number().min(0, 'Stock must be 0 or more').int(),
+  lowStockThreshold: z.coerce.number().int().optional(),
 });
 
 const productSchema = z.object({
@@ -42,14 +44,6 @@ const productSchema = z.object({
   categoryId: z.string().min(1, 'Category is required'),
   shortDescription: z.string().optional(),
   description: z.string().optional(),
-  
-  // Pricing & Inventory (Base)
-  basePrice: z.coerce.number().min(0, 'Price must be positive').optional(),
-  comparePrice: z.coerce.number().optional(),
-  baseSku: z.string().optional(),
-  stockQuantity: z.coerce.number().min(0).int().optional(),
-  lowStockThreshold: z.coerce.number().optional(),
-  
   // Variants
   hasVariants: z.boolean(),
   variants: z.array(variantSchema).optional(),
@@ -108,11 +102,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       categoryId: '',
       shortDescription: '',
       description: '',
-      basePrice: 0,
-      baseSku: '',
-      stockQuantity: 0,
-      lowStockThreshold: 5,
-      hasVariants: false,
+      hasVariants: true,
       variants: [],
       purchaseType: 'BUY_ENQUIRE',
       whatsappEnabled: false,
@@ -154,11 +144,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           categoryId: prod.category?._id || prod.category || '',
           shortDescription: prod.shortDescription || '',
           description: prod.description || '',
-          basePrice: prod.basePrice || 0,
-          baseSku: prod.baseSku || '',
-          stockQuantity: prod.stockQuantity || 0,
-          lowStockThreshold: prod.lowStockThreshold || 5,
-          hasVariants: prod.hasVariants || false,
+          hasVariants: prod.hasVariants !== undefined ? prod.hasVariants : true,
           variants: prod.variants || [],
           purchaseType: prod.purchaseType || 'BUY_ENQUIRE',
           whatsappEnabled: prod.whatsappEnabled || false,
@@ -220,6 +206,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setGalleryFiles(prev => [...prev, ...newFiles]);
     
     // We add placeholders in react-hook-form to render the alt text inputs
+    // eslint-disable-next-line react-hooks/incompatible-library
     const currentGallery = watch('gallery') || [];
     setValue('gallery', [...currentGallery, ...newFiles.map(() => ({ url: '', altText: '' }))], { shouldValidate: true });
   };
@@ -231,6 +218,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     }
     setGalleryFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
     
+    // eslint-disable-next-line react-hooks/incompatible-library
     const currentGallery = watch('gallery') || [];
     setValue('gallery', currentGallery.filter((_, idx) => idx !== indexToRemove), { shouldValidate: true });
   };
@@ -256,12 +244,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         finalPrimaryImage = { url: coverFile.previewUrl, altText: data.primaryImage?.altText || '' };
       }
 
-      const finalGallery = [];
-      
-      for (let i = 0; i < galleryFiles.length; i++) {
-        if (galleryFiles[i].file) {
+      const finalGallery: { url: string; altText: string }[] = [];
+
+      const galleryUploadPromises = galleryFiles.map(async (fileObj, i) => {
+        if (fileObj.file) {
           const formData = new FormData();
-          formData.append('file', galleryFiles[i].file as File);
+          formData.append('file', fileObj.file as File);
           const res = await uploadMedia(formData);
           if (res.success && res.data) {
             finalGallery.push({ url: res.data.secureUrl || res.data.url, altText: data.gallery?.[i]?.altText || '' });
@@ -269,9 +257,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             throw new Error(`Gallery upload failed: ${res.error}`);
           }
         } else {
-          finalGallery.push({ url: galleryFiles[i].previewUrl, altText: data.gallery?.[i]?.altText || '' });
+          finalGallery.push({ url: fileObj.previewUrl, altText: data.gallery?.[i]?.altText || '' });
         }
-      }
+      });
+      
+      await Promise.all(galleryUploadPromises);
 
       const finalData = { ...data, primaryImage: finalPrimaryImage, gallery: finalGallery };
       const res = await updateProduct(resolvedParams.id, finalData);
@@ -300,18 +290,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
   const tabs = [
     { id: 'basic', label: '1. Basic Info' },
-    { id: 'pricing', label: '2. Pricing & Stock' },
-    { id: 'variants', label: '3. Variants' },
-    { id: 'media', label: '4. Cover & Gallery Images' },
-    { id: 'specs', label: '5. Specifications & SEO' },
-    { id: 'purchase', label: '6. Purchase Rules' },
+    { id: 'variants', label: '2. Pricing & Variants' },
+    { id: 'media', label: '3. Cover & Gallery Images' },
+    { id: 'specs', label: '4. Specifications & SEO' },
+    { id: 'purchase', label: '5. Purchase Rules' },
   ];
 
   const currentTabIndex = tabs.findIndex(t => t.id === activeTab);
   
   const tabFields: Record<string, (keyof ProductFormValues)[]> = {
     basic: ['name', 'categoryId', 'status', 'shortDescription', 'description'],
-    pricing: ['basePrice', 'comparePrice', 'baseSku', 'stockQuantity', 'lowStockThreshold'],
     variants: ['hasVariants', 'variants'],
     media: ['primaryImage', 'gallery'],
     specs: ['material', 'stone', 'size', 'weight', 'origin', 'certification', 'metaTitle', 'metaDescription'],
@@ -525,151 +513,94 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
 
-            {/* 2. PRICING & STOCK */}
-            <div className={activeTab === 'pricing' ? 'space-y-5' : 'hidden'}>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-3">
-                Pricing & Inventory
-              </h2>
+            {/* REMOVED: PRICING & STOCK TAB */}
 
-              {!hasVariants ? (
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <AdminInput 
-                      type="text"
-                      onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                      label="Selling Price (₹) *" 
-                      placeholder="e.g. 85000"
-                      {...register('basePrice')} 
-                      error={errors.basePrice?.message} 
-                    />
-                    <AdminInput 
-                      type="text"
-                      onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                      label="Compare at Original Price (₹)" 
-                      placeholder="e.g. 95000"
-                      {...register('comparePrice')} 
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <AdminInput 
-                      label="SKU Code *" 
-                      placeholder="e.g. GEM-SPH-001"
-                      {...register('baseSku')} 
-                      error={errors.baseSku?.message} 
-                    />
-                    <AdminInput 
-                      type="text"
-                      onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                      label="Stock Quantity *" 
-                      placeholder="0"
-                      {...register('stockQuantity')} 
-                      error={errors.stockQuantity?.message} 
-                    />
-                    <AdminInput 
-                      type="text"
-                      onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                      label="Low Stock Threshold" 
-                      placeholder="5"
-                      {...register('lowStockThreshold')} 
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-xl text-sm border border-blue-200 dark:border-blue-800 flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-blue-600 shrink-0" />
-                  <span>
-                    Variants are enabled. Price and stock are calculated automatically across all active variants in the <strong>Variants tab</strong>.
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* 3. VARIANTS */}
+            {/* 2. PRICING & VARIANTS */}
             <div className={activeTab === 'variants' ? 'space-y-5' : 'hidden'}>
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                   <Layers className="w-5 h-5 text-blue-600" />
-                  Product Variants
+                  Pricing & Variants
                 </h2>
-                <label className="flex items-center gap-2 cursor-pointer bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-                  <input 
-                    type="checkbox" 
-                    id="hasVariants" 
-                    {...register('hasVariants')} 
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" 
-                  />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Enable Variants (Size, Metal, Carat)
-                  </span>
-                </label>
               </div>
 
-              {hasVariants ? (
-                <div className="space-y-4">
-                  {variantFields.map((field, index) => (
-                    <div 
-                      key={field.id} 
-                      className="p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/60 dark:bg-slate-800/40 flex items-start gap-3"
-                    >
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <AdminInput 
-                          label="Variant Name" 
-                          placeholder="e.g. 5.5 Carat - Gold Ring"
-                          {...register(`variants.${index}.name`)} 
-                          error={errors.variants?.[index]?.name?.message} 
-                        />
-                        <AdminInput 
-                          label="Variant SKU" 
-                          placeholder="e.g. SPH-55-GLD"
-                          {...register(`variants.${index}.sku`)} 
-                          error={errors.variants?.[index]?.sku?.message} 
-                        />
-                        <AdminInput 
-                          type="text"
-                          onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                          label="Price (₹)" 
-                          placeholder="0"
-                          {...register(`variants.${index}.price`)} 
-                          error={errors.variants?.[index]?.price?.message} 
-                        />
-                        <AdminInput 
-                          type="text"
-                          onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                          label="Stock Units" 
-                          placeholder="0"
-                          {...register(`variants.${index}.stock`)} 
-                          error={errors.variants?.[index]?.stock?.message} 
-                        />
-                      </div>
+              <div className="space-y-4">
+                {variantFields.map((field, index) => (
+                  <div 
+                    key={field.id} 
+                    className="p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/60 dark:bg-slate-800/40 flex items-start gap-3 relative"
+                  >
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+                      <AdminInput 
+                        label="Carat Approx" 
+                        placeholder="e.g. 4.05"
+                        type="number"
+                        step="0.01"
+                        {...register(`variants.${index}.caratApprox`)} 
+                        error={errors.variants?.[index]?.caratApprox?.message} 
+                      />
+                      <AdminInput 
+                        label="Size (mm)" 
+                        placeholder="e.g. 6x4mm"
+                        {...register(`variants.${index}.size`)} 
+                        error={errors.variants?.[index]?.size?.message} 
+                      />
+                      <AdminInput 
+                        type="text"
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                        label="Selling Price (₹) *" 
+                        placeholder="0"
+                        {...register(`variants.${index}.price`)} 
+                        error={errors.variants?.[index]?.price?.message} 
+                      />
+                      <AdminInput 
+                        type="text"
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                        label="Compare Price" 
+                        placeholder="0"
+                        {...register(`variants.${index}.comparePrice`)} 
+                        error={errors.variants?.[index]?.comparePrice?.message} 
+                      />
+                      <AdminInput 
+                        type="text"
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                        label="Current Stock" 
+                        placeholder="0"
+                        {...register(`variants.${index}.stock`)} 
+                        error={errors.variants?.[index]?.stock?.message} 
+                      />
+                      <AdminInput 
+                        type="text"
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                        label="Low Stock Alert" 
+                        placeholder="5"
+                        {...register(`variants.${index}.lowStockThreshold`)} 
+                        error={errors.variants?.[index]?.lowStockThreshold?.message} 
+                      />
+                    </div>
+                    {variantFields.length > 1 && (
                       <button 
                         type="button" 
                         onClick={() => removeVariant(index)}
-                        className="mt-7 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                        className="mt-7 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors absolute -right-2 -top-2 bg-white shadow-sm border border-slate-200"
                         title="Remove Variant"
                       >
-                        <Trash2 size={18} />
+                        <X size={16} />
                       </button>
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                ))}
 
-                  <AdminButton 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => appendVariant({ name: '', sku: '', price: 0, stock: 0 })}
-                    className="w-full border-dashed border-2 py-3 text-slate-600 dark:text-slate-300"
-                  >
-                    <Plus size={16} className="mr-1.5" />
-                    Add Variant Option
-                  </AdminButton>
-                </div>
-              ) : (
-                <div className="text-center py-12 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                  <p className="font-medium text-slate-700 dark:text-slate-300">Single Item Product (No Variants)</p>
-                  <p className="text-xs mt-1 text-slate-500">
-                    Enable the checkbox above if this stone or jewellery piece comes in multiple sizes, carats, or metals.
-                  </p>
-                </div>
-              )}
+                <AdminButton 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => appendVariant({ price: 0, stock: 1, lowStockThreshold: 5 })}
+                  className="w-full border-dashed border-2 py-3 text-slate-600 dark:text-slate-300"
+                >
+                  <Plus size={16} className="mr-1.5" />
+                  Add Another Option / Size
+                </AdminButton>
+              </div>
             </div>
 
             {/* 4. COVER & GALLERY IMAGES */}
