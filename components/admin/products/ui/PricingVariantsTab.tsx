@@ -21,9 +21,9 @@ export function PricingVariantsTab({ isActive }: PricingVariantsTabProps) {
 
   return (
     <div className={isActive ? 'space-y-5' : 'hidden'}>
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          <Layers className="w-5 h-5 text-blue-600" />
+      <div className="flex items-center justify-between border-b border-gold-100 dark:border-gold-800 pb-3">
+        <h2 className="text-lg font-semibold text-gold-900 dark:text-white flex items-center gap-2">
+          <Layers className="w-5 h-5 text-gold-600" />
           Pricing & Variants
         </h2>
       </div>
@@ -32,7 +32,7 @@ export function PricingVariantsTab({ isActive }: PricingVariantsTabProps) {
         {variantFields.map((field, index) => (
           <div
             key={field.id}
-            className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/60 dark:bg-slate-800/40 flex items-start gap-2 relative"
+            className="p-3 border border-gold-200 dark:border-gold-700 rounded-xl bg-gold-50/60 dark:bg-gold-800/40 flex items-start gap-2 relative"
           >
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
               <AdminInput
@@ -86,7 +86,7 @@ export function PricingVariantsTab({ isActive }: PricingVariantsTabProps) {
               <button
                 type="button"
                 onClick={() => removeVariant(index)}
-                className="mt-7 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors absolute -right-2 -top-2 bg-white shadow-sm border border-slate-200"
+                className="mt-7 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors absolute -right-2 -top-2 bg-white shadow-sm border border-gold-200"
                 title="Remove Variant"
               >
                 <X size={16} />
@@ -99,7 +99,7 @@ export function PricingVariantsTab({ isActive }: PricingVariantsTabProps) {
           type="button"
           variant="outline"
           onClick={() => appendVariant({ price: 0, stock: 1, lowStockThreshold: 5 })}
-          className="w-full border-dashed border-2 py-3 text-slate-600 dark:text-slate-300"
+          className="w-full border-dashed border-2 py-3 text-gold-600 dark:text-gold-300"
         >
           <Plus size={16} className="mr-1.5" />
           Add Another Option / Size

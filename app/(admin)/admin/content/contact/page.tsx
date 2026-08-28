@@ -30,11 +30,11 @@ export default function ContactContentPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-            <PhoneCall className="w-6 h-6 text-blue-600" />
+          <h1 className="text-2xl font-bold text-gold-800 dark:text-white flex items-center gap-2">
+            <PhoneCall className="w-6 h-6 text-gold-600" />
             Contact Information CMS
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
             Update phone numbers, WhatsApp lines, showroom address, and operating hours.
           </p>
         </div>
@@ -50,11 +50,11 @@ export default function ContactContentPage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
+      <form onSubmit={handleSave} className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
         
         {/* Direct Contacts */}
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+          <h2 className="text-base font-semibold text-gold-900 dark:text-white mb-4 border-b border-gold-100 dark:border-gold-800 pb-2">
             Direct Communication Channels
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -84,19 +84,19 @@ export default function ContactContentPage() {
 
         {/* Location & Hours */}
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+          <h2 className="text-base font-semibold text-gold-900 dark:text-white mb-4 border-b border-gold-100 dark:border-gold-800 pb-2">
             Showroom Location & Working Hours
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1.5">
                 Physical Showroom Address
               </label>
               <textarea
                 rows={3}
                 value={address}
                 onChange={e => setAddress(e.target.value)}
-                className="w-full rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2.5 text-sm"
+                className="w-full rounded-lg bg-gold-50 dark:bg-gold-900/50 text-gold-900 dark:text-white border border-gold-200 dark:border-gold-700 focus:outline-none focus:ring-2 focus:ring-gold-500 px-3 py-2.5 text-sm"
               />
             </div>
 
@@ -116,7 +116,7 @@ export default function ContactContentPage() {
           </div>
         </div>
 
-        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex justify-end pt-4 border-t border-gold-100 dark:border-gold-800">
           <AdminButton type="submit" isLoading={saving} className="gap-2">
             <Save size={18} />
             Save Changes

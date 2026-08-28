@@ -21,19 +21,19 @@ export default function HomepageSectionsTable({ sections }: { sections: Homepage
     {
       header: 'Section Name',
       cell: (item: HomepageSectionRow) => (
-        <span className="font-medium text-slate-800 dark:text-slate-200">{item.name}</span>
+        <span className="font-medium text-gold-800 dark:text-gold-200">{item.name}</span>
       ),
     },
     {
       header: 'Type',
       cell: (item: HomepageSectionRow) => (
-        <span className="text-slate-600 dark:text-slate-400">{item.type.replace(/_/g, ' ')}</span>
+        <span className="text-gold-600 dark:text-gold-400">{item.type.replace(/_/g, ' ')}</span>
       ),
     },
     {
       header: 'Order',
       cell: (item: HomepageSectionRow) => (
-        <span className="text-slate-600 dark:text-slate-400">{item.displayOrder}</span>
+        <span className="text-gold-600 dark:text-gold-400">{item.displayOrder}</span>
       ),
     },
     {
@@ -48,7 +48,7 @@ export default function HomepageSectionsTable({ sections }: { sections: Homepage
     {
       header: 'Last Updated',
       cell: (item: HomepageSectionRow) => (
-        <span className="text-slate-500 dark:text-slate-400 text-sm">
+        <span className="text-gold-500 dark:text-gold-400 text-sm">
           {new Date(item.updatedAt).toLocaleDateString()}
         </span>
       ),
@@ -59,7 +59,7 @@ export default function HomepageSectionsTable({ sections }: { sections: Homepage
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/website/homepage/${item._id}/edit`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Edit size={16} />
           </Link>

@@ -50,15 +50,16 @@ export function BottomNav() {
     <nav
       aria-label="Primary Mobile Navigation"
       className="fixed bottom-[calc(0.625rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-1.5rem)] max-w-md lg:hidden"
+      suppressHydrationWarning
     >
-      <div className="relative rounded-full border border-gold-500/30 bg-plum-950/92 p-1.5 shadow-[0_10px_35px_-5px_rgba(19,11,27,0.75)] backdrop-blur-xl ring-1 ring-white/10">
+      <div className="relative rounded-full border border-gold-500/30 bg-plum-950/92 p-1.5 shadow-[0_10px_35px_-5px_rgba(19,11,27,0.75)] backdrop-blur-xl ring-1 ring-white/10" suppressHydrationWarning>
         {/* Ambient Subtle Gold Glow Ring */}
         <div
           aria-hidden
           className="pointer-events-none absolute -inset-0.5 rounded-full bg-gradient-to-r from-gold-500/20 via-gold-400/30 to-gold-600/20 opacity-75 blur-sm"
         />
 
-        <ul className="relative grid grid-cols-5 items-center">
+        <ul className="relative grid grid-cols-5 items-center" suppressHydrationWarning>
           {/* Smooth Sliding Gold Active Pill Indicator */}
           <div
             aria-hidden
@@ -74,7 +75,7 @@ export function BottomNav() {
             const active = isTabActive(href, exact);
 
             return (
-              <li key={href} className="relative z-10">
+              <li key={href} className="relative z-10" suppressHydrationWarning>
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}

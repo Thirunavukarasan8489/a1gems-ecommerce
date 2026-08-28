@@ -40,6 +40,7 @@
   --color-gold-700: #855c19;
   --color-gold-800: #6b491b;
   --color-gold-900: #5a3d1b;
+  --color-gold-950: #2d1d0b;
 
   /* ---- Emerald (secondary) ---------------------------------------------- */
   --color-emerald-50: #ecfdf6;
@@ -245,8 +246,23 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
     }
+  }
+
+  /* Thin scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-gold-300);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-gold-500);
   }
 }
 

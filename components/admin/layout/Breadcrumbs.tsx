@@ -17,7 +17,7 @@ export default function Breadcrumbs() {
   // We want to skip 'admin' visually but include it in the href
 
   return (
-    <nav className="flex items-center text-sm text-plum-600 dark:text-plum-300 mb-6" aria-label="Breadcrumb">
+    <nav className="flex items-center text-sm text-gold-600 dark:text-gold-300 mb-6" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-2">
         <li className="inline-flex items-center">
           <Link href="/admin" className="hover:text-gold-600 dark:hover:text-gold-400 flex items-center transition-colors">
@@ -37,9 +37,9 @@ export default function Breadcrumbs() {
           return (
             <li key={path}>
               <div className="flex items-center">
-                <ChevronRight size={16} className="mx-1 text-plum-400 dark:text-plum-500" />
+                <ChevronRight size={16} className="mx-1 text-gold-400 dark:text-gold-500" />
                 {isLast ? (
-                  <span className="text-plum-900 dark:text-ivory-100 font-semibold">{label}</span>
+                  <span className="text-gold-900 dark:text-gold-100 font-semibold">{label}</span>
                 ) : (
                   <Link href={href} className="hover:text-gold-600 dark:hover:text-gold-400 transition-colors">
                     {label}

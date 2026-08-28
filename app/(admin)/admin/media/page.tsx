@@ -105,11 +105,11 @@ export default function MediaLibraryPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gold-800 dark:text-white flex items-center gap-2">
             <ImageIcon className="w-6 h-6 text-purple-500" />
             Media Library
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage images, banners, and documents powered by Cloudinary.</p>
+          <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">Manage images, banners, and documents powered by Cloudinary.</p>
         </div>
         
         <input 
@@ -130,21 +130,21 @@ export default function MediaLibraryPage() {
         </AdminButton>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl overflow-hidden">
+      <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 shadow-sm rounded-xl overflow-hidden">
         
         {/* Toolbar */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-4 border-b border-gold-200 dark:border-gold-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <Search size={16} className="text-slate-400" />
+                <Search size={16} className="text-gold-400" />
               </span>
               <input
                 type="text"
                 placeholder="Search media..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full sm:w-64 transition-colors"
+                className="pl-9 pr-4 py-2 border border-gold-200 dark:border-gold-700 rounded-md text-sm bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full sm:w-64 transition-colors"
               />
             </div>
           </div>
@@ -165,21 +165,21 @@ export default function MediaLibraryPage() {
         {/* Media Grid */}
         <div className="p-6">
           {loading ? (
-            <div className="py-12 text-center text-slate-500">Loading media...</div>
+            <div className="py-12 text-center text-gold-500">Loading media...</div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               
               {/* Upload Box (First item in grid) */}
               <div 
                 onClick={() => { if (isConfigured && !uploading) fileInputRef.current?.click(); }}
-                className={`aspect-square rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex flex-col items-center justify-center transition-colors group ${
-                  isConfigured && !uploading ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800' : 'opacity-50 cursor-not-allowed'
+                className={`aspect-square rounded-xl border-2 border-dashed border-gold-300 dark:border-gold-700 bg-gold-50 dark:bg-gold-800/50 flex flex-col items-center justify-center transition-colors group ${
+                  isConfigured && !uploading ? 'cursor-pointer hover:bg-gold-100 dark:hover:bg-gold-800' : 'opacity-50 cursor-not-allowed'
                 }`}
               >
-                <div className="h-10 w-10 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center mb-2 shadow-sm border border-slate-200 dark:border-slate-600 group-hover:scale-110 transition-transform">
+                <div className="h-10 w-10 bg-white dark:bg-gold-700 rounded-full flex items-center justify-center mb-2 shadow-sm border border-gold-200 dark:border-gold-600 group-hover:scale-110 transition-transform">
                   <UploadCloud className="text-purple-600 dark:text-purple-400" size={20} />
                 </div>
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                <span className="text-sm font-medium text-gold-600 dark:text-gold-300">
                   {uploading ? 'Uploading...' : 'Upload'}
                 </span>
               </div>
@@ -195,7 +195,7 @@ export default function MediaLibraryPage() {
                     <div 
                       onClick={() => toggleSelect(item._id)}
                       className={`relative aspect-square rounded-xl border-2 overflow-hidden cursor-pointer transition-all ${
-                        isSelected ? 'border-purple-500 shadow-md' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                        isSelected ? 'border-purple-500 shadow-md' : 'border-gold-200 dark:border-gold-700 hover:border-gold-300 dark:hover:border-gold-600'
                       }`}
                     >
                       {/* Selection Indicator */}
@@ -206,7 +206,7 @@ export default function MediaLibraryPage() {
                       )}
                       
                       {/* Hover Overlay */}
-                      <div className={`absolute inset-0 bg-slate-900/20 z-10 transition-opacity ${isSelected ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'}`} />
+                      <div className={`absolute inset-0 bg-gold-900/20 z-10 transition-opacity ${isSelected ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'}`} />
 
                       {/* Image/File Preview */}
                       {item.resourceType === 'image' ? (
@@ -218,24 +218,24 @@ export default function MediaLibraryPage() {
                           className="object-cover" 
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
-                          <FileText size={48} className="text-slate-400" />
+                        <div className="w-full h-full flex items-center justify-center bg-gold-100 dark:bg-gold-800">
+                          <FileText size={48} className="text-gold-400" />
                         </div>
                       )}
 
                       {/* Copy Link Button (Visible on hover) */}
                       <button 
                         onClick={(e) => { e.stopPropagation(); copyUrl(item.secureUrl || item.url); }}
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white dark:bg-slate-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-50 text-slate-700"
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white dark:bg-gold-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gold-50 text-gold-700"
                         title="Copy URL"
                       >
                         <Copy size={16} />
                       </button>
 
                       {/* File Info Bar */}
-                      <div className="absolute bottom-0 inset-x-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 p-2 text-xs truncate z-20">
-                        <p className="font-medium text-slate-800 dark:text-white truncate">{filename}</p>
-                        <p className="text-slate-500 dark:text-slate-400 mt-0.5">{sizeKB} KB</p>
+                      <div className="absolute bottom-0 inset-x-0 bg-white/90 dark:bg-gold-900/90 backdrop-blur-sm border-t border-gold-200 dark:border-gold-700 p-2 text-xs truncate z-20">
+                        <p className="font-medium text-gold-800 dark:text-white truncate">{filename}</p>
+                        <p className="text-gold-500 dark:text-gold-400 mt-0.5">{sizeKB} KB</p>
                       </div>
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export default function MediaLibraryPage() {
           )}
           
           {!loading && filteredMedia.length === 0 && media.length > 0 && (
-            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+            <div className="text-center py-12 text-gold-500 dark:text-gold-400">
               No media found matching &quot;{searchTerm}&quot;
             </div>
           )}

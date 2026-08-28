@@ -8,7 +8,7 @@ import {
 } from "@/components/public/product/product-filters";
 import { buttonStyles } from "@/components/public/ui/button";
 import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
-import { products } from "@/lib/data/products";
+import { getProducts } from "@/lib/services/product-service";
 import { applyFilters, toQuery } from "@/lib/filters";
 
 export const metadata: Metadata = {
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function ProductsPage(props: PageProps<"/products">) {
   const query = toQuery(await props.searchParams);
+  const products = await getProducts();
   const results = applyFilters(products, query);
 
   return (

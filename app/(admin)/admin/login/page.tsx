@@ -58,20 +58,20 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-gold-50 dark:bg-gold-900 flex items-center justify-center p-4 selection:bg-gold-100 selection:text-gold-900">
       
       <div className="w-full max-w-md">
         {/* Logo/Branding Area */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 mb-4">
-            <ShieldAlert className="text-blue-600 dark:text-blue-500" size={32} />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white dark:bg-gold-800 shadow-sm border border-gold-200 dark:border-gold-700 mb-4">
+            <ShieldAlert className="text-gold-600 dark:text-gold-500" size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">A1 GEMS</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Sign in to your administration panel</p>
+          <h1 className="text-3xl font-bold text-gold-800 dark:text-white tracking-tight">A1 GEMS</h1>
+          <p className="text-gold-500 dark:text-gold-400 mt-2 text-sm">Sign in to your administration panel</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-slate-700/60 p-8">
+        <div className="bg-white dark:bg-gold-800 rounded-2xl shadow-xl shadow-gold-200/50 dark:shadow-gold-900/50 border border-gold-200/60 dark:border-gold-700/60 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
             {loginError && (
@@ -83,20 +83,20 @@ export default function AdminLogin() {
             <div className="space-y-4">
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="email">
+                <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1.5" htmlFor="email">
                   Email Address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-slate-400" />
+                    <Mail className="h-5 w-5 text-gold-400" />
                   </div>
                   <input
                     id="email"
                     type="email"
                     {...register('email')}
-                    className={`block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900/50 border ${
-                      errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
+                    className={`block w-full pl-10 pr-3 py-2.5 bg-gold-50 dark:bg-gold-900/50 border ${
+                      errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gold-200 dark:border-gold-700 focus:ring-gold-500 focus:border-gold-500'
+                    } rounded-lg text-gold-900 dark:text-white placeholder-gold-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
                     placeholder="admin@a1gems.com"
                   />
                 </div>
@@ -108,30 +108,30 @@ export default function AdminLogin() {
               {/* Password Input */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="password">
+                  <label className="block text-sm font-medium text-gold-700 dark:text-gold-300" htmlFor="password">
                     Password
                   </label>
-                  <Link href="/admin/forgot-password" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
+                  <Link href="/admin/forgot-password" className="text-sm font-medium text-gold-600 dark:text-gold-400 hover:text-gold-500">
                     Forgot password?
                   </Link>
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-slate-400" />
+                    <Lock className="h-5 w-5 text-gold-400" />
                   </div>
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     {...register('password')}
-                    className={`block w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900/50 border ${
-                      errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
+                    className={`block w-full pl-10 pr-10 py-2.5 bg-gold-50 dark:bg-gold-900/50 border ${
+                      errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gold-200 dark:border-gold-700 focus:ring-gold-500 focus:border-gold-500'
+                    } rounded-lg text-gold-900 dark:text-white placeholder-gold-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gold-400 hover:text-gold-600 dark:hover:text-gold-300 transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -152,9 +152,9 @@ export default function AdminLogin() {
                 id="rememberMe"
                 type="checkbox"
                 {...register('rememberMe')}
-                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
+                className="h-4 w-4 rounded border-gold-300 text-gold-600 focus:ring-gold-500 dark:border-gold-600 dark:bg-gold-700"
               />
-              <label htmlFor="rememberMe" className="ml-2 block text-sm text-slate-600 dark:text-slate-400">
+              <label htmlFor="rememberMe" className="ml-2 block text-sm text-gold-600 dark:text-gold-400">
                 Keep me signed in
               </label>
             </div>
@@ -163,7 +163,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all dark:focus:ring-offset-slate-900"
+              className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gold-600 hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gold-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all dark:focus:ring-offset-gold-900"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-8 text-center text-sm text-gold-500 dark:text-gold-400">
           Secure portal for authorized personnel only. <br />
           &copy; {new Date().getFullYear()} A1 Gems Platform.
         </p>

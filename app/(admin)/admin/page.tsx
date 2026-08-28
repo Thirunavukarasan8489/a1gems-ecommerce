@@ -47,15 +47,15 @@ export default async function AdminDashboard() {
       
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Admin Dashboard</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold text-gold-800 dark:text-white">Admin Dashboard</h1>
+        <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
           Real-time metrics, order volumes, inventory alerts, and lead management overview.
         </p>
       </div>
 
       {/* Commerce KPIs Section */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-gold-400">
           Commerce Overview
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -114,7 +114,7 @@ export default async function AdminDashboard() {
 
       {/* Lead Management KPIs Section */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-gold-400">
           Lead Pipeline
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -149,14 +149,14 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Revenue Trends Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="lg:col-span-2 bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-gold-100 dark:border-gold-800 pb-3">
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-blue-600" />
+              <h3 className="font-semibold text-gold-900 dark:text-white flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-gold-600" />
                 Revenue & Sales Performance
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Monthly revenue trajectory (INR)</p>
+              <p className="text-xs text-gold-400 mt-0.5">Monthly revenue trajectory (INR)</p>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 rounded-full">
               +18.4% YoY
@@ -171,13 +171,13 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Lead Conversion Pipeline Chart */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 space-y-4">
-          <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm p-6 space-y-4">
+          <div className="border-b border-gold-100 dark:border-gold-800 pb-3">
+            <h3 className="font-semibold text-gold-900 dark:text-white flex items-center gap-2">
               <PieChart className="w-4 h-4 text-purple-600" />
               Lead Status Distribution
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">Current lead pipeline stages</p>
+            <p className="text-xs text-gold-400 mt-0.5">Current lead pipeline stages</p>
           </div>
 
           <LeadStatusChart 

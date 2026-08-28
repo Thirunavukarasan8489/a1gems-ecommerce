@@ -9,14 +9,14 @@ export function PrimaryNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden flex-1 justify-center lg:flex">
-      <ul className="flex items-center gap-1">
+    <nav className="hidden flex-1 justify-center lg:flex" suppressHydrationWarning>
+      <ul className="flex items-center gap-1" suppressHydrationWarning>
         {primaryNav.map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
-            <li key={item.href}>
+            <li key={item.href} suppressHydrationWarning>
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}

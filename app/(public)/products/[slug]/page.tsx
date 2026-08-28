@@ -13,26 +13,22 @@ import { AddToCart } from "@/components/public/cart/add-to-cart";
 import { ProductGallery } from "@/components/public/product/product-gallery";
 import { ProductRail } from "@/components/public/product/product-rail";
 import { Badge } from "@/components/public/ui/badge";
-import { buttonStyles } from "@/components/public/ui/button";
 import { Breadcrumbs } from "@/components/public/ui/page-header";
+import { ProductPurchaseOptions } from "@/components/public/product/product-purchase-options";
 import { Rating } from "@/components/public/ui/rating";
 import { SectionHeading } from "@/components/public/ui/section-heading";
 import { getCategory } from "@/lib/data/categories";
 import {
-  getProduct,
+  getProductBySlug,
+  getProducts,
   getRelatedProducts,
-  products,
-} from "@/lib/data/products";
-import { whatsappLink } from "@/lib/data/nav";
+} from "@/lib/services/product-service";
 import {
   availableQuantity,
-  canBuy,
-  canEnquire,
-  stockStatus,
 } from "@/lib/types";
-import { discountPercent, formatINR } from "@/lib/utils";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const products = await getProducts();
   return products
     .filter((p) => p.published)
     .map((product) => ({ slug: product.slug }));
@@ -42,31 +38,16 @@ export async function generateMetadata(
   props: PageProps<"/products/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
 
   return {
-    title: product.name,
-    description: product.shortDescription,
-    openGraph: {
-      title: product.name,
-      description: product.shortDescription,
-      type: "website",
-      images: [
-        {
-          url: "/og-image.jpg",
-          width: 800,
-          height: 800,
-          alt: product.name,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: product.name,
-      description: product.shortDescription,
-      images: ["/og-image.jpg"],
-    },
+    title: product.seo?.metaTitle || `${product.name} | A1 Gems`,
+    description: product.seo?.metaDescription || product.shortDescription,
+    keywords: product.seo?.keywords,
+    openGraph: product.seo?.ogImage ? {
+      images: [{ url: product.seo.ogImage }],
+    } : undefined,
   };
 }
 
@@ -74,16 +55,11 @@ export default async function ProductDetailPage(
   props: PageProps<"/products/[slug]">,
 ) {
   const { slug } = await props.params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   const category = getCategory(product.categorySlug);
-  const off = discountPercent(product.sellingPrice, product.comparePrice);
-  const status = stockStatus(product);
-  const available = availableQuantity(product);
-  const buyable = canBuy(product);
-  const enquirable = canEnquire(product);
-  const related = getRelatedProducts(product);
+  const related = await getRelatedProducts(product.id, product.categorySlug);
 
   const specs = [
     ["Stone", product.specifications.stone],
@@ -118,6 +94,7 @@ export default async function ProductDetailPage(
           <ProductGallery
             color={product.gemColor}
             count={product.gallery}
+            images={product.images && product.images.length > 0 ? product.images : (product.primaryImage ? [product.primaryImage] : undefined)}
             name={product.name}
           />
         </div>
@@ -133,82 +110,37 @@ export default async function ProductDetailPage(
             {product.name}
           </h1>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Rating value={product.rating} count={product.reviewCount} />
-            {status === "IN_STOCK" && (
-              <Badge tone="emerald">
-                <PackageCheck size={12} /> In stock
-              </Badge>
-            )}
-            {status === "LOW_STOCK" && (
-              <Badge tone="warning">Only {available} left</Badge>
-            )}
-            {status === "OUT_OF_STOCK" && <Badge tone="plum">Sold out</Badge>}
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
-            <span className="text-3xl font-semibold text-plum-900 tabular-nums sm:text-4xl">
-              {formatINR(product.sellingPrice)}
-            </span>
-            {product.comparePrice && (
-              <span className="text-lg text-plum-400 line-through tabular-nums">
-                {formatINR(product.comparePrice)}
-              </span>
-            )}
-            {off && <Badge tone="gold">Save {off}%</Badge>}
-          </div>
-          <p className="mt-1 text-xs text-ink-muted">
-            Inclusive of all taxes. Shipping calculated at checkout.
-          </p>
-
           <p className="mt-5 text-[0.9375rem] leading-relaxed text-plum-800">
             {product.shortDescription}
           </p>
 
-          {/* Purchase CTA — driven by the product's purchase type (§9). */}
-          <div className="mt-7 space-y-3" id="enquire">
-            {buyable && <AddToCart product={product} />}
+          <ProductPurchaseOptions product={product} category={category} />
 
-            {enquirable && (
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Link
-                  href={`/contact?product=${encodeURIComponent(product.name)}${category ? `&category=${encodeURIComponent(category.name)}` : ""}`}
-                  className={buttonStyles({
-                    variant: buyable ? "outline" : "emerald",
-                    size: "lg",
-                    full: true,
-                  })}
-                >
-                  <MessageCircle size={18} />
-                  Enquire now
-                </Link>
-                {product.whatsappEnabled && (
-                  <a
-                    href={whatsappLink(
-                      `Hi A1 Gems, I am interested in ${product.name} (${product.sku}).`,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={buttonStyles({
-                      variant: "whatsapp",
-                      size: "lg",
-                      full: true,
-                    })}
-                  >
-                    WhatsApp us
-                  </a>
-                )}
+          {/* Long Description */}
+          {product.description && (
+            <div className="mt-10 border-t border-plum-100 pt-8">
+              <h2 className="text-lg font-semibold text-plum-900 mb-4">About this piece</h2>
+              <div className="whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-plum-800">
+                {product.description}
               </div>
-            )}
+            </div>
+          )}
 
-            {!buyable && (
-              <p className="rounded-xl bg-ivory-200 px-4 py-3 text-[0.8125rem] leading-relaxed text-plum-800">
-                This is a one-of-a-kind piece sold by enquiry. We will walk you
-                through origin, treatment and pricing, and arrange independent
-                verification before any payment.
+          {/* Linked Guide */}
+          {product.guide && (
+            <div className="mt-8 rounded-xl bg-ivory-200 p-5">
+              <h3 className="text-sm font-semibold text-plum-900">Gemstone Education</h3>
+              <p className="mt-1 text-sm text-plum-700">
+                Learn more about origin, treatment, and value in our guide.
               </p>
-            )}
-          </div>
+              <Link 
+                href={`/guides/${product.guide.slug}`}
+                className="mt-3 inline-flex text-sm font-medium text-gold-600 hover:text-gold-700 transition-colors underline underline-offset-4"
+              >
+                Read the {product.guide.name} Guide
+              </Link>
+            </div>
+          )}
 
           {/* Certification callout — the trust anchor of the whole page. */}
           {product.specifications.certification && (

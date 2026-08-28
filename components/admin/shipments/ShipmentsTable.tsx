@@ -22,17 +22,17 @@ export default function ShipmentsTable({ shipments }: { shipments: ShipmentRow[]
     {
       header: 'Shipment ID',
       cell: (item: ShipmentRow) => (
-        <span className="font-medium text-slate-800 dark:text-slate-200">{item.shipmentNumber}</span>
+        <span className="font-medium text-gold-800 dark:text-gold-200">{item.shipmentNumber}</span>
       ),
     },
     {
       header: 'Order Details',
       cell: (item: ShipmentRow) => (
         <div>
-          <Link href={`/admin/orders/${item.orderId?._id}`} className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href={`/admin/orders/${item.orderId?._id}`} className="font-medium text-gold-600 dark:text-gold-400 hover:underline">
             {item.orderId?.orderNumber ?? '—'}
           </Link>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{item.orderId?.customerName}</p>
+          <p className="text-xs text-gold-500 dark:text-gold-400">{item.orderId?.customerName}</p>
         </div>
       ),
     },
@@ -40,8 +40,8 @@ export default function ShipmentsTable({ shipments }: { shipments: ShipmentRow[]
       header: 'Courier Info',
       cell: (item: ShipmentRow) => (
         <div>
-          <span className="font-medium text-slate-700 dark:text-slate-300">{item.courierName || '—'}</span>
-          {item.trackingNumber && <p className="text-xs text-slate-500 dark:text-slate-400">{item.trackingNumber}</p>}
+          <span className="font-medium text-gold-700 dark:text-gold-300">{item.courierName || '—'}</span>
+          {item.trackingNumber && <p className="text-xs text-gold-500 dark:text-gold-400">{item.trackingNumber}</p>}
         </div>
       ),
     },
@@ -62,7 +62,7 @@ export default function ShipmentsTable({ shipments }: { shipments: ShipmentRow[]
     {
       header: 'Dispatch Date',
       cell: (item: ShipmentRow) => (
-        <span className="text-slate-600 dark:text-slate-400 text-sm">
+        <span className="text-gold-600 dark:text-gold-400 text-sm">
           {item.dispatchDate ? new Date(item.dispatchDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
         </span>
       ),
@@ -73,7 +73,7 @@ export default function ShipmentsTable({ shipments }: { shipments: ShipmentRow[]
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/shipments/${item._id}`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Eye size={16} />
           </Link>

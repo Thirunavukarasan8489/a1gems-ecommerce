@@ -28,7 +28,7 @@ export function Logo({
           alt="A1 Gems Logo"
           width={74}
           height={74}
-          className="object-contain"
+          className="object-contain w-auto h-auto"
         />
       </span>
 

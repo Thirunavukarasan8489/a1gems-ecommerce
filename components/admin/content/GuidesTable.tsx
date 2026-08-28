@@ -21,13 +21,13 @@ export default function GuidesTable({ guides }: { guides: GuideRow[] }) {
     {
       header: 'Title',
       cell: (item: GuideRow) => (
-        <span className="font-medium text-slate-800 dark:text-slate-200">{item.title}</span>
+        <span className="font-medium text-gold-800 dark:text-gold-200">{item.title}</span>
       ),
     },
     {
       header: 'Read Time',
       cell: (item: GuideRow) => (
-        <span className="text-slate-600 dark:text-slate-400">{item.readTimeMinutes} min</span>
+        <span className="text-gold-600 dark:text-gold-400">{item.readTimeMinutes} min</span>
       ),
     },
     {
@@ -42,7 +42,7 @@ export default function GuidesTable({ guides }: { guides: GuideRow[] }) {
     {
       header: 'Published Date',
       cell: (item: GuideRow) => (
-        <span className="text-slate-500 dark:text-slate-400 text-sm">
+        <span className="text-gold-500 dark:text-gold-400 text-sm">
           {new Date(item.publishedAt).toLocaleDateString()}
         </span>
       ),
@@ -53,7 +53,7 @@ export default function GuidesTable({ guides }: { guides: GuideRow[] }) {
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/content/guides/${item._id}/edit`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Edit size={16} />
           </Link>

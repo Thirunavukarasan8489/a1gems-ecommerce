@@ -33,8 +33,8 @@ export function GemImage({
   const facets = Array.from({ length: facetCount }, (_, i) => {
     const angle = ((360 / facetCount) * i + rotate) * (Math.PI / 180);
     return {
-      x2: 50 + Math.cos(angle) * 68,
-      y2: 50 + Math.sin(angle) * 68,
+      x2: (50 + Math.cos(angle) * 68).toFixed(2),
+      y2: (50 + Math.sin(angle) * 68).toFixed(2),
       light: i % 2 === 0,
     };
   });

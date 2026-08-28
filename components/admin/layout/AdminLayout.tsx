@@ -25,7 +25,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-[#f8f5f0] dark:bg-plum-950 overflow-hidden font-sans text-plum-900 dark:text-ivory-100">
+    <div className="flex h-screen bg-gold-50 dark:bg-gold-950 overflow-hidden font-sans text-gold-900 dark:text-gold-100">
       {/* Sidebar Navigation */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 

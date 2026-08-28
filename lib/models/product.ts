@@ -59,6 +59,9 @@ const ProductSchema = new mongoose.Schema(
     metaDescription: { type: String },
     keywords: [{ type: String }],
     ogImage: { type: String },
+
+    // Linked CMS Content
+    guide: { type: mongoose.Schema.Types.ObjectId, ref: 'Guide' },
   },
   { timestamps: true }
 );

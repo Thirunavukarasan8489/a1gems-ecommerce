@@ -4,7 +4,7 @@ import { MessageCircle } from "lucide-react";
 import { Accordion } from "@/components/public/ui/accordion";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
-import { faqs } from "@/lib/data/content";
+import { getFaqs } from "@/lib/services/content-service";
 import { whatsappLink } from "@/lib/data/nav";
 
 export const metadata: Metadata = {
@@ -13,7 +13,8 @@ export const metadata: Metadata = {
     "Answers on certification, treatments, returns, shipping, GST invoices and COD for A1 Gems purchases.",
 };
 
-export default function FaqsPage() {
+export default async function FaqsPage() {
+  const faqs = await getFaqs();
   return (
     <>
       <PageHeader

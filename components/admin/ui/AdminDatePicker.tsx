@@ -37,12 +37,12 @@ export function AdminDatePicker({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+        <label htmlFor={id} className="block text-sm font-medium text-gold-700 dark:text-gold-300">
           {label}
         </label>
       )}
       <div className="relative w-full">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 z-10">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gold-400 z-10">
           <CalendarIcon size={16} />
         </div>
         <DatePicker
@@ -56,10 +56,10 @@ export function AdminDatePicker({
           dateFormat={dateFormat}
           isClearable={isClearable}
           disabled={disabled}
-          className={`w-full pl-9 pr-3 py-2.5 bg-white dark:bg-slate-900 border rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors ${
+          className={`w-full pl-9 pr-3 py-2.5 bg-white dark:bg-gold-900 border rounded-lg text-sm text-gold-800 dark:text-gold-100 placeholder-gold-400 focus:outline-none focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 transition-colors ${
             error
               ? 'border-red-500 ring-1 ring-red-500'
-              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+              : 'border-gold-200 dark:border-gold-700 hover:border-gold-300 dark:hover:border-gold-600'
           }`}
         />
       </div>

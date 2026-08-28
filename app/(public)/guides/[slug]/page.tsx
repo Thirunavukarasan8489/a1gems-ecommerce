@@ -5,17 +5,18 @@ import { ArrowRight, Clock } from "lucide-react";
 import { EnquiryForm } from "@/components/public/lead/enquiry-form";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { Breadcrumbs } from "@/components/public/ui/page-header";
-import { guides, getGuide } from "@/lib/data/content";
+import { getGuides, getGuideBySlug } from "@/lib/services/content-service";
 
-export function generateStaticParams() {
-  return guides.map((guide) => ({ slug: guide.slug }));
+export async function generateStaticParams() {
+  const guides = await getGuides();
+  return guides.map((guide: any) => ({ slug: guide.slug }));
 }
 
 export async function generateMetadata(
   props: PageProps<"/guides/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const guide = getGuide(slug);
+  const guide = await getGuideBySlug(slug);
   if (!guide) return { title: "Guide not found" };
 
   return {
@@ -47,10 +48,11 @@ export default async function GuideDetailPage(
   props: PageProps<"/guides/[slug]">,
 ) {
   const { slug } = await props.params;
-  const guide = getGuide(slug);
+  const guide = await getGuideBySlug(slug);
   if (!guide) notFound();
 
-  const more = guides.filter((g) => g.slug !== guide.slug).slice(0, 3);
+  const guides = await getGuides();
+  const more = guides.filter((g: any) => g.slug !== guide.slug).slice(0, 3);
 
   return (
     <>
@@ -94,23 +96,7 @@ export default async function GuideDetailPage(
             className="aspect-16/9 w-full rounded-2xl sm:aspect-21/9"
           />
 
-          <div className="mx-auto mt-10 max-w-2xl">
-            {guide.body.map((section) => (
-              <section key={section.heading} className="mb-9">
-                <h2 className="font-display text-2xl leading-tight font-semibold text-plum-900 sm:text-3xl">
-                  {section.heading}
-                </h2>
-                {section.paragraphs.map((paragraph, i) => (
-                  <p
-                    key={i}
-                    className="mt-4 text-[1.0625rem] leading-[1.75] text-plum-800"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </section>
-            ))}
-          </div>
+          <div className="mx-auto mt-10 max-w-2xl prose prose-plum lg:prose-lg" dangerouslySetInnerHTML={{ __html: guide.content }} />
         </div>
       </article>
 

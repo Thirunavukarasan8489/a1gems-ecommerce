@@ -14,14 +14,14 @@ export default async function HomepageCMSPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Homepage Configuration</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-gold-800 dark:text-white">Homepage Configuration</h1>
+          <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
             Manage the content sections on the public homepage
           </p>
         </div>
         <Link
           href="/admin/website/homepage/create"
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 bg-gold-600 hover:bg-gold-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
         >
           <Plus size={16} />
           Add Section

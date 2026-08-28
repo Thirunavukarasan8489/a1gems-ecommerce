@@ -64,6 +64,7 @@ const productSchema = z.object({
   weight: z.string().optional(),
   origin: z.string().optional(),
   certification: z.string().optional(),
+  guide: z.string().optional(),
 
   // Images & Media
   primaryImage: z.object({ url: z.string(), altText: z.string().optional() }).optional(),
@@ -78,7 +79,7 @@ const productSchema = z.object({
 
 export type ProductFormValues = z.infer<typeof productSchema>;
 
-export default function ProductForm({ initialData, categories = [] }: { initialData?: any; categories?: { label: string; value: string }[] }) {
+export default function ProductForm({ initialData, categories = [], guides = [] }: { initialData?: any; categories?: { label: string; value: string }[], guides?: { label: string; value: string }[] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('basic');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -92,6 +93,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
     defaultValues: initialData ? {
       ...initialData,
       categoryId: initialData.category?._id || initialData.categoryId || '',
+      guide: initialData.guide?._id || initialData.guide || '',
     } : {
       name: '',
       categoryId: '',
@@ -107,6 +109,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
       weight: '',
       origin: '',
       certification: '',
+      guide: '',
       primaryImage: { url: '', altText: '' },
       gallery: [],
       metaTitle: '',
@@ -258,7 +261,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
     basic: ['name', 'categoryId', 'status', 'shortDescription', 'description'],
     variants: ['hasVariants', 'variants'],
     media: ['primaryImage', 'gallery'],
-    specs: ['material', 'stone', 'size', 'weight', 'origin', 'certification', 'metaTitle', 'metaDescription'],
+    specs: ['material', 'stone', 'size', 'weight', 'origin', 'certification', 'guide', 'metaTitle', 'metaDescription'],
     purchase: ['purchaseType', 'whatsappEnabled'],
   };
 
@@ -305,16 +308,16 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
         <div className="flex items-center gap-4">
           <Link
             href="/admin/products"
-            className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300"
+            className="p-2 border border-gold-200 dark:border-gold-700 rounded-lg hover:bg-gold-100 dark:hover:bg-gold-800 transition-colors text-gold-600 dark:text-gold-300"
           >
             <ArrowLeft size={20} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <Package className="w-6 h-6 text-blue-600" />
+            <h1 className="text-2xl font-bold text-gold-800 dark:text-white flex items-center gap-2">
+              <Package className="w-6 h-6 text-gold-600" />
               {initialData ? 'Edit Product' : 'Create Product'}
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-gold-500 dark:text-gold-400 mt-0.5">
               Unique slug is automatically generated in the backend from product title.
             </p>
           </div>
@@ -339,7 +342,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
       <div className="flex flex-col md:flex-row gap-6 items-start">
 
         {/* Navigation Tabs Sidebar */}
-        <div className="w-full md:w-60 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-2 sticky top-24">
+        <div className="w-full md:w-60 shrink-0 bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm p-2 sticky top-24">
           <nav className="flex flex-col space-y-1">
             {tabs.map(tab => (
               <button
@@ -347,8 +350,8 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100 font-semibold'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-gold-100 text-gold-900 dark:bg-gold-800 dark:text-gold-100 font-semibold'
+                  : 'text-gold-600 dark:text-gold-400 hover:bg-gold-50 dark:hover:bg-gold-800'
                   }`}
               >
                 {tab.label}
@@ -358,7 +361,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
         </div>
 
         {/* Form Content Area */}
-        <div className="flex-1 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-5 lg:p-6">
+        <div className="flex-1 w-full bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm p-5 lg:p-6">
           <form
             id="product-form"
             className="space-y-6"
@@ -389,14 +392,14 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
               />
 
               {/* 4. SPECIFICATIONS & SEO */}
-              <SpecificationsSeoTab isActive={activeTab === 'specs'} />
+              <SpecificationsSeoTab isActive={activeTab === 'specs'} guides={guides} />
 
               {/* 5. PURCHASE RULES */}
               <PurchaseRulesTab isActive={activeTab === 'purchase'} />
             </FormProvider>
 
             {/* Form Navigation / Save */}
-            <div className="flex items-center justify-between pt-5 border-t border-slate-200 dark:border-slate-800 mt-6">
+            <div className="flex items-center justify-between pt-5 border-t border-gold-200 dark:border-gold-800 mt-6">
               <div>
                 {tabs.findIndex(t => t.id === activeTab) > 0 && (
                   <AdminButton
@@ -435,22 +438,22 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
 
       {/* Validation Errors Modal */}
       {validationErrors && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-red-50 dark:bg-red-900/20">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gold-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gold-900 rounded-xl shadow-2xl max-w-md w-full border border-gold-200 dark:border-gold-800 overflow-hidden">
+            <div className="p-4 border-b border-gold-100 dark:border-gold-800 flex justify-between items-center bg-red-50 dark:bg-red-900/20">
               <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
                 <X size={18} /> Validation Errors
               </h3>
-              <button onClick={() => setValidationErrors(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setValidationErrors(null)} className="text-gold-400 hover:text-gold-600">
                 <X size={20} />
               </button>
             </div>
             <div className="p-4 max-h-96 overflow-y-auto">
-              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">Please fix the following required fields before saving:</p>
+              <p className="text-sm text-gold-600 dark:text-gold-300 mb-4">Please fix the following required fields before saving:</p>
               <ul className="space-y-3">
                 {validationErrors.map((err, i) => (
-                  <li key={i} className="flex flex-col text-sm p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                    <span className="font-medium text-slate-800 dark:text-slate-200 capitalize">{err.field.replace(/\./g, ' ')}</span>
+                  <li key={i} className="flex flex-col text-sm p-3 bg-gold-50 dark:bg-gold-800/50 rounded-lg border border-gold-100 dark:border-gold-800">
+                    <span className="font-medium text-gold-800 dark:text-gold-200 capitalize">{err.field.replace(/\./g, ' ')}</span>
                     <span className="text-red-600 dark:text-red-400 mt-1">{err.message}</span>
                     <button
                       type="button"
@@ -459,7 +462,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
                         setActiveTab(err.tabId);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="text-blue-600 text-xs font-semibold text-left mt-2 hover:underline"
+                      className="text-gold-600 text-xs font-semibold text-left mt-2 hover:underline"
                     >
                       Go to {tabs.find(t => t.id === err.tabId)?.label.replace(/^\d+\.\s/, '')} Tab &rarr;
                     </button>
@@ -467,7 +470,7 @@ export default function ProductForm({ initialData, categories = [] }: { initialD
                 ))}
               </ul>
             </div>
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/20 flex justify-end">
+            <div className="p-4 border-t border-gold-100 dark:border-gold-800 bg-gold-50 dark:bg-gold-800/20 flex justify-end">
               <AdminButton onClick={() => setValidationErrors(null)} variant="outline">Close</AdminButton>
             </div>
           </div>

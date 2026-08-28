@@ -9,13 +9,19 @@ import { availableQuantity, type Product } from "@/lib/types";
 export function AddToCart({
   product,
   withQuantity = true,
+  variantName,
+  variantPrice,
+  maxQuantity,
 }: {
   product: Product;
   withQuantity?: boolean;
+  variantName?: string;
+  variantPrice?: number;
+  maxQuantity?: number;
 }) {
   const { add } = useCart();
   const [qty, setQty] = React.useState(1);
-  const max = availableQuantity(product);
+  const max = maxQuantity ?? availableQuantity(product);
   const soldOut = max <= 0;
 
   if (soldOut) {
@@ -57,7 +63,7 @@ export function AddToCart({
         </div>
       )}
 
-      <Button size="lg" full onClick={() => add(product, qty)}>
+      <Button size="lg" full onClick={() => add(product, qty, variantName, variantPrice)}>
         <ShoppingBag size={18} strokeWidth={2.25} />
         Add to cart
       </Button>

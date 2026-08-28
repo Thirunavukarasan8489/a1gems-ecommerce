@@ -20,7 +20,7 @@ type CartContextValue = {
   hydrated: boolean;
   count: number;
   subtotal: number;
-  add: (product: Product, quantity?: number) => void;
+  add: (product: Product, quantity?: number, variantName?: string, variantPrice?: number) => void;
   setQuantity: (productId: string, quantity: number) => void;
   remove: (productId: string) => void;
   clear: () => void;
@@ -68,21 +68,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [lines, hydrated]);
 
-  const add = React.useCallback((product: Product, quantity = 1) => {
+  const add = React.useCallback((product: Product, quantity = 1, variantName?: string, variantPrice?: number) => {
     const line: CartLine = {
       productId: product.id,
       slug: product.slug,
       name: product.name,
       gemColor: product.gemColor,
-      unitPrice: product.sellingPrice,
+      unitPrice: variantPrice ?? product.sellingPrice,
       quantity,
+      variantName,
     };
 
     setLines((current) => {
-      const existing = current.find((l) => l.productId === product.id);
+      const existing = current.find((l) => l.productId === product.id && l.variantName === variantName);
       if (!existing) return [...current, line];
       return current.map((l) =>
-        l.productId === product.id
+        (l.productId === product.id && l.variantName === variantName)
           ? { ...l, quantity: l.quantity + quantity }
           : l,
       );

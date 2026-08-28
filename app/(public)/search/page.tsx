@@ -5,8 +5,8 @@ import { ProductGrid } from "@/components/public/product/product-rail";
 import { SearchInput } from "@/components/public/product/search-input";
 import { buttonStyles } from "@/components/public/ui/button";
 import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
-import { categories } from "@/lib/data/categories";
-import { getBestsellers, products } from "@/lib/data/products";
+import { getCategories } from "@/lib/services/category-service";
+import { getBestsellers, getProducts } from "@/lib/services/product-service";
 import { applyFilters, toQuery } from "@/lib/filters";
 import { categoryTerms } from "@/lib/utils";
 
@@ -20,7 +20,11 @@ const suggestions = ["Unheated", "Ceylon", "Bracelet", "Rudraksha", "Emerald"];
 export default async function SearchPage(props: PageProps<"/search">) {
   const query = toQuery(await props.searchParams);
   const term = query.q?.trim() ?? "";
+  const products = await getProducts();
   const results = term ? applyFilters(products, query) : [];
+  
+  const categories = !term ? await getCategories() : [];
+  const bestsellers = !term ? await getBestsellers() : [];
 
   return (
     <>
@@ -108,7 +112,7 @@ export default async function SearchPage(props: PageProps<"/search">) {
               <h2 className="mb-4 font-display text-xl font-semibold text-plum-900">
                 Popular right now
               </h2>
-              <ProductGrid products={getBestsellers()} />
+              <ProductGrid products={bestsellers} />
             </>
           )}
         </div>

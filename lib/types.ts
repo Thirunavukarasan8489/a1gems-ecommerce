@@ -17,6 +17,7 @@ export interface Category {
   description: string;
   /** Hue anchor used to render the placeholder gem artwork. */
   gemColor: string;
+  image?: string;
   displayOrder: number;
   published: boolean;
 }
@@ -28,6 +29,23 @@ export interface ProductSpecifications {
   weight?: string;
   origin?: string;
   certification?: string;
+}
+
+export interface ProductVariant {
+  name: string;
+  caratApprox?: number;
+  size?: string;
+  price: number;
+  comparePrice?: number;
+  stock: number;
+  lowStockThreshold: number;
+}
+
+export interface ProductSeo {
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string[];
+  ogImage?: string;
 }
 
 export interface Product {
@@ -56,6 +74,17 @@ export interface Product {
   /** Hue anchor for the placeholder artwork until real media is uploaded. */
   gemColor: string;
   gallery: number;
+  primaryImage?: { url: string; altText?: string };
+  images?: { url: string; altText?: string }[];
+
+  hasVariants: boolean;
+  variants?: ProductVariant[];
+
+  seo?: ProductSeo;
+  guide?: {
+    name: string;
+    slug: string;
+  };
 
   featured: boolean;
   bestseller: boolean;
@@ -98,6 +127,7 @@ export interface CartLine {
   /** Price snapshot at the time the line was added (§11.1). */
   unitPrice: number;
   quantity: number;
+  variantName?: string;
 }
 
 export interface LeadNote {

@@ -93,21 +93,21 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center gap-4">
           <Link
             href="/admin/categories"
-            className="p-2 border border-slate-200 dark:border-slate-700 rounded-md text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 border border-gold-200 dark:border-gold-700 rounded-md text-gold-500 hover:bg-gold-50 dark:hover:bg-gold-800 transition-colors"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
+            <h1 className="text-2xl font-bold text-gold-800 dark:text-white">
               {initialData ? 'Edit Category' : 'Create Category'}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
               {initialData ? 'Update the category details' : 'Add a new product category to your catalogue'}
             </p>
           </div>
@@ -126,11 +126,11 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Details */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Basic Information</h3>
+          <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gold-800 dark:text-white mb-4">Basic Information</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1">
                   Category Name *
                 </label>
                 <input
@@ -139,14 +139,14 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="w-full px-4 py-2 border border-gold-200 dark:border-gold-700 rounded-md bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500 transition-colors"
                   placeholder="e.g. Ruby Rings"
                 />
               </div>
 
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1">
                   Description
                 </label>
                 <textarea
@@ -154,7 +154,7 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                   rows={4}
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="w-full px-4 py-2 border border-gold-200 dark:border-gold-700 rounded-md bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500 transition-colors"
                   placeholder="Describe the category..."
                 />
               </div>
@@ -162,11 +162,11 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
           </div>
           
           {/* SEO Details */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Search Engine Optimization</h3>
+          <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gold-800 dark:text-white mb-4">Search Engine Optimization</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1">
                   Meta Title
                 </label>
                 <input
@@ -174,12 +174,12 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                   name="metaTitle"
                   value={formData.metaTitle}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="w-full px-4 py-2 border border-gold-200 dark:border-gold-700 rounded-md bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500 transition-colors"
                   placeholder="Leave blank to use category name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1">
                   Meta Description
                 </label>
                 <textarea
@@ -187,7 +187,7 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                   rows={3}
                   value={formData.metaDescription}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="w-full px-4 py-2 border border-gold-200 dark:border-gold-700 rounded-md bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500 transition-colors"
                 />
               </div>
             </div>
@@ -196,10 +196,10 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Status</h3>
+          <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gold-800 dark:text-white mb-4">Status</h3>
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1">
                 Visibility
               </label>
               <AdminSelect
@@ -217,15 +217,15 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Category Image</h3>
+          <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gold-800 dark:text-white mb-4">Category Image</h3>
             <div className="space-y-4">
               
               <div className="flex flex-col items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:hover:bg-bray-800 dark:bg-slate-800 hover:bg-slate-100 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:bg-slate-700 transition-colors">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gold-300 border-dashed rounded-lg cursor-pointer bg-gold-50 dark:hover:bg-bray-800 dark:bg-gold-800 hover:bg-gold-100 dark:border-gold-600 dark:hover:border-gold-500 dark:hover:bg-gold-700 transition-colors">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <UploadCloud className="w-8 h-8 mb-2 text-slate-400" />
-                    <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
+                    <UploadCloud className="w-8 h-8 mb-2 text-gold-400" />
+                    <p className="mb-2 text-sm text-gold-500 dark:text-gold-400">
                       <span className="font-semibold">Click to upload</span> or drag and drop
                     </p>
                   </div>
@@ -240,7 +240,7 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
 
               {/* Preview */}
               {(imagePreview || formData.image) && (
-                <div className="relative w-full h-40 rounded-md overflow-hidden border border-slate-200 dark:border-slate-700 group">
+                <div className="relative w-full h-40 rounded-md overflow-hidden border border-gold-200 dark:border-gold-700 group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={imagePreview || formData.image} 
@@ -263,8 +263,8 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                 </div>
               )}
 
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+              <div className="pt-2 border-t border-gold-100 dark:border-gold-800">
+                <label className="block text-xs font-medium text-gold-500 dark:text-gold-400 mb-1">
                   Or enter image URL manually
                 </label>
                 <input
@@ -280,7 +280,7 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                     }
                   }}
                   disabled={!!selectedFile}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+                  className="w-full px-3 py-2 text-sm border border-gold-200 dark:border-gold-700 rounded-md bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500 transition-colors disabled:opacity-50"
                   placeholder="https://res.cloudinary.com/..."
                 />
               </div>

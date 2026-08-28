@@ -9,21 +9,21 @@ import {
 import { ProductGrid } from "@/components/public/product/product-rail";
 import { buttonStyles } from "@/components/public/ui/button";
 import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
-import { categories, getCategory } from "@/lib/data/categories";
-import { getProductsByCategory } from "@/lib/data/products";
+import { getCategories, getCategoryBySlug } from "@/lib/services/category-service";
+import { getProductsByCategory } from "@/lib/services/product-service";
 import { applyFilters, toQuery } from "@/lib/filters";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const categories = await getCategories();
   return categories
-    .filter((c) => c.published)
-    .map((category) => ({ slug: category.slug }));
+    .map((category: any) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata(
   props: PageProps<"/collections/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const category = getCategory(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) return { title: "Collection not found" };
 
   return {
@@ -55,11 +55,12 @@ export default async function CollectionPage(
   props: PageProps<"/collections/[slug]">,
 ) {
   const { slug } = await props.params;
-  const category = getCategory(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
   const query = toQuery(await props.searchParams);
-  const results = applyFilters(getProductsByCategory(slug), {
+  const products = await getProductsByCategory(slug);
+  const results = applyFilters(products, {
     ...query,
     category: undefined,
   });

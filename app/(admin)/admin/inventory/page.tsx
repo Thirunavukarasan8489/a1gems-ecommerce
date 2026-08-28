@@ -113,11 +113,11 @@ export default function InventoryPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-            <Boxes className="w-6 h-6 text-blue-600" />
+          <h1 className="text-2xl font-bold text-gold-800 dark:text-white flex items-center gap-2">
+            <Boxes className="w-6 h-6 text-gold-600" />
             Inventory & Stock Tracking
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
             Real-time stock availability, reservation tracking, and inventory adjustments.
           </p>
         </div>
@@ -129,34 +129,34 @@ export default function InventoryPage() {
 
       {/* KPI Highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
-          <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-gold-50 dark:bg-gold-900/30 text-gold-600 flex items-center justify-center">
             <Boxes size={22} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase text-slate-400">Total Tracked Items</p>
-            <p className="text-xl font-bold text-slate-900 dark:text-white">{inventory.length}</p>
+            <p className="text-xs font-semibold uppercase text-gold-400">Total Tracked Items</p>
+            <p className="text-xl font-bold text-gold-900 dark:text-white">{inventory.length}</p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center">
             <AlertTriangle size={22} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase text-slate-400">Low Stock Alerts</p>
+            <p className="text-xs font-semibold uppercase text-gold-400">Low Stock Alerts</p>
             <p className="text-xl font-bold text-amber-600">
               {inventory.filter(i => i.status === 'LOW_STOCK').length}
             </p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center">
             <XCircle size={22} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase text-slate-400">Out of Stock</p>
+            <p className="text-xs font-semibold uppercase text-gold-400">Out of Stock</p>
             <p className="text-xl font-bold text-red-600">
               {inventory.filter(i => i.status === 'OUT_OF_STOCK').length}
             </p>
@@ -165,17 +165,17 @@ export default function InventoryPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
         
         {/* Search */}
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={16} />
           <input
             type="text"
             placeholder="Search by product name or SKU..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-2 bg-gold-50 dark:bg-gold-800 border border-gold-200 dark:border-gold-700 rounded-lg text-sm text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500"
           />
         </div>
 
@@ -210,10 +210,10 @@ export default function InventoryPage() {
       </div>
 
       {/* Inventory Data Table */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">
+            <thead className="bg-gold-50 dark:bg-gold-800/50 border-b border-gold-200 dark:border-gold-700 text-gold-600 dark:text-gold-400">
               <tr>
                 <th className="px-6 py-3.5 font-semibold">SKU / Product</th>
                 <th className="px-6 py-3.5 font-semibold">Category</th>
@@ -224,41 +224,41 @@ export default function InventoryPage() {
                 <th className="px-6 py-3.5 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-gold-100 dark:divide-gold-800">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gold-400">
                     Loading live inventory...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gold-400">
                     No matching inventory items found.
                   </td>
                 </tr>
               ) : (
                 filtered.map(item => (
-                  <tr key={item._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr key={item._id} className="hover:bg-gold-50 dark:hover:bg-gold-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <div>
-                        <p className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <p className="font-semibold text-gold-900 dark:text-white flex items-center gap-1.5">
                           {item.name}
                           {item.hasVariants && (
-                            <span className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] bg-gold-100 dark:bg-gold-900/40 text-gold-700 dark:text-gold-300 font-bold px-1.5 py-0.5 rounded">
                               {item.variants.length} VARIANTS
                             </span>
                           )}
                         </p>
-                        <p className="text-xs text-slate-500 font-mono mt-0.5">{item.sku}</p>
+                        <p className="text-xs text-gold-500 font-mono mt-0.5">{item.sku}</p>
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                    <td className="px-6 py-4 text-gold-600 dark:text-gold-300">
                       {item.category}
                     </td>
 
-                    <td className="px-6 py-4 text-center font-medium text-slate-800 dark:text-slate-200">
+                    <td className="px-6 py-4 text-center font-medium text-gold-800 dark:text-gold-200">
                       {item.stock}
                     </td>
 
@@ -266,7 +266,7 @@ export default function InventoryPage() {
                       {item.reserved}
                     </td>
 
-                    <td className="px-6 py-4 text-center font-bold text-slate-900 dark:text-white">
+                    <td className="px-6 py-4 text-center font-bold text-gold-900 dark:text-white">
                       {item.available}
                     </td>
 
@@ -277,7 +277,7 @@ export default function InventoryPage() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleOpenAdjustment(item)}
-                        className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 rounded-lg text-xs font-semibold transition-colors inline-flex items-center gap-1"
+                        className="px-3 py-1.5 bg-gold-50 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 hover:bg-gold-100 rounded-lg text-xs font-semibold transition-colors inline-flex items-center gap-1"
                       >
                         <ArrowUpDown size={13} />
                         Adjust Stock
@@ -293,14 +293,14 @@ export default function InventoryPage() {
 
       {/* Adjust Stock Modal */}
       {adjustingItem && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-gold-900/50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gold-900 rounded-2xl shadow-xl max-w-md w-full p-6 border border-gold-200 dark:border-gold-800 space-y-5">
+            <div className="flex items-center justify-between border-b border-gold-100 dark:border-gold-800 pb-3">
               <div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">Adjust Stock Level</h2>
-                <p className="text-xs text-slate-500">{adjustingItem.name}</p>
+                <h2 className="text-base font-bold text-gold-900 dark:text-white">Adjust Stock Level</h2>
+                <p className="text-xs text-gold-500">{adjustingItem.name}</p>
               </div>
-              <button onClick={() => setAdjustingItem(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setAdjustingItem(null)} className="text-gold-400 hover:text-gold-600">
                 <X size={18} />
               </button>
             </div>
@@ -331,7 +331,7 @@ export default function InventoryPage() {
 
               {/* Action Type: ADD or SUBTRACT */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-gold-700 dark:text-gold-300 mb-1.5">
                   Adjustment Type
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -341,7 +341,7 @@ export default function InventoryPage() {
                     className={`py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-1.5 transition-all ${
                       adjustType === 'ADD'
                         ? 'bg-green-50 text-green-700 border-green-600 dark:bg-green-900/30 dark:text-green-300'
-                        : 'border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-50'
+                        : 'border-gold-200 dark:border-gold-700 text-gold-600 hover:bg-gold-50'
                     }`}
                   >
                     <Plus size={14} /> Add Stock (+)
@@ -353,7 +353,7 @@ export default function InventoryPage() {
                     className={`py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-1.5 transition-all ${
                       adjustType === 'SUBTRACT'
                         ? 'bg-red-50 text-red-700 border-red-600 dark:bg-red-900/30 dark:text-red-300'
-                        : 'border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-50'
+                        : 'border-gold-200 dark:border-gold-700 text-gold-600 hover:bg-gold-50'
                     }`}
                   >
                     <Minus size={14} /> Reduce Stock (-)
@@ -391,7 +391,7 @@ export default function InventoryPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex justify-end gap-2 pt-3 border-t border-gold-100 dark:border-gold-800">
                 <AdminButton type="button" variant="outline" onClick={() => setAdjustingItem(null)}>
                   Cancel
                 </AdminButton>

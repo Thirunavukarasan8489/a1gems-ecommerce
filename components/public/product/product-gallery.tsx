@@ -120,11 +120,20 @@ export function ProductGallery({
                     active === i ? "ring-gold-500" : "ring-transparent hover:ring-plum-300",
                   )}
                 >
-                  <GemImage
-                    color={color}
-                    seed={i * 7 + 3}
-                    className="aspect-square w-full"
-                  />
+                  {hasImages ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={images[i].url}
+                      alt={images[i].altText || `Thumbnail ${i + 1}`}
+                      className="aspect-square w-full object-cover"
+                    />
+                  ) : (
+                    <GemImage
+                      color={color}
+                      seed={i * 7 + 3}
+                      className="aspect-square w-full"
+                    />
+                  )}
                 </button>
               </li>
             ))}

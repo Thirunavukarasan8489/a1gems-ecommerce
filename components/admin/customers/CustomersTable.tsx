@@ -21,27 +21,27 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
       header: 'Customer',
       cell: (item: CustomerRow) => (
         <div>
-          <p className="font-medium text-slate-800 dark:text-slate-200">{item.name}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{item.phone}</p>
+          <p className="font-medium text-gold-800 dark:text-gold-200">{item.name}</p>
+          <p className="text-xs text-gold-500 dark:text-gold-400">{item.phone}</p>
         </div>
       ),
     },
     {
       header: 'Email',
       cell: (item: CustomerRow) => (
-        <span className="text-slate-600 dark:text-slate-400 text-sm">{item.email ?? '—'}</span>
+        <span className="text-gold-600 dark:text-gold-400 text-sm">{item.email ?? '—'}</span>
       ),
     },
     {
       header: 'Total Orders',
       cell: (item: CustomerRow) => (
-        <span className="font-medium text-slate-700 dark:text-slate-300">{item.totalOrders}</span>
+        <span className="font-medium text-gold-700 dark:text-gold-300">{item.totalOrders}</span>
       ),
     },
     {
       header: 'Total Spent',
       cell: (item: CustomerRow) => (
-        <span className="font-medium text-slate-700 dark:text-slate-300">
+        <span className="font-medium text-gold-700 dark:text-gold-300">
           ₹{(item.totalSpent ?? 0).toLocaleString('en-IN')}
         </span>
       ),
@@ -49,7 +49,7 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
     {
       header: 'Last Order',
       cell: (item: CustomerRow) => (
-        <span className="text-slate-600 dark:text-slate-400 text-sm">
+        <span className="text-gold-600 dark:text-gold-400 text-sm">
           {item.lastOrderDate
             ? new Date(item.lastOrderDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
             : '—'}
@@ -70,7 +70,7 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
           {item.email && (
             <a
               href={`mailto:${item.email}`}
-              className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
               title="Send email"
             >
               <Mail size={16} />
@@ -78,7 +78,7 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
           )}
           <Link
             href={`/admin/customers/${encodeURIComponent(item.phone)}`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
             title="View customer"
           >
             <Eye size={16} />

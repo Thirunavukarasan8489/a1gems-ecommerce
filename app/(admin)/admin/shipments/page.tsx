@@ -12,8 +12,8 @@ export default async function ShipmentsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Shipments</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-gold-800 dark:text-white">Shipments</h1>
+          <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
             Track and manage outbound orders
           </p>
         </div>

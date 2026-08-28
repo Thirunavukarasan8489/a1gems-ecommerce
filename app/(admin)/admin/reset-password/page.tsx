@@ -52,32 +52,32 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-gold-50 dark:bg-gold-900 flex items-center justify-center p-4 selection:bg-gold-100 selection:text-gold-900">
       <div className="w-full max-w-md">
         {/* Logo/Branding Area */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 mb-4">
-            <ShieldAlert className="text-blue-600 dark:text-blue-500" size={32} />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white dark:bg-gold-800 shadow-sm border border-gold-200 dark:border-gold-700 mb-4">
+            <ShieldAlert className="text-gold-600 dark:text-gold-500" size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">A1 GEMS</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Create New Password</p>
+          <h1 className="text-3xl font-bold text-gold-800 dark:text-white tracking-tight">A1 GEMS</h1>
+          <p className="text-gold-500 dark:text-gold-400 mt-2 text-sm">Create New Password</p>
         </div>
 
         {/* Reset Password Card */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-slate-700/60 p-8">
+        <div className="bg-white dark:bg-gold-800 rounded-2xl shadow-xl shadow-gold-200/50 dark:shadow-gold-900/50 border border-gold-200/60 dark:border-gold-700/60 p-8">
           {isSuccess ? (
             <div className="text-center space-y-4">
               <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle2 className="text-green-600 dark:text-green-400" size={24} />
               </div>
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-white">Password Reset Complete</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">
+              <h2 className="text-xl font-semibold text-gold-800 dark:text-white">Password Reset Complete</h2>
+              <p className="text-gold-500 dark:text-gold-400 text-sm">
                 Your password has been successfully updated. You can now use your new password to sign in.
               </p>
               <div className="pt-4">
                 <Link
                   href="/admin/login"
-                  className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                  className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gold-600 hover:bg-gold-700 transition-colors"
                 >
                   Sign in to your account
                 </Link>
@@ -87,7 +87,7 @@ export default function ResetPassword() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               
               <div className="text-center mb-6">
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-sm text-gold-600 dark:text-gold-400">
                   Please enter your new password below.
                 </p>
               </div>
@@ -101,26 +101,26 @@ export default function ResetPassword() {
               <div className="space-y-4">
                 {/* New Password Input */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="password">
+                  <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1.5" htmlFor="password">
                     New Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-slate-400" />
+                      <Lock className="h-5 w-5 text-gold-400" />
                     </div>
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       {...register('password')}
-                      className={`block w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900/50 border ${
-                        errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
-                      } rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
+                      className={`block w-full pl-10 pr-10 py-2.5 bg-gold-50 dark:bg-gold-900/50 border ${
+                        errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gold-200 dark:border-gold-700 focus:ring-gold-500 focus:border-gold-500'
+                      } rounded-lg text-gold-900 dark:text-white placeholder-gold-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gold-400 hover:text-gold-600 dark:hover:text-gold-300 transition-colors"
                     >
                       {showPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -136,26 +136,26 @@ export default function ResetPassword() {
 
                 {/* Confirm Password Input */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="confirmPassword">
+                  <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1.5" htmlFor="confirmPassword">
                     Confirm New Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-slate-400" />
+                      <Lock className="h-5 w-5 text-gold-400" />
                     </div>
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
                       {...register('confirmPassword')}
-                      className={`block w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900/50 border ${
-                        errors.confirmPassword ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500'
-                      } rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
+                      className={`block w-full pl-10 pr-10 py-2.5 bg-gold-50 dark:bg-gold-900/50 border ${
+                        errors.confirmPassword ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gold-200 dark:border-gold-700 focus:ring-gold-500 focus:border-gold-500'
+                      } rounded-lg text-gold-900 dark:text-white placeholder-gold-400 focus:outline-none focus:ring-2 transition-colors sm:text-sm`}
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gold-400 hover:text-gold-600 dark:hover:text-gold-300 transition-colors"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -174,7 +174,7 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all dark:focus:ring-offset-slate-900"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gold-600 hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gold-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all dark:focus:ring-offset-gold-900"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function ResetPassword() {
               <div className="text-center mt-4">
                 <Link
                   href="/admin/login"
-                  className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="text-sm font-medium text-gold-600 dark:text-gold-400 hover:text-gold-900 dark:hover:text-white transition-colors"
                 >
                   Back to login
                 </Link>
@@ -202,7 +202,7 @@ export default function ResetPassword() {
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-8 text-center text-sm text-gold-500 dark:text-gold-400">
           Secure portal for authorized personnel only. <br />
           &copy; {new Date().getFullYear()} A1 Gems Platform.
         </p>

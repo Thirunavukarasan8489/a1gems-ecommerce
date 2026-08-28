@@ -2,17 +2,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/public/ui/page-header";
-import { getPolicy, policies } from "@/lib/data/policies";
+import { getPolicies, getPolicyBySlug } from "@/lib/services/content-service";
 
-export function generateStaticParams() {
-  return policies.map((policy) => ({ slug: policy.slug }));
+export async function generateStaticParams() {
+  const policies = await getPolicies();
+  return policies.map((policy: any) => ({ slug: policy.slug }));
 }
 
 export async function generateMetadata(
   props: PageProps<"/policies/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const policy = getPolicy(slug);
+  const policy = await getPolicyBySlug(slug);
   if (!policy) return { title: "Policy not found" };
 
   return { title: policy.title, description: policy.summary };
@@ -22,7 +23,7 @@ export default async function PolicyPage(
   props: PageProps<"/policies/[slug]">,
 ) {
   const { slug } = await props.params;
-  const policy = getPolicy(slug);
+  const policy = await getPolicyBySlug(slug);
   if (!policy) notFound();
 
   return (
@@ -38,29 +39,15 @@ export default async function PolicyPage(
         <div className="mx-auto max-w-2xl">
           <p className="text-xs text-ink-muted">Last updated {policy.updated}</p>
 
-          {policy.sections.map((section) => (
-            <section key={section.heading} className="mt-8">
-              <h2 className="font-display text-2xl leading-tight font-semibold text-plum-900">
-                {section.heading}
-              </h2>
-              {section.paragraphs.map((paragraph, i) => (
-                <p
-                  key={i}
-                  className="mt-3 text-[1.0625rem] leading-[1.75] text-plum-800"
-                >
-                  {paragraph}
-                </p>
-              ))}
-            </section>
-          ))}
+          <div className="mt-8 prose prose-plum max-w-none" dangerouslySetInnerHTML={{ __html: policy.content }} />
 
           <nav className="mt-12 border-t border-ivory-300 pt-6">
             <h2 className="text-[0.6875rem] font-semibold tracking-[0.14em] text-ink-muted uppercase">
               Other policies
             </h2>
             <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-              {policies
-                .filter((p) => p.slug !== policy.slug)
+              {(await getPolicies())
+                .filter((p: any) => p.slug !== policy.slug)
                 .map((p) => (
                   <li key={p.slug}>
                     <Link

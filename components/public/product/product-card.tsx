@@ -28,11 +28,20 @@ export function ProductCard({
       )}
     >
       <div className="relative">
-        <GemImage
-          color={product.gemColor}
-          seed={product.id.length}
-          className="aspect-4/5 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04]"
-        />
+        {product.primaryImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.primaryImage.url}
+            alt={product.primaryImage.altText || product.name}
+            className="aspect-4/5 w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04]"
+          />
+        ) : (
+          <GemImage
+            color={product.gemColor}
+            seed={product.id.length}
+            className="aspect-4/5 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04]"
+          />
+        )}
 
         <div className="pointer-events-none absolute inset-x-2 top-2 flex flex-wrap gap-1.5">
           {status === "OUT_OF_STOCK" ? (

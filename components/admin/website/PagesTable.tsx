@@ -20,13 +20,13 @@ export default function PagesTable({ pages }: { pages: ContentPageRow[] }) {
     {
       header: 'Title',
       cell: (item: ContentPageRow) => (
-        <span className="font-medium text-slate-800 dark:text-slate-200">{item.title}</span>
+        <span className="font-medium text-gold-800 dark:text-gold-200">{item.title}</span>
       ),
     },
     {
       header: 'URL Slug',
       cell: (item: ContentPageRow) => (
-        <span className="text-slate-600 dark:text-slate-400 font-mono text-sm">/{item.slug}</span>
+        <span className="text-gold-600 dark:text-gold-400 font-mono text-sm">/{item.slug}</span>
       ),
     },
     {
@@ -41,7 +41,7 @@ export default function PagesTable({ pages }: { pages: ContentPageRow[] }) {
     {
       header: 'Last Updated',
       cell: (item: ContentPageRow) => (
-        <span className="text-slate-500 dark:text-slate-400 text-sm">
+        <span className="text-gold-500 dark:text-gold-400 text-sm">
           {new Date(item.updatedAt).toLocaleDateString()}
         </span>
       ),
@@ -52,7 +52,7 @@ export default function PagesTable({ pages }: { pages: ContentPageRow[] }) {
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/website/pages/${item._id}/edit`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Edit size={16} />
           </Link>

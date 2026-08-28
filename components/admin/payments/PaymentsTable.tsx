@@ -21,30 +21,30 @@ export default function PaymentsTable({ payments }: { payments: PaymentRow[] }) 
     {
       header: 'Payment ID',
       cell: (item: PaymentRow) => (
-        <span className="font-medium text-slate-800 dark:text-slate-200">{item.paymentNumber}</span>
+        <span className="font-medium text-gold-800 dark:text-gold-200">{item.paymentNumber}</span>
       ),
     },
     {
       header: 'Order Details',
       cell: (item: PaymentRow) => (
         <div>
-          <Link href={`/admin/orders/${item.orderId?._id}`} className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href={`/admin/orders/${item.orderId?._id}`} className="font-medium text-gold-600 dark:text-gold-400 hover:underline">
             {item.orderId?.orderNumber ?? '—'}
           </Link>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{item.orderId?.customerName}</p>
+          <p className="text-xs text-gold-500 dark:text-gold-400">{item.orderId?.customerName}</p>
         </div>
       ),
     },
     {
       header: 'Method',
       cell: (item: PaymentRow) => (
-        <span className="text-slate-700 dark:text-slate-300">{item.method}</span>
+        <span className="text-gold-700 dark:text-gold-300">{item.method}</span>
       ),
     },
     {
       header: 'Amount',
       cell: (item: PaymentRow) => (
-        <span className="font-medium text-slate-800 dark:text-slate-200">
+        <span className="font-medium text-gold-800 dark:text-gold-200">
           ₹{(item.amount ?? 0).toLocaleString('en-IN')}
         </span>
       ),
@@ -52,7 +52,7 @@ export default function PaymentsTable({ payments }: { payments: PaymentRow[] }) 
     {
       header: 'Date',
       cell: (item: PaymentRow) => (
-        <span className="text-slate-600 dark:text-slate-400 text-sm">
+        <span className="text-gold-600 dark:text-gold-400 text-sm">
           {new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
         </span>
       ),
@@ -76,7 +76,7 @@ export default function PaymentsTable({ payments }: { payments: PaymentRow[] }) 
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/payments/${item._id}`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Eye size={16} />
           </Link>

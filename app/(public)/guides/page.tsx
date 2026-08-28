@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { ArrowRight, Clock } from "lucide-react";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { PageHeader } from "@/components/public/ui/page-header";
-import { guides } from "@/lib/data/content";
+import { getGuides } from "@/lib/services/content-service";
 
 export const metadata: Metadata = {
   title: "Gemstone Guides",
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
     "Practical guides to buying gemstones — identifying natural stones, reading certificates, understanding treatments and choosing carat weight.",
 };
 
-export default function GuidesPage() {
+export default async function GuidesPage() {
+  const guides = await getGuides();
   const [lead, ...rest] = guides;
 
   return (
@@ -23,9 +24,14 @@ export default function GuidesPage() {
         breadcrumbs={[{ label: "Gemstone Guides" }]}
       />
 
-      <div className="shell gutter py-10 sm:py-14">
-        <Link
-          href={`/guides/${lead.slug}`}
+      {guides.length === 0 ? (
+        <div className="shell gutter py-10 sm:py-14">
+          <p className="text-center text-ink-muted">No guides found.</p>
+        </div>
+      ) : (
+        <div className="shell gutter py-10 sm:py-14">
+          <Link
+            href={`/guides/${lead.slug}`}
           className="group grid overflow-hidden rounded-2xl border border-ivory-300 bg-white transition-[border-color,box-shadow] duration-300 hover:border-gold-300 hover:shadow-md lg:grid-cols-2"
         >
           <GemImage
@@ -46,7 +52,7 @@ export default function GuidesPage() {
             <span className="mt-5 flex items-center gap-4 text-[0.8125rem] font-semibold text-plum-700">
               <span className="flex items-center gap-1.5 text-ink-muted">
                 <Clock size={14} />
-                {lead.readMinutes} min read
+                {lead.readTimeMinutes} min read
               </span>
               <span className="flex items-center gap-1.5 text-gold-700">
                 Read guide
@@ -83,14 +89,15 @@ export default function GuidesPage() {
                   </p>
                   <span className="mt-auto flex items-center gap-1.5 pt-4 text-xs text-ink-muted">
                     <Clock size={13} />
-                    {guide.readMinutes} min read
+                    {guide.readTimeMinutes} min read
                   </span>
                 </div>
               </Link>
             </li>
           ))}
-        </ul>
-      </div>
+          </ul>
+        </div>
+      )}
     </>
   );
 }

@@ -20,17 +20,17 @@ import {
   getBestsellers,
   getFeaturedProducts,
   getProductsByCategory,
-} from "@/lib/data/products";
+} from "@/lib/services/product-service";
 
 /**
  * §7 Homepage Flow. Section order matches the CMS specification so that when
  * the Homepage CMS lands (Phase 14) each block below maps to one editable,
  * reorderable section document.
  */
-export default function HomePage() {
-  const featured = getFeaturedProducts();
-  const bestsellers = getBestsellers();
-  const bracelets = getProductsByCategory("bracelets");
+export default async function HomePage() {
+  const featured = await getFeaturedProducts();
+  const bestsellers = await getBestsellers();
+  const bracelets = await getProductsByCategory("bracelets");
   const collectorPieces = featured.filter(
     (p) => p.purchaseType === "ENQUIRY_ONLY",
   );

@@ -21,15 +21,15 @@ export default function CategoriesTable({ categories }: { categories: CategoryRo
       header: 'Category Name',
       cell: (item: CategoryRow) => (
         <div>
-          <p className="font-medium text-slate-800 dark:text-slate-200">{item.name}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">/{item.slug}</p>
+          <p className="font-medium text-gold-800 dark:text-gold-200">{item.name}</p>
+          <p className="text-xs text-gold-500 dark:text-gold-400">/{item.slug}</p>
         </div>
       ),
     },
     {
       header: 'Total Products',
       cell: (item: CategoryRow) => (
-        <span className="text-slate-700 dark:text-slate-300">{item.productCount ?? 0}</span>
+        <span className="text-gold-700 dark:text-gold-300">{item.productCount ?? 0}</span>
       ),
     },
     {
@@ -45,7 +45,7 @@ export default function CategoriesTable({ categories }: { categories: CategoryRo
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/categories/${item._id}/edit`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Edit size={16} />
           </Link>

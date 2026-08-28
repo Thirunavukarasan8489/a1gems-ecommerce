@@ -106,20 +106,23 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIs
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-plum-950/60 backdrop-blur-xs z-40 md:hidden" 
+          className="fixed inset-0 bg-gold-950/60 backdrop-blur-xs z-40 md:hidden" 
           onClick={() => setIsOpen && setIsOpen(false)}
         />
       )}
       
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-plum-950 text-ivory-100 flex flex-col h-full overflow-y-auto transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4 border-b border-plum-900/60 flex items-center justify-center">
-          <h1 className="text-xl font-display font-bold text-ivory-100 tracking-wider">A1 GEMS <span className="text-xs font-sans font-semibold text-gold-400 uppercase tracking-widest ml-1 bg-gold-500/10 px-2 py-0.5 rounded-full border border-gold-500/20">Admin</span></h1>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-gold-950 text-ivory-100 flex flex-col h-full overflow-y-auto transition-transform duration-300 ease-in-out md:static md:translate-x-0 border-r border-gold-900 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-5 border-b border-gold-900 flex items-center justify-center">
+          <h1 className="text-2xl font-display font-bold text-gold-50 tracking-wider">
+            A1 GEMS 
+            <span className="align-top text-[0.6rem] font-sans font-bold text-gold-400 uppercase tracking-widest ml-1.5 bg-gold-900/80 px-2 py-0.5 rounded-full border border-gold-800">Admin</span>
+          </h1>
         </div>
 
-        <nav className="flex-1 p-4 space-y-6">
+        <nav className="flex-1 p-4 space-y-7">
           {sidebarGroups.map((group) => (
           <div key={group.title}>
-            <h2 className="text-[0.65rem] font-semibold text-gold-500/70 uppercase tracking-[0.14em] mb-2">
+            <h2 className="text-[0.65rem] font-bold text-gold-600 uppercase tracking-[0.15em] mb-3 px-2">
               {group.title}
             </h2>
             <ul className="space-y-1">
@@ -131,13 +134,13 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean, setIs
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-[0.875rem] transition-all duration-300 ${
                         isActive
-                          ? 'bg-gold-500/15 text-gold-300 font-semibold border-l-2 border-gold-400 ring-1 ring-gold-400/20'
-                          : 'text-plum-200 hover:bg-plum-900/60 hover:text-gold-200'
+                          ? 'bg-gold-900 text-white font-medium shadow-inner border border-gold-800/60'
+                          : 'text-gold-200 hover:bg-gold-900/50 hover:text-white border border-transparent'
                       }`}
                     >
-                      <Icon size={18} className={isActive ? 'text-gold-400' : 'text-plum-300/70'} />
+                      <Icon size={18} className={`transition-colors duration-300 ${isActive ? 'text-gold-400' : 'text-gold-600 group-hover:text-gold-400'}`} />
                       {item.name}
                     </Link>
                   </li>

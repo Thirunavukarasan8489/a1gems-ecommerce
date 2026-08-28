@@ -1,14 +1,16 @@
 import ProductForm from '@/components/admin/products/ProductForm';
 import { getProductById } from '@/lib/actions/product.actions';
 import { getCategories } from '@/lib/actions/category.actions';
+import { getGuides } from '@/lib/actions/guide.actions';
 import { notFound } from 'next/navigation';
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   
-  const [productRes, categoriesRes] = await Promise.all([
+  const [productRes, categoriesRes, guidesRes] = await Promise.all([
     getProductById(resolvedParams.id),
-    getCategories()
+    getCategories(),
+    getGuides()
   ]);
   
   if (!productRes.success || !productRes.data) {
@@ -17,6 +19,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   
   const categories = categoriesRes.success && categoriesRes.data 
     ? categoriesRes.data.map((c: any) => ({ label: c.name, value: c._id }))
+    : [];
+    
+  const guides = guidesRes.success && guidesRes.data
+    ? guidesRes.data.map((g: any) => ({ label: g.title, value: g._id }))
     : [];
     
   // Format the existing gallery into the shape expected by ProductForm
@@ -28,5 +34,5 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     })) || []
   };
   
-  return <ProductForm initialData={formattedData} categories={categories} />;
+  return <ProductForm initialData={formattedData} categories={categories} guides={guides} />;
 }

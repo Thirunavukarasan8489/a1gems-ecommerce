@@ -39,6 +39,7 @@ export const products: Product[] = [
     rating: 5,
     reviewCount: 12,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_002",
@@ -73,6 +74,7 @@ export const products: Product[] = [
     rating: 5,
     reviewCount: 28,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_003",
@@ -107,6 +109,7 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 41,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_004",
@@ -140,6 +143,7 @@ export const products: Product[] = [
     rating: 4.9,
     reviewCount: 19,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_005",
@@ -174,6 +178,7 @@ export const products: Product[] = [
     rating: 4.7,
     reviewCount: 63,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_006",
@@ -207,6 +212,7 @@ export const products: Product[] = [
     rating: 4.6,
     reviewCount: 87,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_007",
@@ -241,6 +247,7 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 214,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_008",
@@ -275,6 +282,7 @@ export const products: Product[] = [
     rating: 4.7,
     reviewCount: 156,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_009",
@@ -308,6 +316,7 @@ export const products: Product[] = [
     rating: 4.9,
     reviewCount: 74,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_010",
@@ -342,6 +351,7 @@ export const products: Product[] = [
     rating: 4.7,
     reviewCount: 52,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_011",
@@ -375,6 +385,7 @@ export const products: Product[] = [
     rating: 5,
     reviewCount: 4,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_012",
@@ -408,6 +419,7 @@ export const products: Product[] = [
     rating: 4.6,
     reviewCount: 98,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_013",
@@ -441,6 +453,7 @@ export const products: Product[] = [
     rating: 5,
     reviewCount: 7,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_014",
@@ -474,6 +487,7 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 23,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_015",
@@ -507,6 +521,7 @@ export const products: Product[] = [
     rating: 4.9,
     reviewCount: 16,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_016",
@@ -540,6 +555,7 @@ export const products: Product[] = [
     rating: 4.7,
     reviewCount: 68,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_017",
@@ -573,6 +589,7 @@ export const products: Product[] = [
     rating: 4.5,
     reviewCount: 112,
     published: true,
+    hasVariants: false,
   },
   {
     id: "prd_018",
@@ -605,6 +622,7 @@ export const products: Product[] = [
     rating: 4.6,
     reviewCount: 44,
     published: true,
+    hasVariants: false,
   },
 ];
 

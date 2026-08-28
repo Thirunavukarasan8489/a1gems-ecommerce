@@ -27,7 +27,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
       header: 'Product',
       cell: (item: ProductRow) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
+          <div className="w-10 h-10 bg-gold-100 dark:bg-gold-800 rounded-md overflow-hidden flex-shrink-0 border border-gold-200 dark:border-gold-700">
             {item.primaryImage?.url ? (
               <Image 
                 src={item.primaryImage.url} 
@@ -37,12 +37,12 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
                 className="w-full h-full object-cover" 
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No img</div>
+              <div className="w-full h-full flex items-center justify-center text-gold-400 text-xs">No img</div>
             )}
           </div>
           <div>
-            <p className="font-medium text-slate-800 dark:text-slate-200">{item.name}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">/{item.slug}</p>
+            <p className="font-medium text-gold-800 dark:text-gold-200">{item.name}</p>
+            <p className="text-xs text-gold-500 dark:text-gold-400">/{item.slug}</p>
           </div>
         </div>
       ),
@@ -50,7 +50,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
     {
       header: 'Category',
       cell: (item: ProductRow) => (
-        <span className="text-slate-700 dark:text-slate-300">{item.category?.name ?? '—'}</span>
+        <span className="text-gold-700 dark:text-gold-300">{item.category?.name ?? '—'}</span>
       ),
     },
     {
@@ -70,7 +70,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
           }
         }
         return (
-          <span className="font-medium text-slate-700 dark:text-slate-300">
+          <span className="font-medium text-gold-700 dark:text-gold-300">
             {priceText}
           </span>
         );
@@ -81,7 +81,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
       cell: (item: ProductRow) => {
         const qty = item.stockQuantity ?? 0;
         return (
-          <span className={qty < 5 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-slate-700 dark:text-slate-300'}>
+          <span className={qty < 5 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gold-700 dark:text-gold-300'}>
             {qty}
           </span>
         );
@@ -106,13 +106,13 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/products/${item._id}`}
-            className="p-1 text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
           >
             <Eye size={16} />
           </Link>
           <Link
             href={`/admin/products/${item._id}/edit`}
-            className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
           >
             <Edit size={16} />
           </Link>
