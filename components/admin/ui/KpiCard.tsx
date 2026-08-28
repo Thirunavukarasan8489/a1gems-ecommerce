@@ -27,19 +27,19 @@ export default function KpiCard({
 }: KpiCardProps) {
   
   const colorMap = {
-    blue: 'bg-gold-500/15 text-gold-700 dark:bg-gold-500/20 dark:text-gold-300 border border-gold-500/30',
-    green: 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30',
-    red: 'bg-red-500/15 text-red-700 dark:bg-red-500/20 dark:text-red-300 border border-red-500/30',
-    purple: 'bg-gold-500/15 text-gold-700 dark:bg-gold-500/20 dark:text-gold-300 border border-gold-500/30',
-    amber: 'bg-gold-400/20 text-gold-800 dark:bg-gold-400/25 dark:text-gold-200 border border-gold-400/40',
+    blue: 'bg-plum-100 text-plum-800 dark:bg-plum-800 dark:text-plum-200 border border-plum-200 dark:border-plum-700',
+    green: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
+    red: 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800',
+    purple: 'bg-plum-100 text-plum-800 dark:bg-plum-800 dark:text-plum-200 border border-plum-200 dark:border-plum-700',
+    amber: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800',
   };
 
   return (
-    <div className={cn("bg-white dark:bg-gold-900 rounded-xl p-6 shadow-xs border border-gold-300 dark:border-gold-800 transition-all hover:border-gold-400/40 hover:shadow-md", className)}>
+    <div className={cn("bg-white dark:bg-plum-900 rounded-xl p-6 shadow-xs border border-gray-200 dark:border-plum-800 transition-all hover:border-plum-400/50 hover:shadow-md", className)}>
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm font-medium text-gold-600 dark:text-gold-300">{title}</p>
-          <h3 className="text-2xl font-bold text-gold-900 dark:text-gold-100 mt-2">{value}</h3>
+          <p className="text-sm font-medium text-plum-600 dark:text-plum-300">{title}</p>
+          <h3 className="text-2xl font-bold text-plum-900 dark:text-ivory-100 mt-2">{value}</h3>
         </div>
         <div className={cn("p-3 rounded-xl", colorMap[iconColor])}>
           <Icon size={24} />
@@ -49,18 +49,18 @@ export default function KpiCard({
       {trend && trendValue && (
         <div className="mt-4 flex items-center gap-1.5 text-sm">
           {trend === 'up' && <TrendingUp size={16} className="text-emerald-600 dark:text-emerald-400" />}
-          {trend === 'down' && <TrendingDown size={16} className="text-red-600 dark:text-red-400" />}
-          {trend === 'neutral' && <Minus size={16} className="text-gold-400" />}
+          {trend === 'down' && <TrendingDown size={16} className="text-rose-600 dark:text-rose-400" />}
+          {trend === 'neutral' && <Minus size={16} className="text-plum-400" />}
           
           <span className={cn(
             "font-semibold",
             trend === 'up' ? "text-emerald-700 dark:text-emerald-400" : "",
-            trend === 'down' ? "text-red-700 dark:text-red-400" : "",
-            trend === 'neutral' ? "text-gold-600 dark:text-gold-300" : ""
+            trend === 'down' ? "text-rose-700 dark:text-rose-400" : "",
+            trend === 'neutral' ? "text-plum-600 dark:text-plum-300" : ""
           )}>
             {trendValue}
           </span>
-          <span className="text-gold-500 dark:text-gold-400 ml-1">vs last month</span>
+          <span className="text-plum-500 dark:text-plum-400 ml-1">vs last month</span>
         </div>
       )}
     </div>

@@ -26,13 +26,13 @@ export function Logo({
         <Image
           src="/logo.png"
           alt="A1 Gems Logo"
-          width={74}
-          height={74}
+          width={100}
+          height={100}
           className="object-contain w-auto h-auto"
         />
       </span>
 
-      <span className="flex flex-col leading-none">
+      {/* <span className="flex flex-col leading-none">
         <span
           className={cn(
             "font-display text-base font-semibold tracking-tight sm:text-lg",
@@ -49,7 +49,7 @@ export function Logo({
         >
           Certified Gemstones
         </span>
-      </span>
+      </span> */}
     </Link>
   );
 }

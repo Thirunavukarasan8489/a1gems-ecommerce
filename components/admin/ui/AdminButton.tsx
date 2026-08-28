@@ -9,14 +9,14 @@ export interface AdminButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
 const AdminButton = React.forwardRef<HTMLButtonElement, AdminButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', isLoading = false, children, disabled, ...props }, ref) => {
     
-    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]"
+    const baseStyles = "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-600 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]"
     
     const variants = {
-      primary: "bg-gold-900 text-gold-100 hover:bg-gold-800 shadow-xs border border-gold-950 font-semibold",
-      secondary: "bg-gold-200 text-gold-900 hover:bg-gold-300 dark:bg-gold-800 dark:text-gold-100 dark:hover:bg-gold-700 border border-gold-300 dark:border-gold-700",
-      danger: "bg-red-600 text-white hover:bg-red-700 shadow-xs",
-      ghost: "hover:bg-gold-200 hover:text-gold-900 dark:hover:bg-gold-800 dark:hover:text-gold-100 text-gold-700 dark:text-gold-300",
-      outline: "border border-gold-300 bg-transparent text-gold-900 hover:bg-gold-100 dark:border-gold-700 dark:text-gold-100 dark:hover:bg-gold-800",
+      primary: "bg-plum-900 text-ivory-100 hover:bg-plum-800 shadow-xs font-semibold",
+      secondary: "bg-gray-100 text-plum-900 hover:bg-gray-200 dark:bg-plum-800 dark:text-ivory-100 dark:hover:bg-plum-700 border border-gray-200 dark:border-plum-700",
+      danger: "bg-rose-600 text-white hover:bg-rose-700 shadow-xs",
+      ghost: "hover:bg-gray-100 hover:text-plum-900 dark:hover:bg-plum-800 dark:hover:text-ivory-100 text-plum-700 dark:text-plum-300",
+      outline: "border border-gray-300 bg-transparent text-plum-900 hover:bg-gray-50 dark:border-plum-700 dark:text-ivory-100 dark:hover:bg-plum-800",
     }
     
     const sizes = {

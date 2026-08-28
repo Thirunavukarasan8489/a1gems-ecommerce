@@ -23,9 +23,7 @@ import {
   getProducts,
   getRelatedProducts,
 } from "@/lib/services/product-service";
-import {
-  availableQuantity,
-} from "@/lib/types";
+import { availableQuantity } from "@/lib/types";
 
 export async function generateStaticParams() {
   const products = await getProducts();
@@ -45,9 +43,11 @@ export async function generateMetadata(
     title: product.seo?.metaTitle || `${product.name} | A1 Gems`,
     description: product.seo?.metaDescription || product.shortDescription,
     keywords: product.seo?.keywords,
-    openGraph: product.seo?.ogImage ? {
-      images: [{ url: product.seo.ogImage }],
-    } : undefined,
+    openGraph: product.seo?.ogImage
+      ? {
+          images: [{ url: product.seo.ogImage }],
+        }
+      : undefined,
   };
 }
 
@@ -57,8 +57,9 @@ export default async function ProductDetailPage(
   const { slug } = await props.params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
-
+  // console.log("product :", product);
   const category = getCategory(product.categorySlug);
+  console.log("category :", category);
   const related = await getRelatedProducts(product.id, product.categorySlug);
 
   const specs = [
@@ -73,7 +74,7 @@ export default async function ProductDetailPage(
   return (
     <>
       <div className="shell gutter pt-5">
-        <Breadcrumbs
+        {/* <Breadcrumbs
           items={[
             { label: "Products", href: "/products" },
             ...(category
@@ -86,7 +87,7 @@ export default async function ProductDetailPage(
               : []),
             { label: product.name },
           ]}
-        />
+        /> */}
       </div>
 
       <div className="shell gutter py-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-12 lg:py-10">
@@ -94,15 +95,21 @@ export default async function ProductDetailPage(
           <ProductGallery
             color={product.gemColor}
             count={product.gallery}
-            images={product.images && product.images.length > 0 ? product.images : (product.primaryImage ? [product.primaryImage] : undefined)}
+            images={
+              product.images && product.images.length > 0
+                ? product.images
+                : product.primaryImage
+                  ? [product.primaryImage]
+                  : undefined
+            }
             name={product.name}
           />
         </div>
 
         <div className="mt-7 lg:mt-0">
-          {category && (
+          {product && (
             <p className="text-[0.6875rem] font-semibold tracking-[0.16em] text-gold-700 uppercase">
-              {category.name}
+              {product.categorySlug}
             </p>
           )}
 
@@ -110,16 +117,18 @@ export default async function ProductDetailPage(
             {product.name}
           </h1>
 
-          <p className="mt-5 text-[0.9375rem] leading-relaxed text-plum-800">
+          {/* <p className="mt-5 text-[0.9375rem] leading-relaxed text-plum-800">
             {product.shortDescription}
-          </p>
+          </p> */}
 
           <ProductPurchaseOptions product={product} category={category} />
 
           {/* Long Description */}
           {product.description && (
             <div className="mt-10 border-t border-plum-100 pt-8">
-              <h2 className="text-lg font-semibold text-plum-900 mb-4">About this piece</h2>
+              <h2 className="text-lg font-semibold text-plum-900 mb-4">
+                About this piece
+              </h2>
               <div className="whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-plum-800">
                 {product.description}
               </div>
@@ -129,11 +138,13 @@ export default async function ProductDetailPage(
           {/* Linked Guide */}
           {product.guide && (
             <div className="mt-8 rounded-xl bg-ivory-200 p-5">
-              <h3 className="text-sm font-semibold text-plum-900">Gemstone Education</h3>
+              <h3 className="text-sm font-semibold text-plum-900">
+                Gemstone Education
+              </h3>
               <p className="mt-1 text-sm text-plum-700">
                 Learn more about origin, treatment, and value in our guide.
               </p>
-              <Link 
+              <Link
                 href={`/guides/${product.guide.slug}`}
                 className="mt-3 inline-flex text-sm font-medium text-gold-600 hover:text-gold-700 transition-colors underline underline-offset-4"
               >
