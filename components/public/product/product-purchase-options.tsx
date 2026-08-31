@@ -7,22 +7,24 @@ import { AddToCart } from "@/components/public/cart/add-to-cart";
 import { Badge } from "@/components/public/ui/badge";
 import { buttonStyles } from "@/components/public/ui/button";
 import { Rating } from "@/components/public/ui/rating";
-import { whatsappLink } from "@/lib/data/nav";
 import {
+
   canBuy,
   canEnquire,
   type Category,
   type Product,
   type ProductVariant,
 } from "@/lib/types";
-import { discountPercent, formatINR, cn } from "@/lib/utils";
+import { discountPercent, formatINR, cn, whatsappLink } from "@/lib/utils";
 
 export function ProductPurchaseOptions({
   product,
   category,
+  business,
 }: {
   product: Product;
   category?: Category;
+  business?: any;
 }) {
   const [selectedVariantIdx, setSelectedVariantIdx] = React.useState(0);
 
@@ -154,7 +156,7 @@ export function ProductPurchaseOptions({
             </Link>
             {product.whatsappEnabled && (
               <a
-                href={whatsappLink(
+                href={whatsappLink(business,
                   `Hi A1 Gems, I am interested in ${product.name} (${product.sku})${activeVariant ? ` - ${activeVariant.name}` : ""}.`,
                 )}
                 target="_blank"

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { MessageCircle, PackageSearch } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
-import { business, whatsappLink } from "@/lib/data/nav";
+import { whatsappLink } from "@/lib/utils";
+import { getNavData } from "@/lib/services/nav-service";
 
 export const metadata: Metadata = {
   title: "Track Order",
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
     "Track your A1 Gems order with your order number and the email or phone used at checkout.",
 };
 
-export default function TrackOrderPage() {
+export default async function TrackOrderPage() {
+  const navData = await getNavData();
+  const business = navData.business;
+
   return (
     <>
       <PageHeader
@@ -64,7 +68,7 @@ export default function TrackOrderPage() {
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <a
-              href={whatsappLink("Hi A1 Gems, I would like to track my order.")}
+              href={whatsappLink(business, "Hi A1 Gems, I would like to track my order.")}
               target="_blank"
               rel="noopener noreferrer"
               className={buttonStyles({ variant: "whatsapp" })}

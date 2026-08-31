@@ -2,20 +2,12 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/public/layout/logo";
 import { buttonStyles } from "@/components/public/ui/button";
-import { categories } from "@/lib/data/categories";
-import {
-  business,
-  primaryNav,
-  secondaryNav,
-  whatsappLink,
-} from "@/lib/data/nav";
-import { policies } from "@/lib/data/policies";
+import { getCategories } from "@/lib/services/category-service";
+import { getNavData, whatsappLink } from "@/lib/services/nav-service";
+import { getPolicies } from "@/lib/services/policy-service";
 import { categoryTerms } from "@/lib/utils";
 
-const legal = policies.map((policy) => ({
-  label: policy.title,
-  href: `/policies/${policy.slug}`,
-}));
+
 
 const WhatsappIcon = () => (
   <svg
@@ -27,7 +19,10 @@ const WhatsappIcon = () => (
   </svg>
 );
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const [categories, navData, policies] = await Promise.all([getCategories(), getNavData(), getPolicies()]);
+  const { business, primaryNav, secondaryNav } = navData;
+  const legal = policies.map((policy) => ({ label: policy.title, href: `/policies/${policy.slug}` }));
   return (
     <footer className="mt-20 bg-plum-950 text-plum-200">
       <div className="shell gutter py-12 lg:py-16">
@@ -42,7 +37,7 @@ export function SiteFooter() {
               Treatments always disclosed, pricing always explained.
             </p>
             <a
-              href={whatsappLink(
+              href={whatsappLink(business, 
                 "Hi A1 Gems, I would like a free consultation.",
               )}
               target="_blank"
@@ -70,10 +65,10 @@ export function SiteFooter() {
           </FooterColumn>
 
           <FooterColumn title="Company">
-            {primaryNav.slice(2).map((item) => (
+            {primaryNav.slice(2).map((item: any) => (
               <FooterLink key={item.href} {...item} />
             ))}
-            {secondaryNav.map((item) => (
+            {secondaryNav.map((item: any) => (
               <FooterLink key={item.href} {...item} />
             ))}
           </FooterColumn>
@@ -111,7 +106,7 @@ export function SiteFooter() {
             33ABCDE1234F1Z5
           </p>
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            {legal.map((item) => (
+            {legal.map((item: any) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

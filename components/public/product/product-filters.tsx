@@ -4,7 +4,6 @@ import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Check, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/public/ui/button";
-import { categories } from "@/lib/data/categories";
 import {
   activeFilterCount,
   priceBands,
@@ -62,16 +61,18 @@ function Facets({
   lockCategory,
   query,
   setParam,
+  categories,
 }: {
   lockCategory?: string;
   query: ReturnType<typeof toQuery>;
   setParam: (key: string, value: string | null) => void;
+  categories: any[];
 }) {
   return (
     <>
       {!lockCategory && (
         <Facet title="Stone">
-          {categories.map((cat) => (
+          {categories?.map((cat: any) => (
             <Chip
               key={cat.slug}
               active={query.category === cat.slug}
@@ -128,9 +129,11 @@ function Facets({
 export function FilterBar({
   total,
   lockCategory,
+  categories,
 }: {
   total: number;
   lockCategory?: string;
+  categories: any[];
 }) {
   const { query, count, setParam, clearAll } = useFilterState(lockCategory);
   const [sheetOpen, setSheetOpen] = React.useState(false);
@@ -229,6 +232,7 @@ export function FilterBar({
                 lockCategory={lockCategory}
                 query={query}
                 setParam={setParam}
+                categories={categories}
               />
             </div>
 
@@ -255,7 +259,7 @@ export function FilterBar({
 }
 
 /** Always-visible facet list for wide screens. */
-export function FilterSidebar({ lockCategory }: { lockCategory?: string }) {
+export function FilterSidebar({ lockCategory, categories }: { lockCategory?: string, categories: any[] }) {
   const { query, count, setParam, clearAll } = useFilterState(lockCategory);
 
   return (
@@ -278,6 +282,7 @@ export function FilterSidebar({ lockCategory }: { lockCategory?: string }) {
             lockCategory={lockCategory}
             query={query}
             setParam={setParam}
+            categories={categories}
           />
         </div>
       </div>

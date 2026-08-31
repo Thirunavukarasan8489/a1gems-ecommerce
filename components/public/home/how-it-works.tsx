@@ -1,7 +1,9 @@
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { howItWorks } from "@/lib/data/content";
+import { getContentPage } from "@/lib/services/content-service";
 
-export function HowItWorks() {
+export async function HowItWorks() {
+  const howItWorks = await getContentPage("how-it-works");
+  if (!howItWorks) return null;
   return (
     <section className="shell gutter py-12 sm:py-16 lg:py-20">
       <SectionHeading
@@ -18,7 +20,7 @@ export function HowItWorks() {
           className="absolute top-6 right-8 left-8 hidden h-px bg-gradient-to-r from-transparent via-gold-300 to-transparent lg:block"
         />
 
-        {howItWorks.map((step) => (
+        {howItWorks.map((step: any) => (
           <li key={step.step} className="relative text-center lg:text-left">
             <span className="relative z-10 mx-auto grid size-12 place-items-center rounded-full border border-gold-500/25 bg-ivory-100 font-display text-base font-semibold text-gold-700 lg:mx-0">
               {step.step}

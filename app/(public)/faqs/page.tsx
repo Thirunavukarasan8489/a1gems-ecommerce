@@ -5,7 +5,7 @@ import { Accordion } from "@/components/public/ui/accordion";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
 import { getFaqs } from "@/lib/services/content-service";
-import { whatsappLink } from "@/lib/data/nav";
+import { getNavData, whatsappLink } from "@/lib/services/nav-service";
 
 export const metadata: Metadata = {
   title: "FAQs",
@@ -14,8 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default async function FaqsPage() {
+  const navData = await getNavData();
+  const business = navData.business;
   const faqs = await getFaqs();
-  return (
+      return (
     <>
       <PageHeader
         eyebrow="FAQ"
@@ -38,7 +40,7 @@ export default async function FaqsPage() {
             </p>
             <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
               <a
-                href={whatsappLink("Hi A1 Gems, I have a question.")}
+                href={whatsappLink(business, "Hi A1 Gems, I have a question.")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonStyles({ variant: "whatsapp" })}

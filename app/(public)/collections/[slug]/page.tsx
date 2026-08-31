@@ -55,11 +55,13 @@ export default async function CollectionPage(
   props: PageProps<"/collections/[slug]">,
 ) {
   const { slug } = await props.params;
+  const searchParamsValue = await props.searchParams;
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const query = toQuery(await props.searchParams);
   const products = await getProductsByCategory(slug);
+  const categories = await getCategories();
+  const query = toQuery(searchParamsValue);
   const results = applyFilters(products, {
     ...query,
     category: undefined,
@@ -79,12 +81,12 @@ export default async function CollectionPage(
 
       <div className="shell gutter">
         <Suspense fallback={<div className="h-16" />}>
-          <FilterBar total={results.length} lockCategory={slug} />
+          <FilterBar total={results.length} lockCategory={slug} categories={categories} />
         </Suspense>
 
         <div className="py-8 lg:grid lg:grid-cols-[15rem_1fr] lg:gap-10">
           <Suspense fallback={null}>
-            <FilterSidebar lockCategory={slug} />
+            <FilterSidebar lockCategory={slug} categories={categories} />
           </Suspense>
 
           <div>

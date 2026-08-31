@@ -10,6 +10,14 @@ if (!Guide) console.warn("Guide model not loaded");
 if (!FAQ) console.warn("FAQ model not loaded");
 if (!Testimonial) console.warn("Testimonial model not loaded");
 if (!Policy) console.warn("Policy model not loaded");
+import { ContentPage } from '@/lib/models/content-page';
+
+export const getContentPage = unstable_cache(async (slug: string) => {
+  await dbConnect();
+  const page = await ContentPage.findOne({ slug, isActive: true }).lean();
+  if (!page) return null;
+  return { ...page, _id: (page as any)._id.toString() };
+}, ['public-content-page'], { revalidate: 60, tags: ['content'] });
 
 export const getGuides = unstable_cache(async () => {
   await dbConnect();

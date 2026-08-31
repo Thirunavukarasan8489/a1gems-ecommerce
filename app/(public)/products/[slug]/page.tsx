@@ -15,14 +15,17 @@ import { ProductRail } from "@/components/public/product/product-rail";
 import { Badge } from "@/components/public/ui/badge";
 import { Breadcrumbs } from "@/components/public/ui/page-header";
 import { ProductPurchaseOptions } from "@/components/public/product/product-purchase-options";
+
+import { Accordion } from "@/components/public/ui/accordion";
+import { getCategoryBySlug } from "@/lib/services/category-service";
 import { Rating } from "@/components/public/ui/rating";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { getCategory } from "@/lib/data/categories";
 import {
   getProductBySlug,
   getProducts,
   getRelatedProducts,
 } from "@/lib/services/product-service";
+import { getNavData } from "@/lib/services/nav-service";
 import { availableQuantity } from "@/lib/types";
 
 export async function generateStaticParams() {
@@ -56,9 +59,11 @@ export default async function ProductDetailPage(
 ) {
   const { slug } = await props.params;
   const product = await getProductBySlug(slug);
-  if (!product) notFound();
+  const navData = await getNavData();
+  const business = navData.business;
+  if (!product || !product.published) notFound();
   // console.log("product :", product);
-  const category = getCategory(product.categorySlug);
+  const category = await getCategoryBySlug(product.categorySlug);
   console.log("category :", category);
   const related = await getRelatedProducts(product.id, product.categorySlug);
 
@@ -121,7 +126,7 @@ export default async function ProductDetailPage(
             {product.shortDescription}
           </p> */}
 
-          <ProductPurchaseOptions product={product} category={category} />
+          <ProductPurchaseOptions product={product} category={category} business={business} />
 
           {/* Long Description */}
           {product.description && (

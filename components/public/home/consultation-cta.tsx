@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Phone } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
-import { business, whatsappLink } from "@/lib/data/nav";
+import { getNavData, whatsappLink } from "@/lib/services/nav-service";
 
 const WhatsappIcon = () => (
   <svg
@@ -13,7 +13,7 @@ const WhatsappIcon = () => (
   </svg>
 );
 
-export function ConsultationCta() {
+export function ConsultationCta({ business }: { business: any }) {
   return (
     <section className="shell gutter py-4">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gold-500 via-gold-400 to-gold-600 p-6 sm:p-10 lg:p-14">
@@ -39,7 +39,7 @@ export function ConsultationCta() {
 
           <div className="mt-7 flex flex-col gap-3 lg:mt-0 lg:w-64 lg:shrink-0">
             <a
-              href={whatsappLink(
+              href={whatsappLink(business, 
                 "Hi A1 Gems, I would like a free gemmologist consultation.",
               )}
               target="_blank"

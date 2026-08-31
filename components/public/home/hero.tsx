@@ -3,14 +3,19 @@ import { ArrowRight, BadgeCheck, MessageCircle } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
-import { categories } from "@/lib/data/categories";
-import { stats } from "@/lib/data/content";
-import { whatsappLink } from "@/lib/data/nav";
+
+
+
 import { categoryTerms } from "@/lib/utils";
+import { getNavData } from "@/lib/services/nav-service";
+import { whatsappLink } from "@/lib/utils";
 
 const tilt = ["-rotate-4 lg:-translate-y-2", "rotate-0 -translate-y-6", "rotate-4 lg:-translate-y-1"];
 
-export function Hero() {
+const stats = [{ value: "50+", label: "Years of Trust" },{ value: "100%", label: "Certified Natural" },{ value: "10k+", label: "Happy Customers" },{ value: "5/5", label: "Google Reviews" }];
+export async function Hero({ categories }: { categories: any[] }) {
+  const navData = await getNavData();
+  const business = navData.business;
   return (
     <section className="relative overflow-hidden bg-plum-950 text-ivory-100">
       <OrnamentalBg glowPosition="30% 10%" />
@@ -45,7 +50,7 @@ export function Hero() {
               <ArrowRight size={18} />
             </Link>
             <a
-              href={whatsappLink(
+              href={whatsappLink(business, 
                 "Hi A1 Gems, I would like a free gemmologist consultation.",
               )}
               target="_blank"
@@ -63,7 +68,7 @@ export function Hero() {
           </div>
 
           <dl className="mt-10 grid grid-cols-2 gap-x-4 gap-y-6 border-t border-white/10 pt-7 sm:grid-cols-4">
-            {stats.map((stat, i) => (
+            {stats.map((stat: any, i: number) => (
               <div
                 key={stat.label}
                 className={i > 0 ? "border-l border-white/10 pl-3" : ""}
@@ -95,7 +100,7 @@ export function Hero() {
           />
 
           <ul className="grid grid-cols-3 gap-3 lg:gap-5">
-            {categories.slice(0, 3).map((cat, i) => {
+            {categories.slice(0, 3).map((cat: any, i: number) => {
               const terms = categoryTerms(cat.name);
               return (
                 <li

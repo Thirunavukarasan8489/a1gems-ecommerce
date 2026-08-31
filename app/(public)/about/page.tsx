@@ -7,7 +7,8 @@ import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { PageHeader } from "@/components/public/ui/page-header";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { stats } from "@/lib/data/content";
+import { getContentPage } from "@/lib/services/content-service";
+const stats = [{ value: "50+", label: "Years of Trust" },{ value: "100%", label: "Certified Natural" },{ value: "10k+", label: "Happy Customers" },{ value: "5/5", label: "Google Reviews" }];
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -30,7 +31,9 @@ const values = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const aboutContent = await getContentPage("about");
+  if (!aboutContent) return null;
   return (
     <>
       <PageHeader
@@ -89,7 +92,7 @@ export default function AboutPage() {
 
       <section className="border-y border-ivory-300 bg-white">
         <dl className="shell gutter grid grid-cols-2 gap-6 py-10 lg:grid-cols-4">
-          {stats.map((stat) => (
+          {stats.map((stat: any) => (
             <div key={stat.label} className="text-center">
               <dt className="sr-only">{stat.label}</dt>
               <dd>

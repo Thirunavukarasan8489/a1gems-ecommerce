@@ -5,8 +5,8 @@ import { Accordion } from "@/components/public/ui/accordion";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { faqs } from "@/lib/data/content";
-import { business, whatsappLink } from "@/lib/data/nav";
+import { getFaqs } from "@/lib/services/content-service";
+import { getNavData, whatsappLink } from "@/lib/services/nav-service";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -22,6 +22,10 @@ export default async function ContactPage(props: PageProps<"/contact">) {
   };
   const product = pick("product");
   const category = pick("category");
+
+  const navData = await getNavData();
+  const faqs = await getFaqs();
+  const business = navData.business;
 
   return (
     <>
@@ -67,7 +71,7 @@ export default async function ContactPage(props: PageProps<"/contact">) {
             </ul>
 
             <a
-              href={whatsappLink("Hi A1 Gems, I have a question.")}
+              href={whatsappLink(business, "Hi A1 Gems, I have a question.")}
               target="_blank"
               rel="noopener noreferrer"
               className={buttonStyles({

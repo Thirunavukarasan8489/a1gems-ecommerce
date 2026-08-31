@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { primaryNav } from "@/lib/data/nav";
 import { cn } from "@/lib/utils";
 
-export function PrimaryNav() {
+export function PrimaryNav({ navData }: { navData: any }) {
+  const { primaryNav } = navData;
   const pathname = usePathname();
 
   return (
     <nav className="hidden flex-1 justify-center lg:flex" suppressHydrationWarning>
       <ul className="flex items-center gap-1" suppressHydrationWarning>
-        {primaryNav.map((item) => {
+        {primaryNav.map((item: any) => {
           const active =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
 

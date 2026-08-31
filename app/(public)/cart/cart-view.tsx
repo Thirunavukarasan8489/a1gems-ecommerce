@@ -5,10 +5,9 @@ import { Lock, Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { useCart } from "@/components/public/cart/cart-provider";
 import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
-import { commerceSettings, shippingFor } from "@/lib/data/settings";
 import { formatINR } from "@/lib/utils";
 
-export function CartView() {
+export function CartView({ settings }: { settings: any }) {
   const { lines, hydrated, subtotal, setQuantity, remove } = useCart();
 
   if (!hydrated) {
@@ -49,8 +48,9 @@ export function CartView() {
     );
   }
 
-  const shipping = shippingFor(subtotal);
-  const toFreeShipping = commerceSettings.freeShippingThreshold - subtotal;
+  // shippingFor logic can be implemented here based on settings
+  const shipping = subtotal > settings.freeShippingThreshold ? 0 : settings.flatShippingFee;
+  const toFreeShipping = settings.freeShippingThreshold - subtotal;
 
   return (
     <div className="lg:grid lg:grid-cols-[1fr_22rem] lg:items-start lg:gap-10">

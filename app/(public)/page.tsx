@@ -15,7 +15,10 @@ import { ProductRail } from "@/components/public/product/product-rail";
 import { Accordion } from "@/components/public/ui/accordion";
 import { buttonStyles } from "@/components/public/ui/button";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { faqs } from "@/lib/data/content";
+import { getFaqs } from "@/lib/services/content-service";
+import { getCategories } from "@/lib/services/category-service";
+import { getRashiList } from "@/lib/services/rashi-service";
+import { getNavData } from "@/lib/services/nav-service";
 import {
   getBestsellers,
   getFeaturedProducts,
@@ -34,10 +37,15 @@ export default async function HomePage() {
   const collectorPieces = featured.filter(
     (p) => p.purchaseType === "ENQUIRY_ONLY",
   );
+  
+  const faqs = await getFaqs();
+  const rashiList = await getRashiList();
+  const categories = await getCategories();
+  const navData = await getNavData();
 
   return (
     <>
-      <Hero />
+      <Hero categories={categories} />
       <TrustStrip />
 
       <div className="pt-10 sm:pt-14">
@@ -45,7 +53,7 @@ export default async function HomePage() {
       </div>
 
       <FeaturedCategories />
-      <RashiFinder />
+      <RashiFinder rashiList={rashiList} categories={categories} />
 
       <section className="shell gutter py-12 sm:py-16 lg:py-20">
         <SectionHeading
@@ -134,7 +142,7 @@ export default async function HomePage() {
       </section>
 
       <HowItWorks />
-      <ConsultationCta />
+      <ConsultationCta business={navData.business} />
 
       <section className="shell gutter py-12 sm:py-16 lg:py-20">
         <SectionHeading

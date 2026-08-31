@@ -1,4 +1,4 @@
-import { whatsappLink } from "@/lib/data/nav";
+import { getNavData, whatsappLink } from "@/lib/services/nav-service";
 
 const WhatsappIcon = () => (
   <svg
@@ -14,10 +14,11 @@ const WhatsappIcon = () => (
  * toast (which claims the bottom-right on desktop and the full-width strip
  * above the tab bar on mobile) so the two never fight for the same corner.
  */
-export function WhatsappFab() {
+export async function WhatsappFab() {
+  const navData = await getNavData();
   return (
     <a
-      href={whatsappLink("Hi A1 Gems, I have a question.")}
+      href={whatsappLink(navData.business, "Hi A1 Gems, I have a question.")}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"

@@ -41,3 +41,8 @@ export function categoryTerms(name: string) {
     ? { primary: sanskrit, secondary: english }
     : { primary: english, secondary: null as string | null };
 }
+
+export function whatsappLink(businessData: any, message: string) {
+  const number = businessData?.whatsapp || "919840012345";
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}

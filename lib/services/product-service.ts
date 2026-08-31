@@ -4,7 +4,7 @@ import { Category } from '@/lib/models/category';
 import { Guide } from '@/lib/models/guide';
 import type { Product as PublicProduct } from '@/lib/types';
 import { unstable_cache } from 'next/cache';
-import { getCategory } from '@/lib/data/categories';
+
 
 // Prevent Turbopack from tree-shaking the models
 if (!Category) console.warn("Category model not loaded");
@@ -12,7 +12,7 @@ if (!Guide) console.warn("Guide model not loaded");
 
 function mapToPublicProduct(doc: any): PublicProduct {
   const defaultVariant = doc.variants?.[0] || {};
-  const staticCategory = getCategory(doc.category?.slug || '');
+  const categoryColor = doc.category?.gemColor || '#000000';
   
   return {
     id: doc._id.toString(),
@@ -46,7 +46,7 @@ function mapToPublicProduct(doc: any): PublicProduct {
     },
     
     // Fallback colour if none set in DB (schema lacks gemColor atm)
-    gemColor: doc.gemColor || staticCategory?.gemColor || '#000000',
+    gemColor: doc.gemColor || categoryColor,
     gallery: doc.gallery?.length || 0,
     primaryImage: doc.primaryImage?.url?.trim() ? { url: doc.primaryImage.url, altText: doc.primaryImage.altText } : undefined,
     images: doc.gallery?.filter((g: any) => g.url?.trim()).map((g: any) => ({ url: g.url, altText: g.altText })) || [],

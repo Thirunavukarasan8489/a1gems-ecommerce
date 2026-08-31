@@ -2,11 +2,12 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/public/ui/section-heading";
 import { GemImage } from "@/components/public/ui/gem-image";
-import { categories } from "@/lib/data/categories";
-import { products } from "@/lib/data/products";
+import { getCategories } from "@/lib/services/category-service";
+import { getProducts } from "@/lib/services/product-service";
 import { categoryTerms } from "@/lib/utils";
 
-export function FeaturedCategories() {
+export async function FeaturedCategories() {
+  const [categories, products] = await Promise.all([getCategories(), getProducts()]);
   return (
     <section className="shell gutter py-12 sm:py-16 lg:py-20">
       <SectionHeading

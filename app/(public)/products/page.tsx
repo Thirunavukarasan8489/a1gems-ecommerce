@@ -8,6 +8,7 @@ import {
 } from "@/components/public/product/product-filters";
 import { buttonStyles } from "@/components/public/ui/button";
 import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
+import { getCategories } from "@/lib/services/category-service";
 import { getProducts } from "@/lib/services/product-service";
 import { applyFilters, toQuery } from "@/lib/filters";
 
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default async function ProductsPage(props: PageProps<"/products">) {
   const query = toQuery(await props.searchParams);
   const products = await getProducts();
+  const categories = await getCategories();
   const results = applyFilters(products, query);
 
   return (
@@ -33,12 +35,12 @@ export default async function ProductsPage(props: PageProps<"/products">) {
 
       <div className="shell gutter">
         <Suspense fallback={<div className="h-16" />}>
-          <FilterBar total={results.length} />
+          <FilterBar total={results.length} categories={categories} />
         </Suspense>
 
         <div className="py-8 lg:grid lg:grid-cols-[15rem_1fr] lg:gap-10">
           <Suspense fallback={null}>
-            <FilterSidebar />
+            <FilterSidebar categories={categories} />
           </Suspense>
 
           <div>

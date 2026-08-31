@@ -1,8 +1,10 @@
 import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { whyChooseUs } from "@/lib/data/content";
+import { getContentPage } from "@/lib/services/content-service";
 
-export function WhyChooseUs() {
+export async function WhyChooseUs() {
+  const whyChooseUs = await getContentPage("why-choose-us");
+  if (!whyChooseUs) return null;
   return (
     <section className="relative overflow-hidden bg-plum-900 text-ivory-100">
       <OrnamentalBg glowPosition="88% 0%" />
@@ -16,7 +18,7 @@ export function WhyChooseUs() {
         />
 
         <ol className="mt-9 grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:mt-12 lg:gap-y-10">
-          {whyChooseUs.map((item, i) => (
+          {whyChooseUs.map((item: any, i: number) => (
             <li key={item.title} className="flex gap-4">
               <span className="font-display text-2xl leading-none font-semibold text-gold-500/60 tabular-nums sm:text-3xl">
                 {String(i + 1).padStart(2, "0")}

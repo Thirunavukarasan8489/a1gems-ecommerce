@@ -4,18 +4,19 @@ import { QuickAdd } from "@/components/public/cart/add-to-cart";
 import { Badge } from "@/components/public/ui/badge";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { Rating } from "@/components/public/ui/rating";
-import { getCategory } from "@/lib/data/categories";
+
 import { canBuy, stockStatus, type Product } from "@/lib/types";
 import { categoryTerms, cn, discountPercent, formatINR } from "@/lib/utils";
 
 export function ProductCard({
   product,
+  category,
   className,
 }: {
   product: Product;
+  category?: any;
   className?: string;
 }) {
-  const category = getCategory(product.categorySlug);
   const off = discountPercent(product.sellingPrice, product.comparePrice);
   const status = stockStatus(product);
   const buyable = canBuy(product);

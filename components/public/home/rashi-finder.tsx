@@ -5,22 +5,16 @@ import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { OrnamentalDivider } from "@/components/public/ui/ornamental-divider";
-import { getCategory } from "@/lib/data/categories";
-import { rashiList } from "@/lib/data/rashi";
 import { cn } from "@/lib/utils";
 
-/**
- * §37 doesn't list this as a module, but it's the reason gemstone e-commerce
- * exists as its own category in this market — buyers overwhelmingly arrive
- * asking "which stone for my rashi", not "show me rubies". A generic template
- * has no reason to know this exists.
- */
-export function RashiFinder() {
-  const [selected, setSelected] = React.useState(rashiList[0].slug);
+export function RashiFinder({ rashiList, categories }: { rashiList: any[], categories: any[] }) {
+  const [selected, setSelected] = React.useState(rashiList[0]?.slug);
   const rashi = rashiList.find((r) => r.slug === selected) ?? rashiList[0];
-  const category = rashi.categorySlug
-    ? getCategory(rashi.categorySlug)
+  const category = rashi?.categorySlug
+    ? categories.find(c => c.slug === rashi.categorySlug)
     : undefined;
+
+  if (!rashiList || rashiList.length === 0) return null;
 
   return (
     <section className="bg-ivory-200 py-12 sm:py-16 lg:py-20">
@@ -57,9 +51,6 @@ export function RashiFinder() {
                 <span className="text-lg leading-none" aria-hidden>
                   {r.symbol}
                 </span>
-                {/* <span className="font-devanagari text-sm leading-none">
-                  {r.devanagari}
-                </span> */}
                 <span
                   className={cn(
                     "text-[0.625rem] leading-none text-sm",
@@ -80,9 +71,6 @@ export function RashiFinder() {
               {rashi.symbol}
             </span>
             <div className="min-w-0">
-              {/* <p className="font-devanagari text-xl leading-none">
-                {rashi.devanagari}
-              </p> */}
               <p className="text-xl leading-none">{rashi.transliteration}</p>
               <p className="mt-1.5 text-sm text-plum-300">
                 {rashi.english} · {rashi.dateRange}
@@ -96,9 +84,6 @@ export function RashiFinder() {
             </p>
             <p className="mt-1 text-plum-900">
               {rashi.planet}{" "}
-              {/* <span className="font-devanagari text-ink-muted">
-                ({rashi.planetDevanagari})
-              </span> */}
             </p>
 
             <p className="mt-4 text-[0.6875rem] font-semibold tracking-[0.14em] text-gold-700 uppercase">

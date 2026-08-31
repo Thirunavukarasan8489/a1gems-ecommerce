@@ -7,11 +7,10 @@ import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, MessageCircle, Phone, X } from "lucide-react";
 import { Logo } from "@/components/public/layout/logo";
 import { buttonStyles } from "@/components/public/ui/button";
-import { categories } from "@/lib/data/categories";
-import { business, primaryNav, secondaryNav, whatsappLink } from "@/lib/data/nav";
 import { categoryTerms } from "@/lib/utils";
 
-export function MobileDrawer() {
+export function MobileDrawer({ categories, navData }: { categories: any[], navData: any }) {
+  const { business, primaryNav, secondaryNav, whatsappLink } = navData;
   const [open, setOpen] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
@@ -131,7 +130,7 @@ export function MobileDrawer() {
               </ul>
 
               <ul className="mb-7 space-y-0.5">
-                {primaryNav.map((item) => (
+                {primaryNav.map((item: any) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
@@ -145,7 +144,7 @@ export function MobileDrawer() {
               </ul>
 
               <ul className="flex flex-wrap gap-x-5 gap-y-2 border-t border-ivory-300 pt-5">
-                {secondaryNav.map((item) => (
+                {secondaryNav.map((item: any) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}

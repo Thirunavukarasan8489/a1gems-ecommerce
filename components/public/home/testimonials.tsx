@@ -1,9 +1,11 @@
 import { Quote } from "lucide-react";
 import { Rating } from "@/components/public/ui/rating";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { testimonials } from "@/lib/data/content";
+import { getContentPage } from "@/lib/services/content-service";
 
-export function Testimonials() {
+export async function Testimonials() {
+  const testimonialsPage = await getContentPage("testimonials");
+  const testimonials = testimonialsPage?.content ? JSON.parse(testimonialsPage.content) : [];
   return (
     <section className="relative w-full max-w-full overflow-hidden bg-ivory-200 py-12 sm:py-16 lg:py-20">
       <div className="shell gutter">
@@ -18,7 +20,7 @@ export function Testimonials() {
       {/* Swipe on mobile, three-column masonry-ish grid on desktop. */}
       <div className="relative w-full max-w-full overflow-hidden">
         <ul className="no-scrollbar mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:gap-4 sm:px-6 lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-8">
-          {testimonials.map((t) => (
+          {testimonials.map((t: any) => (
             <li
               key={t.name}
               className="w-[82%] min-w-[16rem] shrink-0 snap-start lg:w-auto lg:min-w-0"

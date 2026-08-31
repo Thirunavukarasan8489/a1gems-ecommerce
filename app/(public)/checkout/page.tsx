@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { MessageCircle, Wrench } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
-import { whatsappLink } from "@/lib/data/nav";
+import { getNavData, whatsappLink } from "@/lib/services/nav-service";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -22,7 +22,9 @@ const steps = [
   { title: "Payment", body: "UPI, card, net banking, COD or bank transfer, verified server-side by webhook." },
 ];
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  const navData = await getNavData();
+  const business = navData.business;
   return (
     <>
       <PageHeader
@@ -47,6 +49,7 @@ export default function CheckoutPage() {
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <a
                   href={whatsappLink(
+                    null,
                     "Hi A1 Gems, I would like to place an order from my cart.",
                   )}
                   target="_blank"
