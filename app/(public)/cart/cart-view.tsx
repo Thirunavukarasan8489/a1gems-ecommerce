@@ -1,10 +1,14 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { Lock, Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { useCart } from "@/components/public/cart/cart-provider";
 import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { validateCart } from "@/lib/actions/cart.actions";
 import { formatINR } from "@/lib/utils";
 
 export function CartView({ settings }: { settings: any }) {
@@ -97,8 +101,9 @@ export function CartView({ settings }: { settings: any }) {
                     onClick={() =>
                       setQuantity(line.productId, line.quantity - 1)
                     }
+                    disabled={line.quantity <= 1}
                     aria-label="Decrease quantity"
-                    className="grid size-10 place-items-center rounded-full text-plum-700 hover:bg-ivory-200"
+                    className="grid size-10 place-items-center rounded-full text-plum-700 hover:bg-ivory-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                   >
                     <Minus size={15} strokeWidth={2.5} />
                   </button>
@@ -152,13 +157,7 @@ export function CartView({ settings }: { settings: any }) {
             </p>
           )}
 
-          <Link
-            href="/checkout"
-            className={buttonStyles({ size: "lg", full: true, className: "mt-5" })}
-          >
-            <Lock size={16} />
-            Proceed to checkout
-          </Link>
+          <ProceedToCheckoutButton />
 
           <Link
             href="/products"
@@ -204,5 +203,38 @@ function Row({
         {value}
       </dd>
     </div>
+  );
+}
+
+function ProceedToCheckoutButton() {
+  const { sessionId } = useCart();
+  const [isValidating, setIsValidating] = React.useState(false);
+  const router = useRouter();
+
+  const handleCheckout = async () => {
+    setIsValidating(true);
+    try {
+      const res = await validateCart(sessionId);
+      if (!res.success) {
+        toast.error(res.error);
+        return;
+      }
+      router.push("/checkout");
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCheckout}
+      disabled={isValidating}
+      className={buttonStyles({ size: "lg", full: true, className: "mt-5" })}
+    >
+      <Lock size={16} />
+      {isValidating ? "Validating..." : "Proceed to checkout"}
+    </button>
   );
 }

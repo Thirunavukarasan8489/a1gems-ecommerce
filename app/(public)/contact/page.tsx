@@ -6,7 +6,7 @@ import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
 import { SectionHeading } from "@/components/public/ui/section-heading";
 import { getFaqs } from "@/lib/services/content-service";
-import { getNavData, whatsappLink } from "@/lib/services/nav-service";
+import { NAV_DATA, whatsappLink } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -23,9 +23,8 @@ export default async function ContactPage(props: PageProps<"/contact">) {
   const product = pick("product");
   const category = pick("category");
 
-  const navData = await getNavData();
   const faqs = await getFaqs();
-  const business = navData.business;
+  const business = NAV_DATA.business;
 
   return (
     <>

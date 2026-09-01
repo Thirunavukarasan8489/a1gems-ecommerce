@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   LayoutDashboard,
   Package,
@@ -29,6 +30,37 @@ import {
   Settings as SettingsIcon,
 } from "lucide-react";
 import Image from "next/image";
+
+type Role = "SUPER_ADMIN" | "CONTENT_MANAGER" | "LEAD_MANAGER";
+
+const hasAccess = (itemHref: string, role: string) => {
+  if (role === "SUPER_ADMIN") return true;
+
+  if (role === "LEAD_MANAGER") {
+    if (itemHref === "/admin") return true;
+    if (itemHref.startsWith("/admin/leads")) return true;
+    if (itemHref.startsWith("/admin/customers")) return true;
+    return false;
+  }
+
+  if (role === "CONTENT_MANAGER") {
+    if (itemHref === "/admin") return true;
+    if (
+      itemHref.startsWith("/admin/categories") ||
+      itemHref.startsWith("/admin/products") ||
+      itemHref.startsWith("/admin/inventory") ||
+      itemHref.startsWith("/admin/media") ||
+      itemHref.startsWith("/admin/website") ||
+      itemHref.startsWith("/admin/content") ||
+      itemHref.startsWith("/admin/rashi")
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  return false;
+};
 
 const sidebarGroups = [
   {
@@ -68,7 +100,6 @@ const sidebarGroups = [
       { name: "Homepage", href: "/admin/website/homepage", icon: Globe },
       { name: "Banners", href: "/admin/website", icon: Megaphone },
       { name: "Pages", href: "/admin/website/pages", icon: FileSpreadsheet },
-      { name: "Navigation", href: "/admin/website/nav", icon: List },
     ],
   },
   {
@@ -105,6 +136,8 @@ export default function Sidebar({
   setIsOpen?: (isOpen: boolean) => void;
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const userRole = (session?.user as any)?.role || "SUPER_ADMIN";
 
   // Find the longest matching href across all sidebar items to handle nested routes properly
   const allItems = sidebarGroups.flatMap((g) => g.items);
@@ -134,9 +167,6 @@ export default function Sidebar({
         className={`fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-plum-950 text-ivory-100 flex flex-col h-full overflow-y-auto transition-transform duration-300 ease-in-out md:static md:translate-x-0 border-r border-plum-900 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="py-2 border-b border-plum-900 bg-gold-50 flex items-center justify-center">
-          {/* <h1 className="text-xl font-display font-bold text-ivory-100 tracking-wider">
-            A1 GEMS
-          </h1> */}
           <span className="relative grid shrink-0 place-items-center">
             <Image
               src="/logo.png"
@@ -146,44 +176,49 @@ export default function Sidebar({
               className="object-contain w-auto h-auto"
             />
           </span>
-          {/* <span className="align-middle text-[0.65rem] font-sans font-semibold text-plum-300 uppercase tracking-widest ml-2 bg-plum-900 px-2 py-0.5 rounded-md border border-plum-800">
-            Admin
-          </span> */}
         </div>
 
         <nav className="flex-1 p-4 space-y-6">
-          {sidebarGroups.map((group) => (
-            <div key={group.title}>
-              <h2 className="text-[0.75rem] font-semibold text-gold-300 uppercase tracking-[0.14em] mb-2 px-2">
-                {group.title}
-              </h2>
-              <ul className="space-y-1">
-                {group.items.map((item) => {
-                  const isActive = item.href === bestMatch;
-                  const Icon = item.icon;
+          {sidebarGroups.map((group) => {
+            const visibleItems = group.items.filter((item) =>
+              hasAccess(item.href, userRole)
+            );
 
-                  return (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
-                          isActive
-                            ? "bg-plum-800 text-white font-semibold border-l-3 border-gold-400 shadow-xs"
-                            : "text-plum-200 hover:bg-plum-900/70 hover:text-white border border-transparent"
-                        }`}
-                      >
-                        <Icon
-                          size={18}
-                          className={`transition-colors duration-200 ${isActive ? "text-gold-400" : "text-plum-400 group-hover:text-plum-200"}`}
-                        />
-                        {item.name}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+            if (visibleItems.length === 0) return null;
+
+            return (
+              <div key={group.title}>
+                <h2 className="text-[0.75rem] font-semibold text-gold-300 uppercase tracking-[0.14em] mb-2 px-2">
+                  {group.title}
+                </h2>
+                <ul className="space-y-1">
+                  {visibleItems.map((item) => {
+                    const isActive = item.href === bestMatch;
+                    const Icon = item.icon;
+
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                            isActive
+                              ? "bg-plum-800 text-white font-semibold border-l-3 border-gold-400 shadow-xs"
+                              : "text-plum-200 hover:bg-plum-900/70 hover:text-white border border-transparent"
+                          }`}
+                        >
+                          <Icon
+                            size={18}
+                            className={`transition-colors duration-200 ${isActive ? "text-gold-400" : "text-plum-400 group-hover:text-plum-200"}`}
+                          />
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
         </nav>
       </aside>
     </>

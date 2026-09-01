@@ -6,16 +6,13 @@ import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 
 
 
-import { categoryTerms } from "@/lib/utils";
-import { getNavData } from "@/lib/services/nav-service";
-import { whatsappLink } from "@/lib/utils";
+import { categoryTerms, NAV_DATA, whatsappLink } from "@/lib/utils";
 
 const tilt = ["-rotate-4 lg:-translate-y-2", "rotate-0 -translate-y-6", "rotate-4 lg:-translate-y-1"];
 
 const stats = [{ value: "50+", label: "Years of Trust" },{ value: "100%", label: "Certified Natural" },{ value: "10k+", label: "Happy Customers" },{ value: "5/5", label: "Google Reviews" }];
 export async function Hero({ categories }: { categories: any[] }) {
-  const navData = await getNavData();
-  const business = navData.business;
+  const business = NAV_DATA.business;
   return (
     <section className="relative overflow-hidden bg-plum-950 text-ivory-100">
       <OrnamentalBg glowPosition="30% 10%" />

@@ -40,11 +40,14 @@ export default async function CollectionsPage() {
                   className="group flex h-full gap-4 overflow-hidden rounded-2xl border border-ivory-300 bg-white p-3 transition-[border-color,box-shadow] duration-300 hover:border-gold-300 hover:shadow-md sm:p-4"
                 >
                   {cat.image ? (
-                    <img
-                      src={cat.image}
-                      alt={cat.name}
-                      className="size-24 shrink-0 rounded-xl object-cover transition-transform duration-500 ease-out-soft group-hover:scale-105 sm:size-32"
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={cat.image}
+                        alt={cat.name}
+                        className="size-24 shrink-0 rounded-xl object-cover transition-transform duration-500 ease-out-soft group-hover:scale-105 sm:size-32"
+                      />
+                    </>
                   ) : (
                     <GemImage
                       color={cat.gemColor}

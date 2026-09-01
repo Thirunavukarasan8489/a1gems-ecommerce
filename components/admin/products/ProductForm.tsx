@@ -124,6 +124,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     handleSubmit,
     setValue,
     watch,
+    getValues,
     trigger,
     formState: { errors, isSubmitting },
   } = methods;
@@ -165,7 +166,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     setGalleryFiles(prev => [...prev, ...newFiles]);
 
     // We add placeholders in react-hook-form to render the alt text inputs
-    const currentGallery = watch('gallery') || [];
+    const currentGallery = getValues('gallery') || [];
     setValue('gallery', [...currentGallery, ...newFiles.map(() => ({ url: '', altText: '' }))], { shouldValidate: true });
   };
 
@@ -176,7 +177,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     }
     setGalleryFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
 
-    const currentGallery = watch('gallery') || [];
+    const currentGallery = getValues('gallery') || [];
     setValue('gallery', currentGallery.filter((_, idx) => idx !== indexToRemove), { shouldValidate: true });
   };
 

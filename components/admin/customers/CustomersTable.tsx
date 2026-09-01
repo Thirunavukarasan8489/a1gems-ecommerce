@@ -6,52 +6,60 @@ import { Eye, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 type CustomerRow = {
-  _id?: string;
-  name: string;
-  email?: string;
-  phone: string;
-  totalOrders: number;
-  totalSpent: number;
-  lastOrderDate: string;
+  _id: string;
+  type: string;
+  profile?: { firstName?: string; lastName?: string };
+  contact?: { email?: string; phone?: string };
+  metrics?: { totalOrders?: number; totalSpend?: number };
+  updatedAt: string;
 };
 
 export default function CustomersTable({ customers }: { customers: CustomerRow[] }) {
   const columns = [
     {
       header: 'Customer',
+      cell: (item: CustomerRow) => {
+        const name = `${item.profile?.firstName || ''} ${item.profile?.lastName || ''}`.trim() || 'Guest';
+        return (
+          <div>
+            <p className="font-medium text-gold-800 dark:text-gold-200">{name}</p>
+            <p className="text-xs text-gold-500 dark:text-gold-400">{item.contact?.phone || '—'}</p>
+          </div>
+        );
+      },
+    },
+    {
+      header: 'Type',
       cell: (item: CustomerRow) => (
-        <div>
-          <p className="font-medium text-gold-800 dark:text-gold-200">{item.name}</p>
-          <p className="text-xs text-gold-500 dark:text-gold-400">{item.phone}</p>
-        </div>
+        <span className="text-gold-600 dark:text-gold-400 text-sm capitalize">{item.type?.toLowerCase() || 'Personal'}</span>
       ),
     },
     {
       header: 'Email',
       cell: (item: CustomerRow) => (
-        <span className="text-gold-600 dark:text-gold-400 text-sm">{item.email ?? '—'}</span>
+        <span className="text-gold-600 dark:text-gold-400 text-sm">{item.contact?.email || '—'}</span>
       ),
     },
     {
       header: 'Total Orders',
       cell: (item: CustomerRow) => (
-        <span className="font-medium text-gold-700 dark:text-gold-300">{item.totalOrders}</span>
+        <span className="font-medium text-gold-700 dark:text-gold-300">{item.metrics?.totalOrders || 0}</span>
       ),
     },
     {
       header: 'Total Spent',
       cell: (item: CustomerRow) => (
         <span className="font-medium text-gold-700 dark:text-gold-300">
-          ₹{(item.totalSpent ?? 0).toLocaleString('en-IN')}
+          ₹{(item.metrics?.totalSpend || 0).toLocaleString('en-IN')}
         </span>
       ),
     },
     {
-      header: 'Last Order',
+      header: 'Last Active',
       cell: (item: CustomerRow) => (
         <span className="text-gold-600 dark:text-gold-400 text-sm">
-          {item.lastOrderDate
-            ? new Date(item.lastOrderDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+          {item.updatedAt
+            ? new Date(item.updatedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
             : '—'}
         </span>
       ),
@@ -59,7 +67,7 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
     {
       header: 'Status',
       cell: (item: CustomerRow) => {
-        const isActive = item.totalOrders > 0;
+        const isActive = (item.metrics?.totalOrders || 0) > 0;
         return <StatusBadge label={isActive ? 'Active' : 'Inactive'} variant={isActive ? 'success' : 'neutral'} />;
       },
     },
@@ -67,9 +75,9 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
       header: 'Actions',
       cell: (item: CustomerRow) => (
         <div className="flex items-center gap-2">
-          {item.email && (
+          {item.contact?.email && (
             <a
-              href={`mailto:${item.email}`}
+              href={`mailto:${item.contact.email}`}
               className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
               title="Send email"
             >
@@ -77,7 +85,7 @@ export default function CustomersTable({ customers }: { customers: CustomerRow[]
             </a>
           )}
           <Link
-            href={`/admin/customers/${encodeURIComponent(item.phone)}`}
+            href={`/admin/customers/${item._id}`}
             className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
             title="View customer"
           >

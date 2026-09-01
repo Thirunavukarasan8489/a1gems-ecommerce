@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, NAV_DATA } from "@/lib/utils";
 
-export function PrimaryNav({ navData }: { navData: any }) {
-  const { primaryNav } = navData;
+export function PrimaryNav() {
+  const { primaryNav } = NAV_DATA;
   const pathname = usePathname();
 
   return (

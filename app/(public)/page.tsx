@@ -18,7 +18,7 @@ import { SectionHeading } from "@/components/public/ui/section-heading";
 import { getFaqs } from "@/lib/services/content-service";
 import { getCategories } from "@/lib/services/category-service";
 import { getRashiList } from "@/lib/services/rashi-service";
-import { getNavData } from "@/lib/services/nav-service";
+import { NAV_DATA } from "@/lib/utils";
 import {
   getBestsellers,
   getFeaturedProducts,
@@ -41,7 +41,6 @@ export default async function HomePage() {
   const faqs = await getFaqs();
   const rashiList = await getRashiList();
   const categories = await getCategories();
-  const navData = await getNavData();
 
   return (
     <>
@@ -142,7 +141,7 @@ export default async function HomePage() {
       </section>
 
       <HowItWorks />
-      <ConsultationCta business={navData.business} />
+      <ConsultationCta business={NAV_DATA.business} />
 
       <section className="shell gutter py-12 sm:py-16 lg:py-20">
         <SectionHeading

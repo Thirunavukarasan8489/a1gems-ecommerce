@@ -5,7 +5,7 @@ import { Accordion } from "@/components/public/ui/accordion";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
 import { getFaqs } from "@/lib/services/content-service";
-import { getNavData, whatsappLink } from "@/lib/services/nav-service";
+import { NAV_DATA, whatsappLink } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "FAQs",
@@ -14,8 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function FaqsPage() {
-  const navData = await getNavData();
-  const business = navData.business;
+  const business = NAV_DATA.business;
   const faqs = await getFaqs();
       return (
     <>

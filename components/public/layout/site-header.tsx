@@ -5,24 +5,24 @@ import { CartButton } from "@/components/public/layout/cart-button";
 import { Logo } from "@/components/public/layout/logo";
 import { MobileDrawer } from "@/components/public/layout/mobile-drawer";
 import { PrimaryNav } from "@/components/public/layout/primary-nav";
-import { getNavData } from "@/lib/services/nav-service";
+import { UserNav } from "@/components/public/layout/user-nav";
 import { getCategories } from "@/lib/services/category-service";
+import { NAV_DATA } from "@/lib/utils";
 
 export async function SiteHeader() {
-  const navData = await getNavData();
   const categories = await getCategories();
-  const business = navData.business;
+  const business = NAV_DATA.business;
   return (
     <header className="sticky top-0 z-50">
       <AnnouncementBar text={"Free insured shipping across India on orders above ₹50,000"} />
 
       <div className="border-b border-ivory-300 bg-ivory-100/85 backdrop-blur-md">
         <div className="shell gutter flex h-15 items-center gap-2 lg:h-18 lg:gap-8">
-          <MobileDrawer navData={navData} categories={categories} />
+          <MobileDrawer categories={categories} />
 
           <Logo className="mr-auto lg:mr-0" />
 
-          <PrimaryNav navData={navData} />
+          <PrimaryNav />
 
           <div className="flex shrink-0 items-center gap-1">
             <a
@@ -40,6 +40,8 @@ export async function SiteHeader() {
             >
               <Search size={20} strokeWidth={2} />
             </Link>
+
+            <UserNav />
 
             <CartButton />
           </div>

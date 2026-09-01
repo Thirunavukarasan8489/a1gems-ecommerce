@@ -1,4 +1,4 @@
-import { getNavData, whatsappLink } from "@/lib/services/nav-service";
+import { NAV_DATA, whatsappLink } from "@/lib/utils";
 
 const WhatsappIcon = () => (
   <svg
@@ -15,7 +15,7 @@ const WhatsappIcon = () => (
  * above the tab bar on mobile) so the two never fight for the same corner.
  */
 export async function WhatsappFab() {
-  const navData = await getNavData();
+  const navData = NAV_DATA;
   return (
     <a
       href={whatsappLink(navData.business, "Hi A1 Gems, I have a question.")}

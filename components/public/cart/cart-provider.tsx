@@ -2,17 +2,9 @@
 
 import * as React from "react";
 import type { CartLine, Product } from "@/lib/types";
+import { syncCart } from "@/lib/actions/cart.actions";
 
 const STORAGE_KEY = "a1gems.cart.v1";
-
-/**
- * Client-side temporary cart.
- *
- * §11.1 of the spec puts the temporary cart in MongoDB keyed by a cookie so it
- * survives across devices and can be TTL-expired. That arrives in Phase 07;
- * until the API exists this keeps the same line shape (including the price
- * snapshot) in localStorage so the swap is a change of transport only.
- */
 
 type CartContextValue = {
   lines: CartLine[];
@@ -26,6 +18,7 @@ type CartContextValue = {
   clear: () => void;
   lastAdded: CartLine | null;
   dismissLastAdded: () => void;
+  sessionId: string;
 };
 
 const CartContext = React.createContext<CartContextValue | null>(null);
@@ -58,15 +51,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const [lines, setLines] = React.useState<CartLine[]>(readStoredLines);
   const [lastAdded, setLastAdded] = React.useState<CartLine | null>(null);
+  const [sessionId, setSessionId] = React.useState<string>("");
+
+  React.useEffect(() => {
+    if (!hydrated) return;
+    
+    let sid = window.localStorage.getItem("a1gems.cart.sessionId");
+    if (!sid) {
+      sid = crypto.randomUUID();
+      window.localStorage.setItem("a1gems.cart.sessionId", sid);
+    }
+    setSessionId(sid);
+  }, [hydrated]);
 
   React.useEffect(() => {
     if (!hydrated) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
     } catch {
-      // Private mode / quota exceeded — the cart still works for this session.
+      // Private mode / quota exceeded
     }
-  }, [lines, hydrated]);
+
+    // Sync with backend
+    if (sessionId) {
+      const timeoutId = setTimeout(() => {
+        syncCart(sessionId, lines).catch(console.error);
+      }, 500); // debounce 500ms
+      return () => clearTimeout(timeoutId);
+    }
+  }, [lines, hydrated, sessionId]);
 
   const add = React.useCallback((product: Product, quantity = 1, variantName?: string, variantPrice?: number) => {
     const line: CartLine = {
@@ -123,6 +136,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       clear,
       lastAdded,
       dismissLastAdded,
+      sessionId,
     }),
     [
       lines,
@@ -133,6 +147,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       clear,
       lastAdded,
       dismissLastAdded,
+      sessionId,
     ],
   );
 

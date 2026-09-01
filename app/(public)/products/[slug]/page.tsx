@@ -25,7 +25,7 @@ import {
   getProducts,
   getRelatedProducts,
 } from "@/lib/services/product-service";
-import { getNavData } from "@/lib/services/nav-service";
+import { NAV_DATA } from "@/lib/utils";
 import { availableQuantity } from "@/lib/types";
 
 export async function generateStaticParams() {
@@ -59,8 +59,7 @@ export default async function ProductDetailPage(
 ) {
   const { slug } = await props.params;
   const product = await getProductBySlug(slug);
-  const navData = await getNavData();
-  const business = navData.business;
+  const business = NAV_DATA.business;
   if (!product || !product.published) notFound();
   // console.log("product :", product);
   const category = await getCategoryBySlug(product.categorySlug);

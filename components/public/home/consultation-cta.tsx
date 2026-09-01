@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Phone } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
-import { getNavData, whatsappLink } from "@/lib/services/nav-service";
+import { NAV_DATA, whatsappLink } from "@/lib/utils";
 
 const WhatsappIcon = () => (
   <svg
@@ -13,7 +13,7 @@ const WhatsappIcon = () => (
   </svg>
 );
 
-export function ConsultationCta({ business }: { business: any }) {
+export function ConsultationCta({ business = NAV_DATA.business }: { business?: any }) {
   return (
     <section className="shell gutter py-4">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gold-500 via-gold-400 to-gold-600 p-6 sm:p-10 lg:p-14">

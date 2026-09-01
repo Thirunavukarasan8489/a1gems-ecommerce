@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { MessageCircle, PackageSearch } from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { PageHeader } from "@/components/public/ui/page-header";
-import { whatsappLink } from "@/lib/utils";
-import { getNavData } from "@/lib/services/nav-service";
+import { NAV_DATA, whatsappLink } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Track Order",
@@ -12,8 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TrackOrderPage() {
-  const navData = await getNavData();
-  const business = navData.business;
+  const business = NAV_DATA.business;
 
   return (
     <>

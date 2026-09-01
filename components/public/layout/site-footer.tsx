@@ -3,9 +3,8 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/public/layout/logo";
 import { buttonStyles } from "@/components/public/ui/button";
 import { getCategories } from "@/lib/services/category-service";
-import { getNavData, whatsappLink } from "@/lib/services/nav-service";
 import { getPolicies } from "@/lib/services/policy-service";
-import { categoryTerms } from "@/lib/utils";
+import { categoryTerms, NAV_DATA, whatsappLink } from "@/lib/utils";
 
 
 
@@ -20,8 +19,8 @@ const WhatsappIcon = () => (
 );
 
 export async function SiteFooter() {
-  const [categories, navData, policies] = await Promise.all([getCategories(), getNavData(), getPolicies()]);
-  const { business, primaryNav, secondaryNav } = navData;
+  const [categories, policies] = await Promise.all([getCategories(), getPolicies()]);
+  const { business, primaryNav, secondaryNav } = NAV_DATA;
   const legal = policies.map((policy) => ({ label: policy.title, href: `/policies/${policy.slug}` }));
   return (
     <footer className="mt-20 bg-plum-950 text-plum-200">

@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { MessageCircle, PackageCheck } from "lucide-react";
 import { AddToCart } from "@/components/public/cart/add-to-cart";
+import { EnquireModal } from "@/components/public/product/enquire-modal";
 import { Badge } from "@/components/public/ui/badge";
 import { buttonStyles } from "@/components/public/ui/button";
 import { Rating } from "@/components/public/ui/rating";
@@ -143,17 +144,14 @@ export function ProductPurchaseOptions({
 
         {enquirable && (
           <div className="grid gap-3 sm:grid-cols-2">
-            <Link
-              href={`/contact?product=${encodeURIComponent(product.name)}${category ? `&category=${encodeURIComponent(category.name)}` : ""}${activeVariant ? `&variant=${encodeURIComponent(activeVariant.name)}` : ""}`}
-              className={buttonStyles({
-                variant: buyable ? "outline" : "emerald",
-                size: "lg",
-                full: true,
-              })}
-            >
-              <MessageCircle size={18} />
-              Enquire now
-            </Link>
+            <EnquireModal
+              productId={product.id}
+              categoryId={category?.id}
+              productName={product.name}
+              categoryName={category?.name}
+              variantName={activeVariant?.name}
+              buyable={buyable}
+            />
             {product.whatsappEnabled && (
               <a
                 href={whatsappLink(business,

@@ -4,13 +4,63 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, MessageCircle, Phone, X } from "lucide-react";
+import { ArrowRight, Menu, MessageCircle, Phone, X, User } from "lucide-react";
 import { Logo } from "@/components/public/layout/logo";
 import { buttonStyles } from "@/components/public/ui/button";
-import { categoryTerms } from "@/lib/utils";
+import { categoryTerms, NAV_DATA, whatsappLink } from "@/lib/utils";
+import { useSession, signOut } from "next-auth/react";
 
-export function MobileDrawer({ categories, navData }: { categories: any[], navData: any }) {
-  const { business, primaryNav, secondaryNav, whatsappLink } = navData;
+function AuthLinksMobile({ close }: { close: () => void }) {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div className="text-sm text-plum-400">Loading...</div>;
+  }
+
+  const isCustomer = (session?.user as any)?.role === "CUSTOMER";
+
+  if (!session || !isCustomer) {
+    return (
+      <Link
+        href="/login"
+        onClick={close}
+        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-plum-800 hover:bg-plum-900/6"
+      >
+        <User size={18} />
+        Sign In / Register
+      </Link>
+    );
+  }
+
+  return (
+    <ul className="space-y-1">
+      <li>
+        <Link href="/account/dashboard" onClick={close} className="block px-3 py-2 text-sm font-medium text-plum-800 hover:bg-plum-900/6 rounded-xl">
+          Dashboard
+        </Link>
+      </li>
+      <li>
+        <Link href="/account/orders" onClick={close} className="block px-3 py-2 text-sm font-medium text-plum-800 hover:bg-plum-900/6 rounded-xl">
+          Orders
+        </Link>
+      </li>
+      <li>
+        <button
+          onClick={() => {
+            close();
+            signOut({ callbackUrl: "/" });
+          }}
+          className="block w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl"
+        >
+          Sign Out
+        </button>
+      </li>
+    </ul>
+  );
+}
+
+export function MobileDrawer({ categories }: { categories: any[] }) {
+  const { business, primaryNav, secondaryNav } = NAV_DATA;
   const [open, setOpen] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
@@ -143,7 +193,7 @@ export function MobileDrawer({ categories, navData }: { categories: any[], navDa
                 ))}
               </ul>
 
-              <ul className="flex flex-wrap gap-x-5 gap-y-2 border-t border-ivory-300 pt-5">
+              <ul className="flex flex-wrap gap-x-5 gap-y-2 border-t border-ivory-300 pt-5 mb-5">
                 {secondaryNav.map((item: any) => (
                   <li key={item.href}>
                     <Link
@@ -155,6 +205,14 @@ export function MobileDrawer({ categories, navData }: { categories: any[], navDa
                   </li>
                 ))}
               </ul>
+              
+              {/* Auth Links */}
+              <div className="border-t border-ivory-300 pt-5">
+                <p className="mb-3 text-[0.625rem] font-semibold tracking-[0.18em] text-plum-500 uppercase">
+                  My Account
+                </p>
+                <AuthLinksMobile close={() => setOpen(false)} />
+              </div>
             </nav>
 
             <div className="safe-b border-t border-ivory-300 bg-white px-4 py-4">
@@ -167,7 +225,7 @@ export function MobileDrawer({ categories, navData }: { categories: any[], navDa
                   Call us
                 </a>
                 <a
-                  href={whatsappLink("Hi A1 Gems, I have a question.")}
+                  href={whatsappLink(business, "Hi A1 Gems, I have a question.")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={buttonStyles({ variant: "whatsapp", size: "sm" })}
