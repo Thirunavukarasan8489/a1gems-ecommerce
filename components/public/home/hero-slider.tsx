@@ -2,11 +2,18 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, BadgeCheck, MessageCircle, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  MessageCircle,
+  Sparkles,
+} from "lucide-react";
 import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { OrnamentalBg } from "@/components/public/ui/ornamental-bg";
 import { cn, whatsappLink } from "@/lib/utils";
+import Image from "next/image";
 
 /**
  * Premium Hero Slider replacing the static text section.
@@ -17,7 +24,8 @@ const heroSlides = [
   {
     badge: "Certified Unheated Gemstones",
     title: "Stones you can verify, not just admire.",
-    subtitle: "Every gemstone carries an independent laboratory report. Verify your certificate number before you spend a rupee.",
+    subtitle:
+      "Every gemstone carries an independent laboratory report. Verify your certificate number before you spend a rupee.",
     ctaText: "Explore Collection",
     ctaHref: "/products",
     secondaryCtaText: "Free Consultation",
@@ -25,11 +33,13 @@ const heroSlides = [
     gemColor: "#10b481",
     bgGradient: "from-plum-950 via-plum-900 to-emerald-950/80",
     glowColor: "#10b481",
+    image: "/images/ruby-manik-1.webp",
   },
   {
     badge: "Ratnapura, Sri Lanka",
     title: "Unheated Ceylon Sapphires",
-    subtitle: "Fresh parcel of royal blue and cornflower sapphires, each with an IGI report confirming zero thermal treatment.",
+    subtitle:
+      "Fresh parcel of royal blue and cornflower sapphires, each with an IGI report confirming zero thermal treatment.",
     ctaText: "Shop Sapphires",
     ctaHref: "/products?category=blue-sapphire",
     secondaryCtaText: "WhatsApp Gemmologist",
@@ -37,11 +47,13 @@ const heroSlides = [
     gemColor: "#1f4fd8",
     bgGradient: "from-plum-950 via-[#131f42] to-[#1f4fd8]/30",
     glowColor: "#1f4fd8",
+    image: "/images/ruby-manik-1.webp",
   },
   {
     badge: "Mogok, Myanmar",
     title: "Certified Pigeon-Blood Rubies",
-    subtitle: "Hand-selected unheated rubies displaying deep crimson saturation and remarkable light return.",
+    subtitle:
+      "Hand-selected unheated rubies displaying deep crimson saturation and remarkable light return.",
     ctaText: "Shop Rubies",
     ctaHref: "/products?category=ruby",
     secondaryCtaText: "Request Inspection",
@@ -49,11 +61,13 @@ const heroSlides = [
     gemColor: "#c81e4a",
     bgGradient: "from-plum-950 via-[#360e18] to-[#c81e4a]/30",
     glowColor: "#c81e4a",
+    image: "/images/ruby-manik-1.webp",
   },
   {
     badge: "Panjshir & Zambia",
     title: "Natural Untreated Emeralds",
-    subtitle: "Vivid green emeralds with exceptional clarity and origin verification from world-renowned mines.",
+    subtitle:
+      "Vivid green emeralds with exceptional clarity and origin verification from world-renowned mines.",
     ctaText: "Shop Emeralds",
     ctaHref: "/products?category=emerald",
     secondaryCtaText: "View Vault",
@@ -61,6 +75,7 @@ const heroSlides = [
     gemColor: "#33ce99",
     bgGradient: "from-plum-950 via-[#0a291f] to-[#10b481]/30",
     glowColor: "#33ce99",
+    image: "/images/ruby-manik-1.webp",
   },
 ];
 
@@ -111,10 +126,18 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
 
       <div
         className="group relative w-full overflow-hidden"
-        onMouseEnter={() => { pausedRef.current = true; }}
-        onMouseLeave={() => { pausedRef.current = false; }}
-        onTouchStart={() => { pausedRef.current = true; }}
-        onTouchEnd={() => { pausedRef.current = false; }}
+        onMouseEnter={() => {
+          pausedRef.current = true;
+        }}
+        onMouseLeave={() => {
+          pausedRef.current = false;
+        }}
+        onTouchStart={() => {
+          pausedRef.current = true;
+        }}
+        onTouchEnd={() => {
+          pausedRef.current = false;
+        }}
       >
         <ul
           ref={trackRef}
@@ -129,7 +152,7 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
               <div
                 className={cn(
                   "relative flex min-h-[480px] sm:min-h-[540px] lg:min-h-[580px] flex-col justify-center bg-gradient-to-br p-6 sm:p-12 lg:p-16",
-                  slide.bgGradient
+                  slide.bgGradient,
                 )}
               >
                 {/* Glow Backdrop Accent */}
@@ -158,7 +181,10 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
                     <div className="mt-7 flex flex-wrap gap-3">
                       <Link
                         href={slide.ctaHref}
-                        className={buttonStyles({ size: "lg", className: "sm:w-auto font-semibold shadow-lg" })}
+                        className={buttonStyles({
+                          size: "lg",
+                          className: "sm:w-auto font-semibold shadow-lg",
+                        })}
                       >
                         {slide.ctaText}
                         <ArrowRight size={18} />
@@ -167,7 +193,7 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
                       <a
                         href={whatsappLink(
                           null,
-                          "Hi A1 Gems, I would like to consult a gemmologist."
+                          "Hi A1 Gems, I would like to consult a gemmologist.",
                         )}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -187,10 +213,17 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
                   {/* Gemstone Graphic / Visual Preview */}
                   <div className="hidden lg:flex justify-center items-center relative">
                     <div className="relative size-72 lg:size-80 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-gold-500/30">
-                      <GemImage
+                      {/* <GemImage
                         color={slide.gemColor}
                         seed={i * 7 + 1}
                         framed
+                        className="aspect-square w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      /> */}
+                      <Image
+                        src={slide.image}
+                        alt={slide.title}
+                        width={1254}
+                        height={1254}
                         className="aspect-square w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-plum-950/80 via-transparent to-transparent p-4 flex flex-col justify-end">
@@ -212,7 +245,9 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
         {/* Carousel Navigation Buttons */}
         <button
           type="button"
-          onClick={() => goTo((active - 1 + heroSlides.length) % heroSlides.length)}
+          onClick={() =>
+            goTo((active - 1 + heroSlides.length) % heroSlides.length)
+          }
           aria-label="Previous slide"
           className="absolute top-1/2 left-4 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-plum-950/60 text-ivory-100 backdrop-blur-md transition-all duration-200 hover:bg-plum-950/80 sm:flex"
         >
@@ -239,7 +274,9 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
               aria-current={active === i}
               className={cn(
                 "h-2 rounded-full transition-all duration-300",
-                active === i ? "w-8 bg-gold-400" : "w-2 bg-white/40 hover:bg-white/60"
+                active === i
+                  ? "w-8 bg-gold-400"
+                  : "w-2 bg-white/40 hover:bg-white/60",
               )}
             />
           ))}

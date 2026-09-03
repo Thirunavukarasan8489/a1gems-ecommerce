@@ -16,7 +16,7 @@ export async function FeaturedCategories() {
   return (
     <section
       id="shop-by-category"
-      className="shell gutter py-12 sm:py-16 lg:py-20"
+      className="shell gutter py-14 sm:py-20 lg:py-24"
     >
       <SectionHeading
         eyebrow="Category"
