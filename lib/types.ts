@@ -123,6 +123,7 @@ export interface CartLine {
   productId: string;
   slug: string;
   name: string;
+  image?: string;
   gemColor: string;
   /** Price snapshot at the time the line was added (§11.1). */
   unitPrice: number;
@@ -148,7 +149,14 @@ export interface LeadType {
   category?: Partial<Category>;
   message: string;
   source: string;
-  status: 'NEW' | 'CONTACTED' | 'FOLLOW_UP' | 'QUALIFIED' | 'CONVERTED' | 'CLOSED' | 'SPAM';
+  status:
+    | "NEW"
+    | "CONTACTED"
+    | "FOLLOW_UP"
+    | "QUALIFIED"
+    | "CONVERTED"
+    | "CLOSED"
+    | "SPAM";
   assignedTo?: string;
   notes?: LeadNote[];
   followUpDate?: string | Date;

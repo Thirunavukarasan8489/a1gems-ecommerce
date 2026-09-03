@@ -12,7 +12,12 @@ type CartContextValue = {
   hydrated: boolean;
   count: number;
   subtotal: number;
-  add: (product: Product, quantity?: number, variantName?: string, variantPrice?: number) => void;
+  add: (
+    product: Product,
+    quantity?: number,
+    variantName?: string,
+    variantPrice?: number,
+  ) => void;
   setQuantity: (productId: string, quantity: number) => void;
   remove: (productId: string) => void;
   clear: () => void;
@@ -55,7 +60,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     if (!hydrated) return;
-    
+
     let sid = window.localStorage.getItem("a1gems.cart.sessionId");
     if (!sid) {
       sid = crypto.randomUUID();
@@ -81,28 +86,39 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [lines, hydrated, sessionId]);
 
-  const add = React.useCallback((product: Product, quantity = 1, variantName?: string, variantPrice?: number) => {
-    const line: CartLine = {
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      gemColor: product.gemColor,
-      unitPrice: variantPrice ?? product.sellingPrice,
-      quantity,
-      variantName,
-    };
+  const add = React.useCallback(
+    (
+      product: Product,
+      quantity = 1,
+      variantName?: string,
+      variantPrice?: number,
+    ) => {
+      const line: CartLine = {
+        productId: product.id,
+        slug: product.slug,
+        name: product.name,
+        image: product.primaryImage?.url,
+        gemColor: product.gemColor,
+        unitPrice: variantPrice ?? product.sellingPrice,
+        quantity,
+        variantName,
+      };
 
-    setLines((current) => {
-      const existing = current.find((l) => l.productId === product.id && l.variantName === variantName);
-      if (!existing) return [...current, line];
-      return current.map((l) =>
-        (l.productId === product.id && l.variantName === variantName)
-          ? { ...l, quantity: l.quantity + quantity }
-          : l,
-      );
-    });
-    setLastAdded(line);
-  }, []);
+      setLines((current) => {
+        const existing = current.find(
+          (l) => l.productId === product.id && l.variantName === variantName,
+        );
+        if (!existing) return [...current, line];
+        return current.map((l) =>
+          l.productId === product.id && l.variantName === variantName
+            ? { ...l, quantity: l.quantity + quantity }
+            : l,
+        );
+      });
+      setLastAdded(line);
+    },
+    [],
+  );
 
   const setQuantity = React.useCallback(
     (productId: string, quantity: number) => {

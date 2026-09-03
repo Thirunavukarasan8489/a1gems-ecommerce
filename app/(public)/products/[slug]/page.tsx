@@ -61,9 +61,7 @@ export default async function ProductDetailPage(
   const product = await getProductBySlug(slug);
   const business = NAV_DATA.business;
   if (!product || !product.published) notFound();
-  // console.log("product :", product);
   const category = await getCategoryBySlug(product.categorySlug);
-  console.log("category :", category);
   const related = await getRelatedProducts(product.id, product.categorySlug);
 
   const specs = [

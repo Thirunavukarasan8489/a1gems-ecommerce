@@ -43,7 +43,6 @@ export default function ResetPassword() {
       // Simulate API call for password reset
       await new Promise((resolve) => setTimeout(resolve, 1000));
       // In a real app, you would POST to /api/auth/reset-password with the token from the URL
-      console.log('Password reset successfully');
       setIsSuccess(true);
     } catch (error) {
       console.error('Password reset failed', error);
