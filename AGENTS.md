@@ -350,3 +350,29 @@ New Order -> Payment Verified -> Order Confirmed -> Admin Processing -> Inventor
 7. SEO (SEO Management)
 8. SETTINGS (Business, Commerce, Shipping, Payment, COD, Tax / GST, Admin Users)
 9. SYSTEM (Audit Logs)
+
+---
+
+## 8. Completed Work & Implementation Progress
+
+### 8.1 Mobile Layout & Responsive Overflow Engine
+- **Document Viewport Bounds:** Enforced `overflow-x: hidden` across `html`, `body`, and `<main>` to prevent horizontal layout blowout on mobile screens.
+- **WebKit Flexbox Fix:** Removed conflicting `max-width: 100vw` rules on flex containers that triggered WebKit layout shrinking in iOS Safari and Android Chrome.
+- **Swipe Rail Clipping:** Contained unclipped horizontal swipe rails with `relative w-full max-w-full overflow-hidden` wrappers across `Testimonials`, `ProductGallery`, `ProductRail`, `PromoBanners`, and `RashiFinder`.
+- **Hero Stats Grid:** Refactored Hero trust stats grid from static `grid-cols-4` to responsive `grid-cols-2 sm:grid-cols-4` to prevent mobile text overflow.
+
+### 8.2 Mobile Bottom Navigation Dock (`BottomNav`)
+- **Floating Glassmorphic Dock:** Built `components/public/layout/bottom-nav.tsx` with high-performance `translateX` tab sliding indicator and spring easing physics.
+- **Android Compatibility:** Implemented `bottom-[calc(0.625rem+env(safe-area-inset-bottom,0px))] z-[100]` and `viewportFit: "cover"` to guarantee visibility above Android gesture bars and browser toolbars.
+- **Route Matching:** Expanded active tab matching logic to handle nested category routes (`/collections/*` -> Shop) and checkout routes (`/checkout` -> Cart).
+
+### 8.3 Admin Panel Redesign & Border System
+- **Theme Palette Integration:** Updated Admin layout background to warm luxury Ivory canvas (`bg-[#f8f5f0] dark:bg-plum-950 text-plum-900 dark:text-ivory-100`).
+- **Sidebar Navigation:** Styled deep Plum maroon sidebar (`bg-plum-950`) with an Emerald active tab indicator (`border-l-3 border-emerald-500 bg-plum-800`).
+- **Clean Border System:** Removed gold borders across Admin UI and enforced clean, visible neutral borders (`border-gray-200 dark:border-plum-800` / `border-gray-300 dark:border-plum-700`).
+- **Admin UI Components Refactored:** `Topbar`, `DataTable`, `KpiCard`, `AdminButton`, `AdminInput`, `AdminSelect`, `Breadcrumbs`.
+
+### 8.4 Authentication, Middleware & Platform Fixes
+- **Admin Auth Loop Resolution:** Refactored `proxy.ts` to use `getToken` directly from `next-auth/jwt` for `/admin/:path*` route matching, fixing infinite 307 redirect loops on `/admin/login`.
+- **Next.js 15 Async Props:** Created global ambient ambient type definitions in `types/global.d.ts` for Next.js 15 async `PageProps` and `LayoutProps`.
+- **OpenGraph Link Previews:** Updated `metadataBase` in `app/layout.tsx` to dynamically resolve `NEXT_PUBLIC_SITE_URL` / `VERCEL_URL` for social `og:image` previews.

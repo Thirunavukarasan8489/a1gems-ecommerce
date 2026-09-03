@@ -28,9 +28,9 @@ export async function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <Logo onDark />
-            <p className="mt-4 font-devanagari text-sm text-gold-400">
+            {/* <p className="mt-4 font-devanagari text-sm text-gold-400">
               शुद्ध रत्न, विश्वसनीय व्यापार
-            </p>
+            </p> */}
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-plum-300">
               Natural, independently certified gemstones sourced at origin.
               Treatments always disclosed, pricing always explained.

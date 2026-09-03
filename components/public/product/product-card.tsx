@@ -87,9 +87,9 @@ export function ProductCard({
             <p className="text-base font-semibold text-plum-900 tabular-nums sm:text-lg">
               {formatINR(product.sellingPrice)}
             </p>
-            {product.comparePrice && (
+            {Boolean(product.comparePrice && product.comparePrice > product.sellingPrice) && (
               <p className="text-xs text-plum-400 line-through tabular-nums">
-                {formatINR(product.comparePrice)}
+                {formatINR(product.comparePrice!)}
               </p>
             )}
           </div>

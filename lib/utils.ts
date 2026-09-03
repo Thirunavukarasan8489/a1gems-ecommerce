@@ -11,9 +11,10 @@ const inr = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 0,
 });
 
-/** Prices are stored in paise so we never do float maths on money. */
-export function formatINR(paise: number) {
-  return inr.format(paise / 100);
+/** Format Rupee amounts nicely with Indian numbering system (e.g. ₹3,27,500). */
+export function formatINR(amount: number) {
+  if (!amount && amount !== 0) return "₹0";
+  return inr.format(amount);
 }
 
 export function discountPercent(sellingPaise: number, comparePaise?: number) {
