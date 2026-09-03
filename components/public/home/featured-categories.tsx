@@ -1,22 +1,22 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/public/ui/section-heading";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { getCategories } from "@/lib/services/category-service";
 import { getProducts } from "@/lib/services/product-service";
 import { categoryTerms } from "@/lib/utils";
-import Image from "next/image";
 
 export async function FeaturedCategories() {
   const [categories, products] = await Promise.all([
     getCategories(),
     getProducts(),
   ]);
-  // console.log("categories :", categories);
+
   return (
     <section
       id="shop-by-category"
-      className="shell gutter py-14 sm:py-20 lg:py-24"
+      className="shell gutter py-10 sm:py-16 lg:py-20"
     >
       <SectionHeading
         eyebrow="Category"
@@ -39,20 +39,23 @@ export async function FeaturedCategories() {
             <li key={cat.slug}>
               <Link
                 href={`/products?category=${cat.slug}`}
-                className="group relative block overflow-hidden rounded-2xl"
+                className="group relative block overflow-hidden rounded-2xl bg-plum-950"
               >
-                {/* <GemImage
-                  color={cat.gemColor}
-                  seed={i * 5 + 1}
-                  className="aspect-square w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
-                /> */}
-                <Image
-                  src={cat.image}
-                  alt={cat.name}
-                  width={500}
-                  height={500}
-                  className="aspect-square w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
-                />
+                {cat.image ? (
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    width={500}
+                    height={500}
+                    className="aspect-square w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
+                  />
+                ) : (
+                  <GemImage
+                    color={cat.gemColor}
+                    seed={i * 5 + 1}
+                    className="aspect-square w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
+                  />
+                )}
 
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum-950/90 via-plum-950/45 to-transparent p-3 pt-10 sm:p-4">
                   <p className="font-display text-base leading-tight font-semibold text-ivory-100 sm:text-lg capitalize">
