@@ -50,7 +50,6 @@ export function whatsappLink(businessData: any, message: string) {
 
 export const NAV_DATA = {
   primaryNav: [
-    { label: "Collections", href: "/collections" },
     { label: "All Products", href: "/products" },
     { label: "Gemstone Guides", href: "/guides" },
     { label: "About", href: "/about" },

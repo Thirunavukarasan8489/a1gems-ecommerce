@@ -5,44 +5,64 @@ import { GemImage } from "@/components/public/ui/gem-image";
 import { getCategories } from "@/lib/services/category-service";
 import { getProducts } from "@/lib/services/product-service";
 import { categoryTerms } from "@/lib/utils";
+import Image from "next/image";
 
 export async function FeaturedCategories() {
-  const [categories, products] = await Promise.all([getCategories(), getProducts()]);
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts(),
+  ]);
+  // console.log("categories :", categories);
   return (
-    <section className="shell gutter py-12 sm:py-16 lg:py-20">
+    <section
+      id="shop-by-category"
+      className="shell gutter py-12 sm:py-16 lg:py-20"
+    >
       <SectionHeading
-        eyebrow="Shop by stone"
-        title="Find your gemstone"
-        body="Eight collections, each sourced from the deposits that produce the material worth owning."
-        href="/collections"
+        eyebrow="Category"
+        title="Shop by Category"
+        body="Explore our natural gemstone categories sourced directly from origin deposits."
+        href="/products"
       />
 
       <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
         {categories.map((cat, i) => {
           const count = products.filter(
-            (p) => p.categorySlug === cat.slug && p.published,
+            (p) =>
+              (p.categorySlug === cat.slug ||
+                p.categorySlug === cat.slug.toLowerCase()) &&
+              p.published,
           ).length;
           const terms = categoryTerms(cat.name);
 
           return (
             <li key={cat.slug}>
               <Link
-                href={`/collections/${cat.slug}`}
+                href={`/products?category=${cat.slug}`}
                 className="group relative block overflow-hidden rounded-2xl"
               >
-                <GemImage
+                {/* <GemImage
                   color={cat.gemColor}
                   seed={i * 5 + 1}
+                  className="aspect-square w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
+                /> */}
+                <Image
+                  src={cat.image}
+                  alt={cat.name}
+                  width={500}
+                  height={500}
                   className="aspect-square w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
                 />
 
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-plum-950/90 via-plum-950/45 to-transparent p-3 pt-10 sm:p-4">
-                  <p className="font-display text-base leading-tight font-semibold text-ivory-100 sm:text-lg">
+                  <p className="font-display text-base leading-tight font-semibold text-ivory-100 sm:text-lg capitalize">
                     {terms.primary}
                   </p>
                   <p className="mt-0.5 flex items-center gap-1.5 text-[0.6875rem] text-plum-300">
                     {terms.secondary && <span>{terms.secondary} ·</span>}
-                    {count} {count === 1 ? "piece" : "pieces"}
+                    {count > 0
+                      ? `${count} ${count === 1 ? "piece" : "pieces"}`
+                      : "In Stock"}
                   </p>
                 </div>
 

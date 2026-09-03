@@ -27,8 +27,7 @@ export function BottomNav() {
     if (href === "/products") {
       return (
         pathname === "/products" ||
-        pathname.startsWith("/products/") ||
-        pathname.startsWith("/collections/")
+        pathname.startsWith("/products/")
       );
     }
     if (href === "/cart") {

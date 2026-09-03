@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { CertificationTrustSection } from "@/components/public/home/certification-trust-section";
 import { ConsultationCta } from "@/components/public/home/consultation-cta";
 import { FeaturedCategories } from "@/components/public/home/featured-categories";
 import { FinalCta } from "@/components/public/home/final-cta";
 import { HeroSlider } from "@/components/public/home/hero-slider";
-import { RashiFinder } from "@/components/public/home/rashi-finder";
+import { HowItWorks } from "@/components/public/home/how-it-works";
 import { Testimonials } from "@/components/public/home/testimonials";
 import { TrustStrip } from "@/components/public/home/trust-strip";
 import { ProductRail } from "@/components/public/product/product-rail";
@@ -13,7 +14,6 @@ import { buttonStyles } from "@/components/public/ui/button";
 import { SectionHeading } from "@/components/public/ui/section-heading";
 import { getFaqs } from "@/lib/services/content-service";
 import { getCategories } from "@/lib/services/category-service";
-import { getRashiList } from "@/lib/services/rashi-service";
 import { NAV_DATA } from "@/lib/utils";
 import {
   getBestsellers,
@@ -25,12 +25,7 @@ export default async function HomePage() {
   const featured = await getFeaturedProducts();
   const bestsellers = await getBestsellers();
   const bracelets = await getProductsByCategory("bracelets");
-  const collectorPieces = featured.filter(
-    (p) => p.purchaseType === "ENQUIRY_ONLY",
-  );
-
   const faqs = await getFaqs();
-  const rashiList = await getRashiList();
   const categories = await getCategories();
 
   return (
@@ -41,9 +36,8 @@ export default async function HomePage() {
 
       {/* 2. Shop by Category Section */}
       <FeaturedCategories />
-      <RashiFinder rashiList={rashiList} categories={categories} />
 
-      {/* Bestsellers Products */}
+      {/* 3. Bestsellers Products */}
       <section className="shell gutter py-12 sm:py-16 lg:py-20">
         <SectionHeading
           eyebrow="Bestsellers"
@@ -55,14 +49,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Bracelet showcase */}
+      {/* 4. Certified Stones Verification Section */}
+      <CertificationTrustSection />
+
+      {/* 5. How It Works — 4 Step Gemstone Recommendation */}
+      <HowItWorks />
+
+      {/* 6. Everyday Gemstone Bracelets */}
       <section className="bg-ivory-200 py-12 sm:py-16 lg:py-20">
         <div className="shell gutter">
           <SectionHeading
             eyebrow="Everyday pieces"
             title="Gemstone bracelets"
             body="Hand-strung to your wrist measurement and dispatched within 48 hours."
-            href="/collections/bracelets"
+            href="/products?category=bracelets"
           />
           <div className="mt-7">
             <ProductRail products={bracelets} />
@@ -70,13 +70,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. Call to Action (CTA) Section */}
+      {/* 7. Consultation CTA */}
       <ConsultationCta business={NAV_DATA.business} />
 
-      {/* 5. Testimonial Section */}
+      {/* 8. Testimonials Section */}
       <Testimonials />
 
-      {/* 6. FAQ Section */}
+      {/* 9. Final CTA */}
+      <FinalCta />
+
+      {/* 10. FAQ Accordion Section */}
       <section className="shell gutter py-12 sm:py-16 lg:py-20">
         <div className="lg:grid lg:grid-cols-[0.9fr_1.4fr] lg:items-start lg:gap-14">
           <SectionHeading
@@ -100,9 +103,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Final Call to Action */}
-      <FinalCta />
     </>
   );
 }

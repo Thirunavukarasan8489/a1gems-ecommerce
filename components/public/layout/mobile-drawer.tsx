@@ -155,7 +155,7 @@ export function MobileDrawer({ categories }: { categories: any[] }) {
                   return (
                     <li key={cat.slug}>
                       <Link
-                        href={`/collections/${cat.slug}`}
+                        href={`/products?category=${cat.slug}`}
                         className="flex h-full items-center gap-2.5 rounded-xl border border-ivory-300 bg-white p-3 text-[0.8125rem] leading-tight font-medium text-plum-800 active:scale-[0.98]"
                       >
                         <span

@@ -56,7 +56,7 @@ export async function SiteFooter() {
             {categories.slice(0, 6).map((cat) => (
               <FooterLink
                 key={cat.slug}
-                href={`/collections/${cat.slug}`}
+                href={`/products?category=${cat.slug}`}
                 label={categoryTerms(cat.name).primary}
               />
             ))}

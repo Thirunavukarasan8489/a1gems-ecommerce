@@ -95,7 +95,7 @@ export function RashiFinder({ rashiList, categories }: { rashiList: any[], categ
 
             {category ? (
               <Link
-                href={`/collections/${category.slug}`}
+                href={`/products?category=${category.slug}`}
                 className={buttonStyles({
                   size: "md",
                   full: true,
