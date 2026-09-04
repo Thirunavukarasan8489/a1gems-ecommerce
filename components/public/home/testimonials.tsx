@@ -83,7 +83,7 @@ export function Testimonials({ items }: { items?: any[] }) {
                   className="mb-3 shrink-0 fill-gold-200 text-gold-400"
                 />
                 <blockquote className="flex-1 text-[0.9375rem] leading-relaxed text-plum-900 font-normal">
-                  "{t.body}"
+                  &quot;{t.body}&quot;
                 </blockquote>
                 <figcaption className="mt-5 border-t border-ivory-200 pt-4">
                   <Rating value={t.rating} className="mb-2" />

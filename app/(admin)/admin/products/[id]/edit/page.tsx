@@ -1,16 +1,14 @@
 import ProductForm from '@/components/admin/products/ProductForm';
 import { getProductById } from '@/lib/actions/product.actions';
 import { getCategories } from '@/lib/actions/category.actions';
-import { getGuides } from '@/lib/actions/guide.actions';
 import { notFound } from 'next/navigation';
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   
-  const [productRes, categoriesRes, guidesRes] = await Promise.all([
+  const [productRes, categoriesRes] = await Promise.all([
     getProductById(resolvedParams.id),
-    getCategories(),
-    getGuides()
+    getCategories()
   ]);
   
   if (!productRes.success || !productRes.data) {
@@ -21,10 +19,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     ? categoriesRes.data.map((c: any) => ({ label: c.name, value: c._id }))
     : [];
     
-  const guides = guidesRes.success && guidesRes.data
-    ? guidesRes.data.map((g: any) => ({ label: g.title, value: g._id }))
-    : [];
-    
+  const guides: any[] = [];
   // Format the existing gallery into the shape expected by ProductForm
   const formattedData = {
     ...productRes.data,

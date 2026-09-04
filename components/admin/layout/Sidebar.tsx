@@ -49,10 +49,7 @@ const hasAccess = (itemHref: string, role: string) => {
       itemHref.startsWith("/admin/categories") ||
       itemHref.startsWith("/admin/products") ||
       itemHref.startsWith("/admin/inventory") ||
-      itemHref.startsWith("/admin/media") ||
-      itemHref.startsWith("/admin/website") ||
-      itemHref.startsWith("/admin/content") ||
-      itemHref.startsWith("/admin/rashi")
+      itemHref.startsWith("/admin/website")
     ) {
       return true;
     }
@@ -73,7 +70,6 @@ const sidebarGroups = [
       { name: "Categories", href: "/admin/categories", icon: Layers },
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Inventory", href: "/admin/inventory", icon: Boxes },
-      { name: "Media Library", href: "/admin/media", icon: ImageIcon },
     ],
   },
   {
@@ -97,27 +93,14 @@ const sidebarGroups = [
   {
     title: "WEBSITE",
     items: [
-      { name: "Homepage", href: "/admin/website/homepage", icon: Globe },
-      { name: "Banners", href: "/admin/website", icon: Megaphone },
-      { name: "Pages", href: "/admin/website/pages", icon: FileSpreadsheet },
+      { name: "Hero Section", href: "/admin/website/hero-section", icon: Megaphone },
     ],
   },
-  {
-    title: "CONTENT",
-    items: [
-      {
-        name: "Gemstone Guides",
-        href: "/admin/content/guides",
-        icon: BookOpen,
-      },
-      { name: "Contact Us", href: "/admin/content/contact", icon: PhoneCall },
-      { name: "Rashi Astrology", href: "/admin/rashi", icon: Star },
-    ],
-  },
+
   {
     title: "SYSTEM & SETTINGS",
     items: [
-      { name: "Commerce Settings", href: "/admin/settings", icon: SettingsIcon },
+      { name: "Company Settings", href: "/admin/settings/company", icon: SettingsIcon },
       { name: "Audit Logs", href: "/admin/system/audit", icon: ShieldAlert },
       {
         name: "Users & Permissions",

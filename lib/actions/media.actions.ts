@@ -1,15 +1,9 @@
 'use server';
 
 import { v2 as cloudinary } from 'cloudinary';
-import { revalidatePath } from 'next/cache';
-import mongoose from 'mongoose';
-
-import dbConnect from '@/lib/db';
-import { MediaAsset } from '@/lib/models/media';
 import { getSession } from '@/lib/auth';
 
 const CLOUDINARY_FOLDER = 'a1gems';
-const MEDIA_PATH = '/admin/media';
 
 /**
  * Configure Cloudinary
@@ -88,21 +82,6 @@ function getErrorMessage(error: unknown): string {
 }
 
 /**
- * Check Cloudinary configuration
- */
-export async function checkCloudinaryConfig() {
-  const isConfigured = Boolean(
-    process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
-  );
-
-  return {
-    isConfigured,
-  };
-}
-
-/**
  * Upload media
  */
 export async function uploadMedia(formData: FormData) {
@@ -111,8 +90,6 @@ export async function uploadMedia(formData: FormData) {
       'SUPER_ADMIN',
       'CONTENT_MANAGER',
     ]);
-
-    await dbConnect();
 
     const file = formData.get('file');
 
@@ -168,130 +145,23 @@ export async function uploadMedia(formData: FormData) {
       uploadStream.end(buffer);
     });
 
-    /**
-     * Save uploaded media in database
-     */
-    const mediaDoc = await MediaAsset.create({
-      publicId: uploadResult.public_id,
-      url: uploadResult.url,
-      secureUrl: uploadResult.secure_url,
-      format: uploadResult.format,
-      resourceType: uploadResult.resource_type,
-      bytes: uploadResult.bytes,
-      width: uploadResult.width,
-      height: uploadResult.height,
-      folder: CLOUDINARY_FOLDER,
-      uploadedBy: session.name,
-    });
-
-    revalidatePath(MEDIA_PATH);
-
     return {
       success: true,
-      data: JSON.parse(JSON.stringify(mediaDoc)),
+      data: {
+        publicId: uploadResult.public_id,
+        url: uploadResult.url,
+        secureUrl: uploadResult.secure_url,
+        format: uploadResult.format,
+        resourceType: uploadResult.resource_type,
+        bytes: uploadResult.bytes,
+        width: uploadResult.width,
+        height: uploadResult.height,
+        folder: CLOUDINARY_FOLDER,
+        uploadedBy: session.name,
+      }
     };
   } catch (error) {
     console.error('uploadMedia ERROR:', error);
-
-    return {
-      success: false,
-      error: getErrorMessage(error),
-    };
-  }
-}
-
-/**
- * Get media assets
- */
-export async function getMediaAssets(
-  page = 1,
-  limit = 50
-) {
-  try {
-    await checkAuth([
-      'SUPER_ADMIN',
-      'CONTENT_MANAGER',
-    ]);
-
-    await dbConnect();
-
-    const currentPage = Math.max(1, page);
-    const currentLimit = Math.min(Math.max(1, limit), 100);
-
-    const skip = (currentPage - 1) * currentLimit;
-
-    const [assets, total] = await Promise.all([
-      MediaAsset.find()
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(currentLimit)
-        .lean(),
-
-      MediaAsset.countDocuments(),
-    ]);
-
-    return {
-      success: true,
-      data: JSON.parse(JSON.stringify(assets)),
-      pagination: {
-        total,
-        page: currentPage,
-        limit: currentLimit,
-        totalPages: Math.ceil(total / currentLimit),
-      },
-    };
-  } catch (error) {
-    console.error('getMediaAssets ERROR:', error);
-
-    return {
-      success: false,
-      error: getErrorMessage(error),
-    };
-  }
-}
-
-/**
- * Update media alt text
- */
-export async function updateMediaAltText(
-  id: string,
-  altText: string
-) {
-  try {
-    await checkAuth([
-      'SUPER_ADMIN',
-      'CONTENT_MANAGER',
-    ]);
-
-    await dbConnect();
-
-    if (!mongoose.isValidObjectId(id)) {
-      throw new Error('Invalid media asset ID');
-    }
-
-    const asset = await MediaAsset.findByIdAndUpdate(
-      id,
-      {
-        altText: altText.trim(),
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    ).lean();
-
-    if (!asset) {
-      throw new Error('Media asset not found');
-    }
-
-    revalidatePath(MEDIA_PATH);
-
-    return {
-      success: true,
-      data: JSON.parse(JSON.stringify(asset)),
-    };
-  } catch (error) {
-    console.error('updateMediaAltText ERROR:', error);
 
     return {
       success: false,
@@ -323,56 +193,6 @@ async function deleteFromCloudinary(
 }
 
 /**
- * Delete media asset
- */
-export async function deleteMediaAsset(id: string) {
-  try {
-    await checkAuth([
-      'SUPER_ADMIN',
-      'CONTENT_MANAGER',
-    ]);
-
-    await dbConnect();
-
-    if (!mongoose.isValidObjectId(id)) {
-      throw new Error('Invalid media asset ID');
-    }
-
-    const asset = await MediaAsset.findById(id);
-
-    if (!asset) {
-      throw new Error('Asset not found');
-    }
-
-    /**
-     * Delete from Cloudinary first
-     */
-    await deleteFromCloudinary(
-      asset.publicId,
-      asset.resourceType
-    );
-
-    /**
-     * Delete from database
-     */
-    await MediaAsset.findByIdAndDelete(id);
-
-    revalidatePath(MEDIA_PATH);
-
-    return {
-      success: true,
-    };
-  } catch (error) {
-    console.error('deleteMediaAsset ERROR:', error);
-
-    return {
-      success: false,
-      error: getErrorMessage(error),
-    };
-  }
-}
-
-/**
  * Delete media by URL
  *
  * Used for cleaning orphaned media.
@@ -386,56 +206,15 @@ export async function deleteMediaByUrl(url: string) {
   }
 
   try {
-    await dbConnect();
-
-    const asset = await MediaAsset.findOne({
-      $or: [
-        { url },
-        { secureUrl: url },
-      ],
-    });
-
-    if (!asset) {
-      return {
-        success: true,
-        skipped: true,
-      };
+    // Extract public_id from Cloudinary URL if possible
+    // A typical Cloudinary URL: https://res.cloudinary.com/<cloud_name>/image/upload/v1234567890/<folder>/<public_id>.<ext>
+    const urlParts = url.split('/');
+    const lastPart = urlParts[urlParts.length - 1];
+    const folder = urlParts[urlParts.length - 2];
+    if (folder === CLOUDINARY_FOLDER && lastPart) {
+      const publicId = `${folder}/${lastPart.split('.')[0]}`;
+      await deleteFromCloudinary(publicId, 'image');
     }
-
-    /**
-     * Check Product references
-     */
-    const Product = mongoose.models.Product;
-
-    if (Product) {
-      const inUse = await Product.exists({
-        $or: [
-          { 'primaryImage.url': url },
-          { 'gallery.url': url },
-        ],
-      });
-
-      if (inUse) {
-        return {
-          success: true,
-          skipped: true,
-          reason: 'Media is still being used by a product',
-        };
-      }
-    }
-
-    /**
-     * Delete from Cloudinary
-     */
-    await deleteFromCloudinary(
-      asset.publicId,
-      asset.resourceType
-    );
-
-    /**
-     * Delete from database
-     */
-    await MediaAsset.findByIdAndDelete(asset._id);
 
     return {
       success: true,

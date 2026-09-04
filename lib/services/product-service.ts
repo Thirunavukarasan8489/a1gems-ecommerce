@@ -1,13 +1,11 @@
 import dbConnect from '@/lib/db';
 import { Product } from '@/lib/models/product';
 import { Category } from '@/lib/models/category';
-import { Guide } from '@/lib/models/guide';
 import type { Product as PublicProduct } from '@/lib/types';
 import { unstable_cache } from 'next/cache';
 
 // Prevent Turbopack from tree-shaking the models
 if (!Category) console.warn("Category model not loaded");
-if (!Guide) console.warn("Guide model not loaded");
 
 const FALLBACK_PRODUCTS: PublicProduct[] = [
   {

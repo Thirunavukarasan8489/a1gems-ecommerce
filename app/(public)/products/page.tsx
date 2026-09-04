@@ -20,8 +20,10 @@ export const metadata: Metadata = {
 
 export default async function ProductsPage(props: PageProps<"/products">) {
   const query = toQuery(await props.searchParams);
-  const products = await getProducts();
-  const categories = await getCategories();
+  const [products, categories] = await Promise.all([
+    getProducts(),
+    getCategories()
+  ]);
   const results = applyFilters(products, query);
 
   return (

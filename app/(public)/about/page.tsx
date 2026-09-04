@@ -7,7 +7,7 @@ import { buttonStyles } from "@/components/public/ui/button";
 import { GemImage } from "@/components/public/ui/gem-image";
 import { PageHeader } from "@/components/public/ui/page-header";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { getContentPage } from "@/lib/services/content-service";
+
 const stats = [{ value: "50+", label: "Years of Trust" },{ value: "100%", label: "Certified Natural" },{ value: "10k+", label: "Happy Customers" },{ value: "5/5", label: "Google Reviews" }];
 
 export const metadata: Metadata = {
@@ -32,8 +32,6 @@ const values = [
 ];
 
 export default async function AboutPage() {
-  const aboutContent = await getContentPage("about");
-  if (!aboutContent) return null;
   return (
     <>
       <PageHeader

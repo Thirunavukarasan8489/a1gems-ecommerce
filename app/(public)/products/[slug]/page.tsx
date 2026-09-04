@@ -61,8 +61,10 @@ export default async function ProductDetailPage(
   const product = await getProductBySlug(slug);
   const business = NAV_DATA.business;
   if (!product || !product.published) notFound();
-  const category = await getCategoryBySlug(product.categorySlug);
-  const related = await getRelatedProducts(product.id, product.categorySlug);
+  const [category, related] = await Promise.all([
+    getCategoryBySlug(product.categorySlug),
+    getRelatedProducts(product.id, product.categorySlug)
+  ]);
 
   const specs = [
     ["Stone", product.specifications.stone],

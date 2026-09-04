@@ -66,7 +66,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       sid = crypto.randomUUID();
       window.localStorage.setItem("a1gems.cart.sessionId", sid);
     }
-    setSessionId(sid);
+    const timeoutId = setTimeout(() => {
+      setSessionId(sid);
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [hydrated]);
 
   React.useEffect(() => {

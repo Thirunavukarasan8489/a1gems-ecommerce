@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MessageSquareText } from "lucide-react";
 import { QuickAdd } from "@/components/public/cart/add-to-cart";
 import { Badge } from "@/components/public/ui/badge";
@@ -30,10 +31,11 @@ export function ProductCard({
     >
       <div className="relative">
         {product.primaryImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={product.primaryImage.url}
             alt={product.primaryImage.altText || product.name}
+            width={400}
+            height={500}
             className="aspect-4/5 w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04]"
           />
         ) : (

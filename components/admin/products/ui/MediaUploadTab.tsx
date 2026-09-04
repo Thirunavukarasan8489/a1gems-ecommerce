@@ -9,9 +9,9 @@ import { ProductFormValues } from '../ProductForm';
 
 interface MediaUploadTabProps {
   isActive: boolean;
-  coverFile: { file: File; previewUrl: string } | null;
-  setCoverFile: (val: { file: File; previewUrl: string } | null) => void;
-  galleryFiles: { file: File; previewUrl: string; id: string }[];
+  coverFile: { file?: File; previewUrl: string; isExisting: boolean } | null;
+  setCoverFile: (val: { file?: File; previewUrl: string; isExisting: boolean } | null) => void;
+  galleryItems: { file?: File; previewUrl: string; id: string; isExisting: boolean }[];
   handleCoverUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleGalleryUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removeGalleryImage: (index: number) => void;
@@ -21,12 +21,20 @@ export function MediaUploadTab({
   isActive,
   coverFile,
   setCoverFile,
-  galleryFiles,
+  galleryItems,
   handleCoverUpload,
   handleGalleryUpload,
   removeGalleryImage
 }: MediaUploadTabProps) {
-  const { register } = useFormContext<ProductFormValues>();
+  const { register, setValue } = useFormContext<ProductFormValues>();
+
+  const handleRemoveCover = () => {
+    if (coverFile && !coverFile.isExisting) {
+      URL.revokeObjectURL(coverFile.previewUrl);
+    }
+    setCoverFile(null);
+    setValue('primaryImage', { url: '', altText: '' }, { shouldValidate: true });
+  };
 
   return (
     <div className={isActive ? 'space-y-6' : 'hidden'}>
@@ -46,10 +54,7 @@ export function MediaUploadTab({
               <Image src={coverFile.previewUrl} alt="Cover Preview" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
               <button
                 type="button"
-                onClick={() => {
-                  URL.revokeObjectURL(coverFile.previewUrl);
-                  setCoverFile(null);
-                }}
+                onClick={handleRemoveCover}
                 className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full shadow hover:bg-red-700 transition-colors"
                 title="Remove Cover Image"
               >
@@ -96,10 +101,14 @@ export function MediaUploadTab({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {galleryFiles.map((fileObj, idx) => (
-            <div key={fileObj.id} className="space-y-2">
+          {galleryItems.map((item, idx) => (
+            <div key={item.id} className="space-y-2">
               <div className="relative aspect-square rounded-xl border border-gold-200 dark:border-gold-700 overflow-hidden group shadow-sm">
-                <Image src={fileObj.previewUrl} alt={`Gallery Preview ${idx + 1}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
+                {item.previewUrl ? (
+                  <Image src={item.previewUrl} alt={`Gallery Preview ${idx + 1}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gold-100 flex items-center justify-center text-gold-400 text-xs text-center p-2">Invalid Image</div>
+                )}
                 <button
                   type="button"
                   onClick={() => removeGalleryImage(idx)}

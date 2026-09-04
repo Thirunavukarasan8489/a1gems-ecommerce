@@ -20,68 +20,23 @@ import Image from "next/image";
  * Features auto-playing high-impact slides, category highlights, GIA/IGI trust badge,
  * smooth sliding transitions, and interactive controls.
  */
-const heroSlides = [
-  {
-    badge: "Certified Unheated Gemstones",
-    title: "Stones you can verify, not just admire.",
-    subtitle:
-      "Every gemstone carries an independent laboratory report. Verify your certificate number before you spend a rupee.",
-    ctaText: "Explore Collection",
-    ctaHref: "/products",
-    secondaryCtaText: "Free Consultation",
-    secondaryCtaHref: "/contact",
-    gemColor: "#10b481",
-    bgGradient: "from-plum-950 via-plum-900 to-emerald-950/80",
-    glowColor: "#10b481",
-    image: "/images/ruby-manik-1.webp",
-  },
-  {
-    badge: "Ratnapura, Sri Lanka",
-    title: "Unheated Ceylon Sapphires",
-    subtitle:
-      "Fresh parcel of royal blue and cornflower sapphires, each with an IGI report confirming zero thermal treatment.",
-    ctaText: "Shop Sapphires",
-    ctaHref: "/products?category=blue-sapphire",
-    secondaryCtaText: "WhatsApp Gemmologist",
-    secondaryCtaHref: "/contact",
-    gemColor: "#1f4fd8",
-    bgGradient: "from-plum-950 via-[#131f42] to-[#1f4fd8]/30",
-    glowColor: "#1f4fd8",
-    image: "/images/ruby-manik-1.webp",
-  },
-  {
-    badge: "Mogok, Myanmar",
-    title: "Certified Pigeon-Blood Rubies",
-    subtitle:
-      "Hand-selected unheated rubies displaying deep crimson saturation and remarkable light return.",
-    ctaText: "Shop Rubies",
-    ctaHref: "/products?category=ruby",
-    secondaryCtaText: "Request Inspection",
-    secondaryCtaHref: "/contact",
-    gemColor: "#c81e4a",
-    bgGradient: "from-plum-950 via-[#360e18] to-[#c81e4a]/30",
-    glowColor: "#c81e4a",
-    image: "/images/ruby-manik-1.webp",
-  },
-  {
-    badge: "Panjshir & Zambia",
-    title: "Natural Untreated Emeralds",
-    subtitle:
-      "Vivid green emeralds with exceptional clarity and origin verification from world-renowned mines.",
-    ctaText: "Shop Emeralds",
-    ctaHref: "/products?category=emerald",
-    secondaryCtaText: "View Vault",
-    secondaryCtaHref: "/products?purchase=enquiry",
-    gemColor: "#33ce99",
-    bgGradient: "from-plum-950 via-[#0a291f] to-[#10b481]/30",
-    glowColor: "#33ce99",
-    image: "/images/ruby-manik-1.webp",
-  },
-];
-
 const AUTOPLAY_MS = 6000;
 
-export function HeroSlider({ categories }: { categories?: any[] }) {
+export function HeroSlider({ categories, banners }: { categories?: any[], banners?: any[] }) {
+  const activeSlides = banners ? banners.map((b) => ({
+    badge: b.badge,
+    title: b.title,
+    subtitle: b.subtitle,
+    ctaText: b.ctaText,
+    ctaHref: b.ctaHref,
+    secondaryCtaText: b.secondaryCtaText,
+    secondaryCtaHref: b.secondaryCtaHref,
+    gemColor: "#10b481", // Can be customized later in admin
+    bgGradient: "from-plum-950 via-plum-900 to-emerald-950/80", // Can be customized later in admin
+    glowColor: "#10b481", // Can be customized later in admin
+    image: b.image,
+  })) : [];
+
   const [active, setActive] = React.useState(0);
   const trackRef = React.useRef<HTMLUListElement>(null);
   const pausedRef = React.useRef(false);
@@ -115,10 +70,14 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
   React.useEffect(() => {
     const interval = window.setInterval(() => {
       if (pausedRef.current) return;
-      goTo((active + 1) % heroSlides.length);
+      goTo((active + 1) % activeSlides.length);
     }, AUTOPLAY_MS);
     return () => window.clearInterval(interval);
-  }, [active, goTo]);
+  }, [active, goTo, activeSlides?.length]);
+
+  if (!banners || banners.length === 0 || !activeSlides) {
+    return null; // Don't render the slider if there are no active banners
+  }
 
   return (
     <section className="relative w-full max-w-full overflow-hidden bg-plum-950 text-ivory-100">
@@ -143,9 +102,9 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
           ref={trackRef}
           className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
         >
-          {heroSlides.map((slide, i) => (
+          {activeSlides.map((slide, i) => (
             <li
-              key={slide.title}
+              key={i}
               data-index={i}
               className="w-full shrink-0 snap-center"
             >
@@ -224,6 +183,7 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
                         alt={slide.title}
                         width={1254}
                         height={1254}
+                        priority={i === 0}
                         className="aspect-square w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-plum-950/80 via-transparent to-transparent p-4 flex flex-col justify-end">
@@ -246,7 +206,7 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
         <button
           type="button"
           onClick={() =>
-            goTo((active - 1 + heroSlides.length) % heroSlides.length)
+            goTo((active - 1 + activeSlides.length) % activeSlides.length)
           }
           aria-label="Previous slide"
           className="absolute top-1/2 left-4 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-plum-950/60 text-ivory-100 backdrop-blur-md transition-all duration-200 hover:bg-plum-950/80 sm:flex"
@@ -256,7 +216,7 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
 
         <button
           type="button"
-          onClick={() => goTo((active + 1) % heroSlides.length)}
+          onClick={() => goTo((active + 1) % activeSlides.length)}
           aria-label="Next slide"
           className="absolute top-1/2 right-4 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-plum-950/60 text-ivory-100 backdrop-blur-md transition-all duration-200 hover:bg-plum-950/80 sm:flex"
         >
@@ -265,7 +225,7 @@ export function HeroSlider({ categories }: { categories?: any[] }) {
 
         {/* Carousel Dots */}
         <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
-          {heroSlides.map((_, i) => (
+          {activeSlides.map((_, i) => (
             <button
               key={i}
               type="button"

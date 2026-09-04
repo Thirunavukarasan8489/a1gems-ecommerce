@@ -84,8 +84,19 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   const [activeTab, setActiveTab] = useState('basic');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const [coverFile, setCoverFile] = useState<{ file: File; previewUrl: string } | null>(null);
-  const [galleryFiles, setGalleryFiles] = useState<{ file: File; previewUrl: string; id: string }[]>([]);
+  const [coverFile, setCoverFile] = useState<{ file?: File; previewUrl: string; isExisting: boolean } | null>(
+    initialData?.primaryImage?.url ? { previewUrl: initialData.primaryImage.url, isExisting: true } : null
+  );
+  
+  const [galleryItems, setGalleryItems] = useState<{ id: string; file?: File; previewUrl: string; isExisting: boolean }[]>(
+    initialData?.gallery?.length > 0 
+      ? initialData.gallery.filter((img: any) => img && img.url && img.url.trim() !== '').map((img: any, i: number) => ({
+          id: `existing-${i}-${img.url.slice(-10).replace(/[^a-zA-Z0-9]/g, '')}`,
+          previewUrl: img.url,
+          isExisting: true
+        }))
+      : []
+  );
   const [validationErrors, setValidationErrors] = useState<{ field: string; message: string; tabId: string }[] | null>(null);
 
   const methods = useForm<ProductFormValues>({
@@ -137,6 +148,8 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
 
   // Remove the useEffect for getCategories since categories are passed via props
 
+
+
   // Handle Cover Image Selection
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -148,7 +161,8 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
 
     setCoverFile({
       file,
-      previewUrl: URL.createObjectURL(file)
+      previewUrl: URL.createObjectURL(file),
+      isExisting: false
     });
   };
 
@@ -160,10 +174,11 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     const newFiles = Array.from(files).map(file => ({
       file,
       previewUrl: URL.createObjectURL(file),
-      id: Math.random().toString(36).substring(7)
+      id: Math.random().toString(36).substring(7),
+      isExisting: false
     }));
 
-    setGalleryFiles(prev => [...prev, ...newFiles]);
+    setGalleryItems(prev => [...prev, ...newFiles]);
 
     // We add placeholders in react-hook-form to render the alt text inputs
     const currentGallery = getValues('gallery') || [];
@@ -171,11 +186,11 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   };
 
   const removeGalleryImage = (indexToRemove: number) => {
-    const removed = galleryFiles[indexToRemove];
-    if (removed) {
+    const removed = galleryItems[indexToRemove];
+    if (removed && !removed.isExisting) {
       URL.revokeObjectURL(removed.previewUrl);
     }
-    setGalleryFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    setGalleryItems(prev => prev.filter((_, idx) => idx !== indexToRemove));
 
     const currentGallery = getValues('gallery') || [];
     setValue('gallery', currentGallery.filter((_, idx) => idx !== indexToRemove), { shouldValidate: true });
@@ -187,28 +202,28 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     const uploadAndSubmit = async () => {
       let finalPrimaryImage = data.primaryImage;
 
-      if (coverFile) {
+      if (coverFile && !coverFile.isExisting) {
         const formData = new FormData();
-        formData.append('file', coverFile.file);
+        formData.append('file', coverFile.file!);
         const res = await uploadMedia(formData);
         if (res.success && res.data) {
           finalPrimaryImage = { url: res.data.secureUrl || res.data.url, altText: data.primaryImage?.altText || '' };
         } else {
           throw new Error(`Cover upload failed: ${res.error}`);
         }
-      } else if (!finalPrimaryImage?.url) {
+      } else if (!coverFile) {
         throw new Error('Cover image is required');
       }
 
       const finalGallery = [...(data.gallery || [])];
 
-      const galleryUploadPromises = galleryFiles.map(async (fileObj, i) => {
+      const galleryUploadPromises = galleryItems.map(async (item, i) => {
+        if (item.isExisting) return null;
         const formData = new FormData();
-        formData.append('file', fileObj.file);
+        formData.append('file', item.file!);
         const res = await uploadMedia(formData);
         if (res.success && res.data) {
-          // This ensures order is preserved regardless of which promise resolves first
-          return { index: finalGallery.length + i, data: { url: res.data.secureUrl || res.data.url, altText: fileObj.file.name } };
+          return { index: i, data: { url: res.data.secureUrl || res.data.url, altText: finalGallery[i]?.altText || item.file!.name } };
         } else {
           throw new Error(`Gallery upload failed: ${res.error}`);
         }
@@ -216,7 +231,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
 
       const uploadedGalleryImages = await Promise.all(galleryUploadPromises);
       uploadedGalleryImages.forEach(img => {
-        finalGallery[img.index] = img.data;
+        if (img) finalGallery[img.index] = img.data;
       });
 
       const finalData = { ...data, primaryImage: finalPrimaryImage, gallery: finalGallery };
@@ -287,7 +302,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     traverseErrors(formErrors);
 
     // Explicit cover image validation check
-    if (!coverFile && !initialData?.primaryImage?.url) {
+    if (!coverFile) {
       extractedErrs.push({ field: 'Cover Image', message: 'Cover image is required', tabId: 'media' });
     }
 
@@ -386,7 +401,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
                 isActive={activeTab === 'media'}
                 coverFile={coverFile}
                 setCoverFile={setCoverFile}
-                galleryFiles={galleryFiles}
+                galleryItems={galleryItems}
                 handleCoverUpload={handleCoverUpload}
                 handleGalleryUpload={handleGalleryUpload}
                 removeGalleryImage={removeGalleryImage}
@@ -400,7 +415,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
             </FormProvider>
 
             {/* Form Navigation / Save */}
-            <div className="flex items-center justify-between pt-5 border-t border-gold-200 dark:border-gold-800 mt-6">
+            <div className="flex items-center justify-between p-4 mt-6 bg-white dark:bg-gold-900 border-t border-gold-200 dark:border-gold-800 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] rounded-b-xl -mx-5 -mb-5 lg:-mx-6 lg:-mb-6">
               <div>
                 {tabs.findIndex(t => t.id === activeTab) > 0 && (
                   <AdminButton
@@ -417,18 +432,25 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <AdminButton
-                  type="button"
-                  disabled={tabs.findIndex(t => t.id === activeTab) === tabs.length - 1}
-                  onClick={() => {
-                    const idx = tabs.findIndex(t => t.id === activeTab);
-                    if (idx < tabs.length - 1) {
-                      setActiveTab(tabs[idx + 1].id);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  Next Step
+                {tabs.findIndex(t => t.id === activeTab) < tabs.length - 1 && (
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const idx = tabs.findIndex(t => t.id === activeTab);
+                      if (idx < tabs.length - 1) {
+                        setActiveTab(tabs[idx + 1].id);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
+                  >
+                    Next Step
+                  </AdminButton>
+                )}
+                
+                <AdminButton type="button" onClick={handleFormSubmit} isLoading={isSubmitting} className="gap-2 bg-gold-600 hover:bg-gold-700 text-white">
+                  <Save size={18} />
+                  {initialData ? 'Update Product' : 'Publish Product'}
                 </AdminButton>
               </div>
             </div>

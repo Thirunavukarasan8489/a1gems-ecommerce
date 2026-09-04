@@ -1,13 +1,10 @@
 import { unstable_cache } from 'next/cache';
 import dbConnect from '@/lib/db';
-import { Guide } from '@/lib/models/guide';
 import { FAQ } from '@/lib/models/faq';
 import { Testimonial } from '@/lib/models/testimonial';
 import { Policy } from '@/lib/models/policy';
-import { ContentPage } from '@/lib/models/content-page';
 
 // Prevent Turbopack tree-shaking
-if (!Guide) console.warn("Guide model not loaded");
 if (!FAQ) console.warn("FAQ model not loaded");
 if (!Testimonial) console.warn("Testimonial model not loaded");
 if (!Policy) console.warn("Policy model not loaded");
@@ -55,42 +52,6 @@ const DEFAULT_FAQS = [
   },
 ];
 
-export const getContentPage = unstable_cache(async (slug: string) => {
-  try {
-    await dbConnect();
-    const page = await ContentPage.findOne({ slug, isActive: true }).lean();
-    if (!page) return null;
-    return { ...page, _id: (page as any)._id.toString() };
-  } catch (error) {
-    console.error("Error in getContentPage:", error);
-    return null;
-  }
-}, ['public-content-page-v2'], { revalidate: 60, tags: ['content'] });
-
-export const getGuides = unstable_cache(async () => {
-  try {
-    await dbConnect();
-    const guides = await Guide.find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 }).lean();
-    if (guides && guides.length > 0) {
-      return guides.map((g: any) => ({ ...g, _id: g._id.toString() }));
-    }
-  } catch (error) {
-    console.error("Error in getGuides:", error);
-  }
-  return [];
-}, ['public-guides-v2'], { revalidate: 60, tags: ['content'] });
-
-export const getGuideBySlug = unstable_cache(async (slug: string) => {
-  try {
-    await dbConnect();
-    const guide = await Guide.findOne({ slug, isActive: true }).lean();
-    if (!guide) return null;
-    return { ...guide, _id: (guide as any)._id.toString() };
-  } catch (error) {
-    console.error("Error in getGuideBySlug:", error);
-    return null;
-  }
-}, ['public-guide-slug-v2'], { revalidate: 60, tags: ['content'] });
 
 export const getFaqs = unstable_cache(async () => {
   try {

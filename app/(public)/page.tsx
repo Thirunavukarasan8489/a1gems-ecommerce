@@ -20,18 +20,31 @@ import {
   getFeaturedProducts,
   getProductsByCategory,
 } from "@/lib/services/product-service";
+import { getHeroSections } from "@/lib/actions/cms.actions";
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts();
-  const bestsellers = await getBestsellers();
-  const bracelets = await getProductsByCategory("bracelets");
-  const faqs = await getFaqs();
-  const categories = await getCategories();
+  const [
+    featured,
+    bestsellers,
+    bracelets,
+    faqs,
+    categories,
+    sectionsRes
+  ] = await Promise.all([
+    getFeaturedProducts(),
+    getBestsellers(),
+    getProductsByCategory("bracelets"),
+    getFaqs(),
+    getCategories(),
+    getHeroSections()
+  ]);
+
+  const banners = sectionsRes.success && Array.isArray(sectionsRes.data) ? sectionsRes.data.filter((s: any) => s.isActive) : undefined;
 
   return (
     <>
       {/* 1. Hero Image Banner Slider Section */}
-      <HeroSlider categories={categories} />
+      <HeroSlider categories={categories} banners={banners} />
       <TrustStrip />
 
       {/* 2. Shop by Category Section */}
