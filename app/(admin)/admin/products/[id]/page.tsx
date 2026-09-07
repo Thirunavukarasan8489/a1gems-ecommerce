@@ -84,14 +84,28 @@ async function ProductViewLoader({ id }: { id: string }) {
                 </div>
                 <div className="bg-gold-50 dark:bg-gold-800/50 p-3 rounded-lg border border-gold-100 dark:border-gold-800">
                   <h3 className="text-xs font-medium text-gold-500 dark:text-gold-400 uppercase tracking-wider mb-1">Short Summary</h3>
-                  <p className="text-gold-800 dark:text-gold-200 truncate">{product.shortDescription || '—'}</p>
+                  {product.shortDescription ? (
+                    <div
+                      className="text-gold-800 dark:text-gold-200 text-xs line-clamp-2 rich-text"
+                      dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+                    />
+                  ) : (
+                    <p className="text-gold-800 dark:text-gold-200 text-xs">—</p>
+                  )}
                 </div>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gold-700 dark:text-gold-300 mb-2">Detailed Description</h3>
-                <div className="text-gold-700 dark:text-gold-300 text-sm prose dark:prose-invert max-w-none bg-gold-50 dark:bg-gold-800/30 p-4 rounded-lg border border-gold-100 dark:border-gold-800 whitespace-pre-wrap">
-                  {product.description || '—'}
-                </div>
+                {product.description ? (
+                  <div
+                    className="text-gold-700 dark:text-gold-300 text-sm rich-text max-w-none bg-gold-50 dark:bg-gold-800/30 p-4 rounded-lg border border-gold-100 dark:border-gold-800"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
+                ) : (
+                  <div className="text-gold-500 dark:text-gold-400 text-sm bg-gold-50 dark:bg-gold-800/30 p-4 rounded-lg border border-gold-100 dark:border-gold-800">
+                    —
+                  </div>
+                )}
               </div>
             </div>
           </div>

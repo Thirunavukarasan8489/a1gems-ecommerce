@@ -121,21 +121,18 @@ export default async function ProductDetailPage(
             {product.name}
           </h1>
 
-          {/* <p className="mt-5 text-[0.9375rem] leading-relaxed text-plum-800">
-            {product.shortDescription}
-          </p> */}
-
           <ProductPurchaseOptions product={product} category={category} business={business} />
 
-          {/* Long Description */}
+          {/* Long Description (Rich Text HTML from backend) */}
           {product.description && (
             <div className="mt-10 border-t border-plum-100 pt-8">
-              <h2 className="text-lg font-semibold text-plum-900 mb-4">
+              <h2 className="text-lg font-semibold text-plum-900 mb-4 font-display">
                 About this piece
               </h2>
-              <div className="whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-plum-800">
-                {product.description}
-              </div>
+              <div
+                className="rich-text text-[0.9375rem] leading-relaxed text-plum-800 max-w-none"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
             </div>
           )}
 
@@ -212,15 +209,6 @@ export default async function ProductDetailPage(
                 </div>
               ))}
             </dl>
-          </section>
-
-          <section className="mt-7">
-            <h2 className="font-display text-xl font-semibold text-plum-900">
-              About this stone
-            </h2>
-            <p className="mt-3 text-[0.9375rem] leading-relaxed text-plum-800">
-              {product.description}
-            </p>
           </section>
 
           <section className="mt-7">

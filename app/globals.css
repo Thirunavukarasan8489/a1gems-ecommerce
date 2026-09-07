@@ -381,3 +381,133 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ============================================================================
+   RICH TEXT FORMATTING UTILITY
+   Used for rendering dangerouslySetInnerHTML content from rich-text CMS/editors.
+   ========================================================================= */
+.rich-text {
+  color: var(--color-plum-800);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.rich-text p {
+  margin-bottom: 1rem;
+}
+
+.rich-text p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text h1,
+.rich-text h2,
+.rich-text h3,
+.rich-text h4,
+.rich-text h5,
+.rich-text h6 {
+  font-family: var(--font-display);
+  color: var(--color-plum-950);
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.rich-text h1 { font-size: 1.5rem; }
+.rich-text h2 { font-size: 1.25rem; }
+.rich-text h3 { font-size: 1.125rem; }
+.rich-text h4 { font-size: 1rem; }
+
+.rich-text ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text li {
+  margin-bottom: 0.375rem;
+}
+
+.rich-text strong,
+.rich-text b {
+  font-weight: 600;
+  color: var(--color-plum-950);
+}
+
+.rich-text em,
+.rich-text i {
+  font-style: italic;
+}
+
+.rich-text a {
+  color: var(--color-gold-600);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.rich-text a:hover {
+  color: var(--color-gold-700);
+}
+
+.rich-text blockquote {
+  border-left: 3px solid var(--color-gold-400);
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+  color: var(--color-plum-900);
+  background-color: var(--color-ivory-200);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.rich-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rich-text th,
+.rich-text td {
+  border: 1px solid var(--color-hairline);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.rich-text th {
+  background-color: var(--color-ivory-200);
+  font-weight: 600;
+  color: var(--color-plum-900);
+}
+
+.rich-text img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  object-fit: cover;
+}
+
+.rich-text hr {
+  border: 0;
+  border-top: 1px solid var(--color-hairline);
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}

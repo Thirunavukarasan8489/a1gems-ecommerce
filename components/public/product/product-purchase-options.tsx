@@ -9,7 +9,6 @@ import { Badge } from "@/components/public/ui/badge";
 import { buttonStyles } from "@/components/public/ui/button";
 import { Rating } from "@/components/public/ui/rating";
 import {
-
   canBuy,
   canEnquire,
   type Category,
@@ -29,20 +28,29 @@ export function ProductPurchaseOptions({
 }) {
   const [selectedVariantIdx, setSelectedVariantIdx] = React.useState(0);
 
-  const hasVariants = product.hasVariants && product.variants && product.variants.length > 0;
-  const activeVariant = hasVariants ? product.variants![selectedVariantIdx] : null;
+  const hasVariants =
+    product.hasVariants && product.variants && product.variants.length > 0;
+  const activeVariant = hasVariants
+    ? product.variants![selectedVariantIdx]
+    : null;
 
   // Active pricing based on variant or fallback
-  const sellingPrice = activeVariant ? activeVariant.price : product.sellingPrice;
-  const comparePrice = activeVariant ? activeVariant.comparePrice : product.comparePrice;
+  const sellingPrice = activeVariant
+    ? activeVariant.price
+    : product.sellingPrice;
+  const comparePrice = activeVariant
+    ? activeVariant.comparePrice
+    : product.comparePrice;
   const off = discountPercent(sellingPrice, comparePrice);
 
   // Active stock based on variant or fallback
-  const available = activeVariant 
-    ? Math.max(0, activeVariant.stock) 
+  const available = activeVariant
+    ? Math.max(0, activeVariant.stock)
     : Math.max(0, product.stockQuantity - product.reservedQuantity);
-    
-  const threshold = activeVariant ? activeVariant.lowStockThreshold : product.lowStockThreshold;
+
+  const threshold = activeVariant
+    ? activeVariant.lowStockThreshold
+    : product.lowStockThreshold;
 
   let status = "IN_STOCK";
   if (available <= 0) status = "OUT_OF_STOCK";
@@ -81,9 +89,12 @@ export function ProductPurchaseOptions({
         Inclusive of all taxes. Shipping calculated at checkout.
       </p>
 
-      <p className="mt-5 text-[0.9375rem] leading-relaxed text-plum-800">
-        {product.shortDescription}
-      </p>
+      {product.shortDescription && (
+        <div
+          className="rich-text mt-5 text-[0.9375rem] leading-relaxed text-plum-800"
+          dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+        />
+      )}
 
       {/* Variant Selector */}
       {hasVariants && (
@@ -103,20 +114,21 @@ export function ProductPurchaseOptions({
                     isActive
                       ? "border-gold-500 bg-gold-50/50 shadow-sm ring-1 ring-gold-500"
                       : "border-plum-200 bg-white hover:border-gold-300 hover:bg-gold-50/30",
-                    isSoldOut && !isActive && "opacity-60"
+                    isSoldOut && !isActive && "opacity-60",
                   )}
                 >
                   <span
                     className={cn(
                       "text-[0.8125rem] font-semibold leading-tight",
-                      isActive ? "text-gold-900" : "text-plum-900"
+                      isActive ? "text-gold-900" : "text-plum-900",
                     )}
                   >
                     {variant.name}
                   </span>
                   {variant.caratApprox && (
                     <span className="mt-1 text-xs text-plum-500">
-                      ~{variant.caratApprox} ct {variant.size ? `(${variant.size})` : ""}
+                      ~{variant.caratApprox} ct{" "}
+                      {variant.size ? `(${variant.size})` : ""}
                     </span>
                   )}
                   {isSoldOut && (
@@ -134,10 +146,10 @@ export function ProductPurchaseOptions({
       {/* Purchase CTA */}
       <div className="mt-7 space-y-3" id="enquire">
         {buyable && (
-          <AddToCart 
-            product={product} 
-            variantName={activeVariant?.name} 
-            variantPrice={activeVariant?.price} 
+          <AddToCart
+            product={product}
+            variantName={activeVariant?.name}
+            variantPrice={activeVariant?.price}
             maxQuantity={activeVariant ? activeVariant.stock : undefined}
           />
         )}
@@ -154,7 +166,8 @@ export function ProductPurchaseOptions({
             />
             {product.whatsappEnabled && (
               <a
-                href={whatsappLink(business,
+                href={whatsappLink(
+                  business,
                   `Hi A1 Gems, I am interested in ${product.name} (${product.sku})${activeVariant ? ` - ${activeVariant.name}` : ""}.`,
                 )}
                 target="_blank"
