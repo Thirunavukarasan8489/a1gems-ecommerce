@@ -374,5 +374,30 @@ New Order -> Payment Verified -> Order Confirmed -> Admin Processing -> Inventor
 
 ### 8.4 Authentication, Middleware & Platform Fixes
 - **Admin Auth Loop Resolution:** Refactored `proxy.ts` to use `getToken` directly from `next-auth/jwt` for `/admin/:path*` route matching, fixing infinite 307 redirect loops on `/admin/login`.
-- **Next.js 15 Async Props:** Created global ambient ambient type definitions in `types/global.d.ts` for Next.js 15 async `PageProps` and `LayoutProps`.
-- **OpenGraph Link Previews:** Updated `metadataBase` in `app/layout.tsx` to dynamically resolve `NEXT_PUBLIC_SITE_URL` / `VERCEL_URL` for social `og:image` previews.
+- **Next.js 15 Async Props:** Created global ambient type definitions in `types/global.d.ts` for Next.js 15 async `PageProps` and `LayoutProps`.
+- **OpenGraph Link Previews:** Updated `metadataBase` in `app/layout.tsx` to dynamically resolve `NEXT_PUBLIC_SITE_URL` / `VERCEL_URL` for social `og:image` previews.
+
+### 8.5 Indian Craftsman & Astrological Storefront Features
+- **Vedic Astrology Rashi Ratan Finder:** Built `components/home/rashi-finder.tsx` / `components/public/home/rashi-finder.tsx` offering interactive Zodiac gemstone lookup across 12 signs (*Mesh, Vrishabh, Mithun, Kark, Simha, Kanya, Tula, Vrishchik, Dhanu, Makar, Kumbh, Meen*) with planetary (*Graha*) benefits and gemmologist advice.
+- **Indian PIN Code & COD Checker:** Built `components/public/product/pincode-checker.tsx` for 6-digit Indian postal code delivery speed & Cash on Delivery (COD) verification.
+- **Ratti & Carat Unit Conversion:** Integrated automatic Ratti calculations (`1 Carat ≈ 1.1 Ratti`) alongside carat weight on product detail pages.
+- **GST Tax Invoice Support:** Personal vs Business purchase selection with GSTIN validation, legal business name, and GST address handling (`lib/validations/order.schema.ts`).
+- **Lab Certificate Assurance:** Display and verification of independent lab reports (IGI, GIA, GRS, SSEF) with pre-payment certificate number issuance.
+
+### 8.6 Database Models, Server Actions & Validation Suite
+- **Mongoose Data Models:** Created 18 complete Mongoose schemas in `lib/models/` (`product.ts`, `category.ts`, `order.ts`, `lead.ts`, `customer.ts`, `payment.ts`, `shipment.ts`, `return.ts`, `refund.ts`, `cart.ts`, `user.ts`, `homepage.ts`, `hero-section.ts`, `faq.ts`, `policy.ts`, `testimonial.ts`, `settings.ts`, `audit.ts`).
+- **Server Actions Suite:** Built 20 server action modules in `lib/actions/` for all public and admin mutations with Zod validation (`product.actions`, `order.actions`, `lead.actions`, `category.actions`, `customer.actions`, `payment.actions`, `shipment.actions`, `return.actions`, `settings.actions`, `media.actions`, `user.actions`, `cms.actions`, `cart.actions`, `checkout.actions`, `inventory.actions`, `audit.actions`).
+- **Domain Service Layer:** Decoupled domain service modules in `lib/services/` (`product-service.ts`, `category-service.ts`, `content-service.ts`, `policy-service.ts`, `payment.ts`, `shipping.ts`, `email.ts`, `analytics.ts`).
+- **Zod Validation Schemas:** Rigid schemas in `lib/validations/` covering products, orders, leads, categories, payments, returns, users, and auth.
+
+### 8.7 Admin Panel Portal & Specification Coverage (101 Screens)
+- **Dashboard Overview:** Implemented Commerce KPIs (Revenue, Total Orders, Pending Payments, Low Stock) & Lead KPIs (Total Leads, New Enquiries, WhatsApp Clicks).
+- **Lead Management CRM:** Lead lifecycle pipeline (`NEW` -> `CONTACTED` -> `FOLLOW_UP` -> `QUALIFIED` -> `CONVERTED` / `CLOSED` / `SPAM`) with WhatsApp integration, call logs, follow-up dates, and internal notes (§10).
+- **Order Management:** Order list & detail with GSTIN invoice handling, line item breakdown, order status timeline, and BlueDart tracking ID assignment (§22).
+- **Catalogue & Inventory:** Full product CRUD with §24 fields (*Basic, Pricing, Inventory, Purchase Mode, Specs, SEO*), inventory availability tracking (`availableQuantity = stockQuantity - reservedQuantity`) (§13).
+- **Media Library:** Cloudinary media upload integration with metadata storage in MongoDB (§29).
+- **CMS & Website Settings:** Homepage section toggling & reordering, promotional banner manager, FAQ/Testimonial manager, GST tax rates & fixed shipping fee configuration (§26, §27, §28, §8).
+
+### 8.8 QA, Security & Testing Framework (`TESTING.md`)
+- Documented complete QA test plan in `TESTING.md` covering Functional Public & Admin testing, E2E customer journeys, Form validation boundary tests, Security & RBAC tests (IDOR, NoSQL injection, XSS, payment signature verification), and standardized bug reporting templates.
+
