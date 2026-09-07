@@ -114,8 +114,20 @@ export async function createProduct(data: any) {
     let isLowStock = false;
 
     if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
-      mappedData.variants = mappedData.variants.map((v: any) => {
-        v.name = `${v.caratApprox || '0'} Carat - ${v.size || 'N/A'}`;
+      mappedData.variants = mappedData.variants.map((v: any, idx: number) => {
+        const hasCarat = v.caratApprox && Number(v.caratApprox) > 0;
+        const hasSize = v.size && v.size !== '0' && v.size !== '0 mm' && String(v.size).toLowerCase() !== 'n/a' && String(v.size).trim() !== '';
+
+        if (hasCarat && hasSize) {
+          v.name = `${v.caratApprox} Carat - ${v.size}`;
+        } else if (hasCarat) {
+          v.name = `${v.caratApprox} Carat`;
+        } else if (hasSize) {
+          v.name = `${v.size}`;
+        } else {
+          v.name = v.name && v.name.trim() ? v.name : `Option ${idx + 1}`;
+        }
+
         const vStock = Number(v.stock) || 0;
         const vThreshold = Number(v.lowStockThreshold) || 5;
         totalStock += vStock;
@@ -179,8 +191,20 @@ export async function updateProduct(id: string, data: any) {
     let isLowStock = false;
 
     if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
-      mappedData.variants = mappedData.variants.map((v: any) => {
-        v.name = `${v.caratApprox || '0'} Carat - ${v.size || 'N/A'}`;
+      mappedData.variants = mappedData.variants.map((v: any, idx: number) => {
+        const hasCarat = v.caratApprox && Number(v.caratApprox) > 0;
+        const hasSize = v.size && v.size !== '0' && v.size !== '0 mm' && String(v.size).toLowerCase() !== 'n/a' && String(v.size).trim() !== '';
+
+        if (hasCarat && hasSize) {
+          v.name = `${v.caratApprox} Carat - ${v.size}`;
+        } else if (hasCarat) {
+          v.name = `${v.caratApprox} Carat`;
+        } else if (hasSize) {
+          v.name = `${v.size}`;
+        } else {
+          v.name = v.name && v.name.trim() ? v.name : `Option ${idx + 1}`;
+        }
+
         const vStock = Number(v.stock) || 0;
         const vThreshold = Number(v.lowStockThreshold) || 5;
         totalStock += vStock;

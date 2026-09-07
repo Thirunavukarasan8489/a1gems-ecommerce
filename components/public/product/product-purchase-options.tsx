@@ -17,6 +17,99 @@ import {
 } from "@/lib/types";
 import { discountPercent, formatINR, cn, whatsappLink } from "@/lib/utils";
 
+function cleanVariantName(
+  rawName: string | undefined,
+  caratApprox?: number | string,
+  size?: string | number,
+  idx: number = 0
+): string {
+  let name = rawName || "";
+
+  // 1. Remove 0 Carat / 0 ct variations
+  name = name.replace(/\b0(?:\.0+)?\s*(?:carat|ct|carats)\b/gi, "");
+
+  // 2. Remove 0 mm / 0mm / 0 size variations
+  name = name.replace(/\b0(?:\.0+)?\s*(?:mm|cm)\b/gi, "");
+
+  // 3. Remove standalone N/A
+  name = name.replace(/\bN\/A\b/gi, "");
+
+  // 4. Clean up leftover separators (e.g. " - ", leading/trailing hyphens/spaces)
+  name = name
+    .replace(/^\s*[-–—,:]+\s*/, "")
+    .replace(/\s*[-–—,:]+\s*$/, "")
+    .replace(/\s*[-–—,:]+\s*[-–—,:]+\s*/g, " - ")
+    .trim();
+
+  // If cleaning resulted in empty string, construct from valid fields
+  if (!name) {
+    const validCarat =
+      caratApprox && Number(caratApprox) > 0 ? `${caratApprox} Carat` : null;
+    const validSize =
+      size &&
+      size !== "0" &&
+      size !== "0 mm" &&
+      String(size).toLowerCase() !== "n/a" &&
+      String(size).trim() !== "" &&
+      Number(size) !== 0
+        ? `${size}`
+        : null;
+
+    if (validCarat && validSize) {
+      name = `${validCarat} - ${validSize}`;
+    } else if (validCarat) {
+      name = validCarat;
+    } else if (validSize) {
+      name = validSize;
+    } else {
+      name = `Option ${idx + 1}`;
+    }
+  }
+
+  return name;
+}
+
+function getVariantSubtitle(
+  variant: ProductVariant,
+  cleanName: string
+): string | null {
+  const numCarat = variant.caratApprox ? Number(variant.caratApprox) : 0;
+  const hasCarat = !isNaN(numCarat) && numCarat > 0;
+
+  const rawSize = variant.size ? String(variant.size).trim() : "";
+  const numSize = Number(rawSize);
+  const hasSize =
+    rawSize !== "" &&
+    rawSize !== "0" &&
+    rawSize !== "0 mm" &&
+    rawSize.toLowerCase() !== "n/a" &&
+    (isNaN(numSize) || numSize > 0);
+
+  if (!hasCarat && !hasSize) return null;
+
+  const nameLower = cleanName.toLowerCase();
+  const caratInName =
+    hasCarat &&
+    (nameLower.includes(`${numCarat}`) ||
+      nameLower.includes("carat") ||
+      nameLower.includes("ct"));
+  const sizeInName = hasSize && nameLower.includes(rawSize.toLowerCase());
+
+  if (hasCarat && hasSize && caratInName && sizeInName) return null;
+  if (hasCarat && !hasSize && caratInName) return null;
+  if (!hasCarat && hasSize && sizeInName) return null;
+
+  const parts: string[] = [];
+  if (hasCarat && !caratInName) {
+    parts.push(`~${numCarat} ct`);
+  }
+  if (hasSize && !sizeInName) {
+    parts.push(`(${rawSize})`);
+  }
+
+  return parts.length > 0 ? parts.join(" ") : null;
+}
+
 export function ProductPurchaseOptions({
   product,
   category,
@@ -33,6 +126,15 @@ export function ProductPurchaseOptions({
   const activeVariant = hasVariants
     ? product.variants![selectedVariantIdx]
     : null;
+
+  const activeCleanName = activeVariant
+    ? cleanVariantName(
+        activeVariant.name,
+        activeVariant.caratApprox,
+        activeVariant.size,
+        selectedVariantIdx
+      )
+    : undefined;
 
   // Active pricing based on variant or fallback
   const sellingPrice = activeVariant
@@ -104,6 +206,14 @@ export function ProductPurchaseOptions({
             {product.variants!.map((variant, idx) => {
               const isActive = idx === selectedVariantIdx;
               const isSoldOut = variant.stock <= 0;
+              const cleanName = cleanVariantName(
+                variant.name,
+                variant.caratApprox,
+                variant.size,
+                idx
+              );
+              const subtitle = getVariantSubtitle(variant, cleanName);
+
               return (
                 <button
                   key={idx}
@@ -114,21 +224,20 @@ export function ProductPurchaseOptions({
                     isActive
                       ? "border-gold-500 bg-gold-50/50 shadow-sm ring-1 ring-gold-500"
                       : "border-plum-200 bg-white hover:border-gold-300 hover:bg-gold-50/30",
-                    isSoldOut && !isActive && "opacity-60",
+                    isSoldOut && !isActive && "opacity-60"
                   )}
                 >
                   <span
                     className={cn(
                       "text-[0.8125rem] font-semibold leading-tight",
-                      isActive ? "text-gold-900" : "text-plum-900",
+                      isActive ? "text-gold-900" : "text-plum-900"
                     )}
                   >
-                    {variant.name}
+                    {cleanName}
                   </span>
-                  {variant.caratApprox && (
+                  {subtitle && (
                     <span className="mt-1 text-xs text-plum-500">
-                      ~{variant.caratApprox} ct{" "}
-                      {variant.size ? `(${variant.size})` : ""}
+                      {subtitle}
                     </span>
                   )}
                   {isSoldOut && (
@@ -148,7 +257,7 @@ export function ProductPurchaseOptions({
         {buyable && (
           <AddToCart
             product={product}
-            variantName={activeVariant?.name}
+            variantName={activeCleanName}
             variantPrice={activeVariant?.price}
             maxQuantity={activeVariant ? activeVariant.stock : undefined}
           />
@@ -161,14 +270,14 @@ export function ProductPurchaseOptions({
               categoryId={category?.id}
               productName={product.name}
               categoryName={category?.name}
-              variantName={activeVariant?.name}
+              variantName={activeCleanName}
               buyable={buyable}
             />
             {product.whatsappEnabled && (
               <a
                 href={whatsappLink(
                   business,
-                  `Hi A1 Gems, I am interested in ${product.name} (${product.sku})${activeVariant ? ` - ${activeVariant.name}` : ""}.`,
+                  `Hi A1 Gems, I am interested in ${product.name} (${product.sku})${activeCleanName ? ` - ${activeCleanName}` : ""}.`
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
