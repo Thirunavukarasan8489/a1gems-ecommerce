@@ -7,6 +7,7 @@ import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import { PaymentCreateSchema, PaymentUpdateSchema } from '@/lib/validations/payment.schema';
+import { finalizeInventory } from '@/lib/inventory';
 
 // Helper to check auth
 async function checkAuth(allowedRoles: string[]) {
@@ -93,9 +94,16 @@ export async function createPayment(data: {
       }], { session });
 
       if (validatedData.updateOrderStatus) {
-        await Order.findByIdAndUpdate(validatedData.orderId, {
-          paymentStatus: 'CONFIRMED' // Mark parent order as paid
-        }, { session });
+        const order = await Order.findById(validatedData.orderId).session(session);
+        if (order && order.paymentStatus !== 'CONFIRMED') {
+          order.paymentStatus = 'CONFIRMED';
+          await order.save({ session });
+          for (const item of order.items) {
+            if (item.productId && item.variantId) {
+              await finalizeInventory(item.productId.toString(), item.variantId, item.quantity, session);
+            }
+          }
+        }
       }
 
       await session.commitTransaction();
@@ -140,8 +148,20 @@ export async function updatePaymentStatus(id: string, status: string, syncOrder:
         if (validatedStatus === 'COMPLETED') orderPaymentStatus = 'CONFIRMED';
         if (validatedStatus === 'FAILED') orderPaymentStatus = 'FAILED';
         // Note: REFUNDED doesn't exist directly on order.paymentStatus usually, but can be managed.
+        
         if (orderPaymentStatus !== 'PENDING') {
-          await Order.findByIdAndUpdate(payment.orderId, { paymentStatus: orderPaymentStatus }, { session });
+          const order = await Order.findById(payment.orderId).session(session);
+          if (order && order.paymentStatus !== orderPaymentStatus) {
+            order.paymentStatus = orderPaymentStatus;
+            await order.save({ session });
+            if (validatedStatus === 'COMPLETED') {
+              for (const item of order.items) {
+                if (item.productId && item.variantId) {
+                  await finalizeInventory(item.productId.toString(), item.variantId, item.quantity, session);
+                }
+              }
+            }
+          }
         }
       }
 

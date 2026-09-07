@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Boxes, 
-  Search, 
-  RefreshCw, 
-  ArrowUpDown, 
-  AlertTriangle, 
-  CheckCircle2, 
-  XCircle, 
-  Plus, 
-  Minus, 
+import {
+  Boxes,
+  Search,
+  RefreshCw,
+  ArrowUpDown,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  Plus,
+  Minus,
   X,
   Layers
 } from 'lucide-react';
@@ -20,6 +20,7 @@ import { AdminSelect } from '@/components/admin/ui/AdminSelect';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
 import { getInventoryList, updateStockLevel } from '@/lib/actions/inventory.actions';
 import { getCategories } from '@/lib/actions/category.actions';
+import toast from 'react-hot-toast';
 
 export default function InventoryPage() {
   const [inventory, setInventory] = useState<any[]>([]);
@@ -31,9 +32,7 @@ export default function InventoryPage() {
 
   // Adjustment Modal State
   const [adjustingItem, setAdjustingItem] = useState<any | null>(null);
-  const [adjustAmount, setAdjustAmount] = useState<number>(1);
-  const [adjustType, setAdjustType] = useState<'ADD' | 'SUBTRACT'>('ADD');
-  const [adjustReason, setAdjustReason] = useState<string>('Stock Purchase / Restock');
+  const [adjustAmount, setAdjustAmount] = useState<string>('');
   const [selectedVariantId, setSelectedVariantId] = useState<string>('');
   const [savingAdjustment, setSavingAdjustment] = useState(false);
 
@@ -62,9 +61,7 @@ export default function InventoryPage() {
 
   const handleOpenAdjustment = (item: any) => {
     setAdjustingItem(item);
-    setAdjustAmount(1);
-    setAdjustType('ADD');
-    setAdjustReason('Stock Purchase / Restock');
+    setAdjustAmount('');
     if (item.hasVariants && item.variants.length > 0) {
       setSelectedVariantId(item.variants[0]._id);
     } else {
@@ -74,30 +71,53 @@ export default function InventoryPage() {
 
   const handleSaveAdjustment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!adjustingItem || adjustAmount <= 0) return;
+    const newTotalStock = Number(adjustAmount);
+    if (!adjustingItem || isNaN(newTotalStock) || newTotalStock < 0 || adjustAmount === '') return;
 
     setSavingAdjustment(true);
-    const delta = adjustType === 'ADD' ? adjustAmount : -adjustAmount;
 
-    const res = await updateStockLevel({
+    let currentStock = 0;
+    if (selectedVariantId && adjustingItem.hasVariants) {
+      const v = adjustingItem.variants.find((v: any) => v._id === selectedVariantId);
+      if (v) currentStock = v.stock;
+    } else {
+      currentStock = adjustingItem.stock;
+    }
+
+    const delta = newTotalStock - currentStock;
+
+    const savePromise = updateStockLevel({
       productId: adjustingItem._id,
       variantId: selectedVariantId || undefined,
       adjustment: delta,
-      reason: adjustReason,
+      reason: 'Absolute override from Inventory Admin'
     });
 
-    if (res.success) {
-      setAdjustingItem(null);
-      fetchData();
-    } else {
-      alert(`Stock update failed: ${res.error}`);
+    toast.promise(savePromise, {
+      loading: 'Updating stock...',
+      success: (res) => {
+        if (!res.success) throw new Error(res.error);
+        return 'Stock updated successfully!';
+      },
+      error: (err) => `Failed: ${err.message}`,
+    });
+
+    try {
+      const res = await savePromise;
+      if (res.success) {
+        setAdjustingItem(null);
+        fetchData();
+      }
+    } catch (e) {
+      // Handled by toast
+    } finally {
+      setSavingAdjustment(false);
     }
-    setSavingAdjustment(false);
   };
 
   // Filtered inventory
   const filtered = inventory.filter(item => {
-    const matchesSearch = 
+    const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.sku.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -109,15 +129,15 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gold-800 dark:text-white flex items-center gap-2">
-            <Boxes className="w-6 h-6 text-gold-600" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Boxes className="w-6 h-6 text-gray-600" />
             Inventory & Stock Tracking
           </h1>
-          <p className="text-sm text-gold-500 dark:text-gold-400 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Real-time stock availability, reservation tracking, and inventory adjustments.
           </p>
         </div>
@@ -129,34 +149,34 @@ export default function InventoryPage() {
 
       {/* KPI Highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
-          <div className="w-11 h-11 rounded-xl bg-gold-50 dark:bg-gold-900/30 text-gold-600 flex items-center justify-center">
+        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-gray-50 dark:bg-slate-900/30 text-gray-600 flex items-center justify-center">
             <Boxes size={22} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase text-gold-400">Total Tracked Items</p>
-            <p className="text-xl font-bold text-gold-900 dark:text-white">{inventory.length}</p>
+            <p className="text-xs font-semibold uppercase text-gray-400">Total Tracked Items</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{inventory.length}</p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center">
             <AlertTriangle size={22} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase text-gold-400">Low Stock Alerts</p>
+            <p className="text-xs font-semibold uppercase text-gray-400">Low Stock Alerts</p>
             <p className="text-xl font-bold text-amber-600">
               {inventory.filter(i => i.status === 'LOW_STOCK').length}
             </p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-4">
           <div className="w-11 h-11 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center">
             <XCircle size={22} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase text-gold-400">Out of Stock</p>
+            <p className="text-xs font-semibold uppercase text-gray-400">Out of Stock</p>
             <p className="text-xl font-bold text-red-600">
               {inventory.filter(i => i.status === 'OUT_OF_STOCK').length}
             </p>
@@ -165,17 +185,17 @@ export default function InventoryPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-        
+      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+
         {/* Search */}
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
           <input
             type="text"
             placeholder="Search by product name or SKU..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-gold-50 dark:bg-gold-800 border border-gold-200 dark:border-gold-700 rounded-lg text-sm text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500"
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
         </div>
 
@@ -210,10 +230,10 @@ export default function InventoryPage() {
       </div>
 
       {/* Inventory Data Table */}
-      <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-gold-50 dark:bg-gold-800/50 border-b border-gold-200 dark:border-gold-700 text-gold-600 dark:text-gold-400">
+            <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400">
               <tr>
                 <th className="px-6 py-3.5 font-semibold">SKU / Product</th>
                 <th className="px-6 py-3.5 font-semibold">Category</th>
@@ -224,41 +244,41 @@ export default function InventoryPage() {
                 <th className="px-6 py-3.5 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gold-100 dark:divide-gold-800">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gold-400">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
                     Loading live inventory...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gold-400">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
                     No matching inventory items found.
                   </td>
                 </tr>
               ) : (
                 filtered.map(item => (
-                  <tr key={item._id} className="hover:bg-gold-50 dark:hover:bg-gold-800/50 transition-colors">
+                  <tr key={item._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4">
                       <div>
-                        <p className="font-semibold text-gold-900 dark:text-white flex items-center gap-1.5">
+                        <p className="font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
                           {item.name}
                           {item.hasVariants && (
-                            <span className="text-[10px] bg-gold-100 dark:bg-gold-900/40 text-gold-700 dark:text-gold-300 font-bold px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] bg-gray-100 dark:bg-slate-900/40 text-gray-700 dark:text-slate-300 font-bold px-1.5 py-0.5 rounded">
                               {item.variants.length} VARIANTS
                             </span>
                           )}
                         </p>
-                        <p className="text-xs text-gold-500 font-mono mt-0.5">{item.sku}</p>
+                        <p className="text-xs text-gray-500 font-mono mt-0.5">{item.sku}</p>
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-gold-600 dark:text-gold-300">
+                    <td className="px-6 py-4 text-gray-600 dark:text-slate-300">
                       {item.category}
                     </td>
 
-                    <td className="px-6 py-4 text-center font-medium text-gold-800 dark:text-gold-200">
+                    <td className="px-6 py-4 text-center font-medium text-gray-900 dark:text-slate-200">
                       {item.stock}
                     </td>
 
@@ -266,7 +286,7 @@ export default function InventoryPage() {
                       {item.reserved}
                     </td>
 
-                    <td className="px-6 py-4 text-center font-bold text-gold-900 dark:text-white">
+                    <td className="px-6 py-4 text-center font-bold text-gray-900 dark:text-white">
                       {item.available}
                     </td>
 
@@ -277,7 +297,7 @@ export default function InventoryPage() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleOpenAdjustment(item)}
-                        className="px-3 py-1.5 bg-gold-50 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 hover:bg-gold-100 rounded-lg text-xs font-semibold transition-colors inline-flex items-center gap-1"
+                        className="px-3 py-1.5 bg-gray-50 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-gray-100 rounded-lg text-xs font-semibold transition-colors inline-flex items-center gap-1"
                       >
                         <ArrowUpDown size={13} />
                         Adjust Stock
@@ -293,20 +313,20 @@ export default function InventoryPage() {
 
       {/* Adjust Stock Modal */}
       {adjustingItem && (
-        <div className="fixed inset-0 z-50 bg-gold-900/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gold-900 rounded-2xl shadow-xl max-w-md w-full p-6 border border-gold-200 dark:border-gold-800 space-y-5">
-            <div className="flex items-center justify-between border-b border-gold-100 dark:border-gold-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full p-6 border border-gray-200 dark:border-slate-800 space-y-5">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 pb-3">
               <div>
-                <h2 className="text-base font-bold text-gold-900 dark:text-white">Adjust Stock Level</h2>
-                <p className="text-xs text-gold-500">{adjustingItem.name}</p>
+                <h2 className="text-base font-bold text-gray-900 dark:text-white">Adjust Stock Level</h2>
+                <p className="text-xs text-gray-500">{adjustingItem.name}</p>
               </div>
-              <button onClick={() => setAdjustingItem(null)} className="text-gold-400 hover:text-gold-600">
+              <button onClick={() => setAdjustingItem(null)} className="text-gray-400 hover:text-gray-600">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleSaveAdjustment} className="space-y-4">
-              
+
               {/* If item has variants */}
               {adjustingItem.hasVariants && adjustingItem.variants.length > 0 && (
                 <div>
@@ -316,82 +336,35 @@ export default function InventoryPage() {
                       adjustingItem.variants
                         .map((v: any) => ({
                           value: v._id,
-                          label: `${v.name} (${v.sku}) — Current Stock: ${v.stock}`
+                          label: `${v.name} (${v.sku || 'N/A'}) — Current Stock: ${v.stock}`
                         }))
                         .find((o: any) => o.value === selectedVariantId) || null
                     }
-                    onChange={(opt: any) => setSelectedVariantId(opt ? opt.value : '')}
+                    onChange={(opt: any) => setSelectedVariantId(opt.value)}
                     options={adjustingItem.variants.map((v: any) => ({
                       value: v._id,
-                      label: `${v.name} (${v.sku}) — Current Stock: ${v.stock}`
+                      label: `${v.name} (${v.sku || 'N/A'}) — Current Stock: ${v.stock}`
                     }))}
                   />
                 </div>
               )}
 
-              {/* Action Type: ADD or SUBTRACT */}
-              <div>
-                <label className="block text-xs font-semibold text-gold-700 dark:text-gold-300 mb-1.5">
-                  Adjustment Type
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setAdjustType('ADD')}
-                    className={`py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-1.5 transition-all ${
-                      adjustType === 'ADD'
-                        ? 'bg-green-50 text-green-700 border-green-600 dark:bg-green-900/30 dark:text-green-300'
-                        : 'border-gold-200 dark:border-gold-700 text-gold-600 hover:bg-gold-50'
-                    }`}
-                  >
-                    <Plus size={14} /> Add Stock (+)
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setAdjustType('SUBTRACT')}
-                    className={`py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-1.5 transition-all ${
-                      adjustType === 'SUBTRACT'
-                        ? 'bg-red-50 text-red-700 border-red-600 dark:bg-red-900/30 dark:text-red-300'
-                        : 'border-gold-200 dark:border-gold-700 text-gold-600 hover:bg-gold-50'
-                    }`}
-                  >
-                    <Minus size={14} /> Reduce Stock (-)
-                  </button>
-                </div>
-              </div>
-
               {/* Quantity */}
               <AdminInput
-                type="number"
-                label="Units Quantity *"
-                min={1}
+                type="text"
+                label="New Total Stock *"
                 value={adjustAmount}
-                onChange={e => setAdjustAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                placeholder="e.g. 50"
+                onChange={e => setAdjustAmount(e.target.value)}
+                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
                 required
               />
 
-              {/* Reason */}
-              <div>
-                <AdminSelect
-                  label="Reason for Adjustment"
-                  value={[
-                    { value: 'Stock Purchase / Restock', label: 'Stock Purchase / Restock' },
-                    { value: 'Showroom Display / Demonstration', label: 'Showroom Display / Demonstration' },
-                    { value: 'Damaged / Sent for Lab Recertification', label: 'Damaged / Sent for Lab Recertification' },
-                    { value: 'Inventory Count Correction', label: 'Inventory Count Correction' }
-                  ].find(o => o.value === adjustReason) || null}
-                  onChange={(opt: any) => setAdjustReason(opt ? opt.value : 'Stock Purchase / Restock')}
-                  options={[
-                    { value: 'Stock Purchase / Restock', label: 'Stock Purchase / Restock' },
-                    { value: 'Showroom Display / Demonstration', label: 'Showroom Display / Demonstration' },
-                    { value: 'Damaged / Sent for Lab Recertification', label: 'Damaged / Sent for Lab Recertification' },
-                    { value: 'Inventory Count Correction', label: 'Inventory Count Correction' }
-                  ]}
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-gold-100 dark:border-gold-800">
+              <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-slate-800">
                 <AdminButton type="button" variant="outline" onClick={() => setAdjustingItem(null)}>
                   Cancel
                 </AdminButton>

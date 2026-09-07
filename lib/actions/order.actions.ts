@@ -3,17 +3,19 @@
 import dbConnect from '@/lib/db';
 import { Order } from '@/lib/models/order';
 import { Product } from '@/lib/models/product';
+import Counter from '@/lib/models/counter';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import { logAuditAction } from '@/lib/actions/audit';
 import { OrderCreateSchema, OrderUpdateSchema } from '@/lib/validations/order.schema';
+import { reserveInventory, finalizeInventory, releaseInventory, restockInventory } from '@/lib/inventory';
 
 // Helper to check auth
 async function checkAuth(allowedRoles: string[]) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
-  
+
   // Normalize roles to match DB ENUMS (SUPER_ADMIN, etc.)
   const normRoles = allowedRoles.map(r => r.replace(' ', '_').toUpperCase());
   if (!normRoles.includes(session.role as string)) {
@@ -38,8 +40,8 @@ export async function getOrders(page = 1, limit = 50) {
 
     const totalCount = await Order.countDocuments({});
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: JSON.parse(JSON.stringify(orders)),
       pagination: {
         totalCount,
@@ -82,16 +84,20 @@ export async function createOrder(data: any) {
     const validatedData = parsed.data;
 
     await dbConnect();
-    
+
     // We must use a MongoDB transaction since we're modifying Order and Product stock
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       // 1. Generate Order Number
-      const count = await Order.countDocuments();
-      const orderNumber = `ORD-${new Date().getFullYear()}-${(count + 1).toString().padStart(4, '0')}`;
-      
+      const counter = await Counter.findOneAndUpdate(
+        { id: 'orderId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true, session }
+      );
+      const orderNumber = `ORD-${new Date().getFullYear()}-${counter.seq.toString().padStart(4, '0')}`;
+
       const orderPayload = {
         ...validatedData,
         orderNumber,
@@ -102,19 +108,13 @@ export async function createOrder(data: any) {
 
       // 3. Update Product Inventory
       for (const item of validatedData.items) {
-        if (!item.productId) continue;
-        
-        const product = await Product.findById(item.productId).session(session);
-        if (product) {
-          if (product.inventory.stockQuantity < item.quantity) {
-            throw new Error(`Insufficient stock for product ${product.name}`);
-          }
-          product.inventory.stockQuantity -= item.quantity;
-          
-          if (product.inventory.stockQuantity === 0) {
-            product.inventory.stockStatus = 'OUT_OF_STOCK';
-          }
-          await product.save({ session });
+        if (!item.productId || !item.variantId) continue;
+
+        await reserveInventory(item.productId.toString(), item.variantId, item.quantity, session);
+
+        // If order is created as paid, immediately finalize
+        if (validatedData.paymentStatus === 'CONFIRMED') {
+          await finalizeInventory(item.productId.toString(), item.variantId, item.quantity, session);
         }
       }
 
@@ -145,7 +145,7 @@ export async function updateOrderStatus(id: string, updateData: { orderStatus?: 
     }
 
     await dbConnect();
-    
+
     const order = await Order.findByIdAndUpdate(id, parsed.data, { new: true }).lean();
     if (!order) return { success: false, error: 'Order not found' };
 
@@ -171,28 +171,27 @@ export async function cancelOrder(id: string, reason: string) {
     if (!isAuth) return { success: false, error: 'Unauthorized' };
 
     await dbConnect();
-    
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       const order = await Order.findById(id).session(session);
       if (!order) throw new Error('Order not found');
-      
+
       if (['CANCELLED', 'RETURNED'].includes(order.orderStatus)) {
         throw new Error('Order is already cancelled or returned');
       }
 
-      // Restock inventory
+      // Restock or release inventory depending on payment status
       for (const item of order.items) {
-        if (!item.productId) continue;
-        const product = await Product.findById(item.productId).session(session);
-        if (product) {
-          product.inventory.stockQuantity += item.quantity;
-          if (product.inventory.stockStatus === 'OUT_OF_STOCK' && product.inventory.stockQuantity > 0) {
-            product.inventory.stockStatus = 'IN_STOCK';
-          }
-          await product.save({ session });
+        if (!item.productId || !item.variantId) continue;
+        if (order.paymentStatus === 'PENDING') {
+          // It was only reserved
+          await releaseInventory(item.productId.toString(), item.variantId, item.quantity, session);
+        } else {
+          // It was paid and finalized, so restock it
+          await restockInventory(item.productId.toString(), item.variantId, item.quantity, session);
         }
       }
 

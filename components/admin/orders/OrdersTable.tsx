@@ -34,22 +34,22 @@ export default function OrdersTable({ orders }: { orders: OrderRow[] }) {
     {
       header: 'Order ID',
       cell: (item: OrderRow) => (
-        <span className="font-medium text-gold-600 dark:text-gold-400">{item.orderNumber}</span>
+        <span className="font-medium text-plum-900 dark:text-ivory-100">{item.orderNumber}</span>
       ),
     },
     {
       header: 'Customer',
       cell: (item: OrderRow) => (
         <div>
-          <p className="font-medium text-gold-800 dark:text-gold-200">{item.customerName}</p>
-          {item.email && <p className="text-xs text-gold-500 dark:text-gold-400">{item.email}</p>}
+          <p className="font-medium text-plum-900 dark:text-ivory-100">{item.customerName}</p>
+          {item.email && <p className="text-xs text-slate-500 dark:text-slate-400">{item.email}</p>}
         </div>
       ),
     },
     {
       header: 'Date',
       cell: (item: OrderRow) => (
-        <span className="text-gold-600 dark:text-gold-400 text-sm">
+        <span className="text-slate-600 dark:text-slate-300 text-sm">
           {new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
         </span>
       ),
@@ -57,7 +57,7 @@ export default function OrdersTable({ orders }: { orders: OrderRow[] }) {
     {
       header: 'Amount',
       cell: (item: OrderRow) => (
-        <span className="font-medium text-gold-800 dark:text-gold-200">
+        <span className="font-medium text-plum-900 dark:text-ivory-100">
           ₹{(item.total ?? 0).toLocaleString('en-IN')}
         </span>
       ),
@@ -75,15 +75,9 @@ export default function OrdersTable({ orders }: { orders: OrderRow[] }) {
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/orders/${item._id}`}
-            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
             <Eye size={16} />
-          </Link>
-          <Link
-            href={`/admin/orders/${item._id}/edit`}
-            className="p-1 text-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors"
-          >
-            <Edit size={16} />
           </Link>
         </div>
       ),

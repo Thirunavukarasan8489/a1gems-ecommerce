@@ -10,6 +10,7 @@ export const AddressSchema = z.object({
 
 export const OrderItemSchema = z.object({
   productId: z.string().min(1, 'Product ID is required'),
+  variantId: z.string().min(1, 'Variant ID is required'),
   sku: z.string().min(1, 'SKU is required'),
   name: z.string().min(1, 'Name is required'),
   quantity: z.number().int().min(1, 'Quantity must be at least 1'),
@@ -39,6 +40,11 @@ export const OrderCreateSchema = z.object({
   total: z.number().min(0),
   
   paymentMethod: z.enum(['UPI', 'CARD', 'NET_BANKING', 'COD', 'BANK_TRANSFER']),
+  paymentStatus: z.enum(['PENDING', 'CONFIRMED', 'FAILED']).optional(),
+  orderStatus: z.enum([
+    'PAYMENT_PENDING', 'CONFIRMED', 'PROCESSING', 'PACKED', 'SHIPPED', 
+    'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'DELIVERY_FAILED', 'RETURNED'
+  ]).optional(),
 });
 
 export const OrderUpdateSchema = z.object({

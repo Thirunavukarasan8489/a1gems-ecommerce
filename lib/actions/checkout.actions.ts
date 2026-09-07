@@ -4,8 +4,10 @@ import dbConnect from '@/lib/db';
 import { Order } from '@/lib/models/order';
 import { Customer } from '@/lib/models/customer';
 import { Product } from '@/lib/models/product';
+import Counter from '@/lib/models/counter';
 import mongoose from 'mongoose';
 import { getSession } from '@/lib/auth';
+import { reserveInventory } from '@/lib/inventory';
 
 export async function placeOrder(data: any) {
   try {
@@ -24,8 +26,12 @@ export async function placeOrder(data: any) {
 
     try {
       // 1. Generate Order Number
-      const count = await Order.countDocuments();
-      const orderNumber = `ORD-${new Date().getFullYear()}-${(count + 1).toString().padStart(4, '0')}`;
+      const counter = await Counter.findOneAndUpdate(
+        { id: 'orderId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true, session: dbSession }
+      );
+      const orderNumber = `ORD-${new Date().getFullYear()}-${counter.seq.toString().padStart(4, '0')}`;
       
       const serverSubtotal = data.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
       const totals = await calculateOrderTotals(serverSubtotal, data.shippingAddress.state || "", data.purchaseType || "PERSONAL");
@@ -46,20 +52,8 @@ export async function placeOrder(data: any) {
 
       // 3. Update Product Inventory
       for (const item of data.items) {
-        if (!item.productId) continue;
-        
-        const product = await Product.findById(item.productId).session(dbSession);
-        if (product) {
-          if (product.inventory.stockQuantity < item.quantity) {
-            throw new Error(`Insufficient stock for product ${item.name}`);
-          }
-          product.inventory.stockQuantity -= item.quantity;
-          
-          if (product.inventory.stockQuantity === 0) {
-            product.inventory.stockStatus = 'OUT_OF_STOCK';
-          }
-          await product.save({ session: dbSession });
-        }
+        if (!item.productId || !item.variantId) continue;
+        await reserveInventory(item.productId, item.variantId, item.quantity, dbSession);
       }
 
       // 4. Update or Create Customer Profile Metrics

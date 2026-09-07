@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import mongoose from "mongoose";
 import dbConnect from "@/lib/db";
 import { Order } from "@/lib/models/order";
+import { finalizeInventory } from "@/lib/inventory";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,10 +35,27 @@ export async function POST(req: NextRequest) {
 
       // Find the order with this razorpayOrderId
       const order = await Order.findOne({ razorpayOrderId });
-      if (order) {
-        order.paymentStatus = "COMPLETED";
-        order.orderStatus = "CONFIRMED";
-        await order.save();
+      if (order && order.paymentStatus !== "COMPLETED") {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        try {
+          order.paymentStatus = "COMPLETED";
+          order.orderStatus = "CONFIRMED";
+          await order.save({ session });
+
+          for (const item of order.items) {
+            if (item.productId && item.variantId) {
+              await finalizeInventory(item.productId.toString(), item.variantId, item.quantity, session);
+            }
+          }
+
+          await session.commitTransaction();
+          session.endSession();
+        } catch (err) {
+          await session.abortTransaction();
+          session.endSession();
+          throw err;
+        }
       }
     }
 

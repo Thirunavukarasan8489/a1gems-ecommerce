@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const OrderItemSchema = new mongoose.Schema({
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  variantId: { type: String, required: true },
   sku: { type: String, required: true },
   name: { type: String, required: true },
   quantity: { type: Number, required: true },

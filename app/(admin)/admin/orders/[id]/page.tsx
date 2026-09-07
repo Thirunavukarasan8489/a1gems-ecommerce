@@ -25,15 +25,15 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin/orders" className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-gray-600">
+          <Link href="/admin/orders" className="p-2 bg-slate-100 dark:bg-plum-800 hover:bg-slate-200 dark:hover:bg-plum-700 rounded-full transition-colors text-slate-600 dark:text-slate-300">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-plum-900 dark:text-ivory-100 flex items-center gap-3">
               Order {order.orderNumber}
               <StatusBadge status={order.orderStatus} />
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Placed on {format(new Date(order.createdAt), "MMMM d, yyyy 'at' h:mm a")}
             </p>
           </div>
@@ -47,14 +47,14 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
           <ProcessingCard orderId={order._id} currentStatus={order.orderStatus} />
 
           {/* Order Items */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-              <PackageIcon className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
+          <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 rounded-lg shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-plum-800 bg-slate-50 dark:bg-plum-950/50 flex items-center gap-2">
+              <PackageIcon className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <h2 className="text-lg font-semibold text-plum-900 dark:text-ivory-100">Order Items</h2>
             </div>
             <div className="p-6">
               <table className="w-full text-sm text-left">
-                <thead className="text-gray-500 border-b border-gray-200">
+                <thead className="text-slate-500 dark:text-slate-400 border-b border-gray-200 dark:border-plum-800">
                   <tr>
                     <th className="pb-3 font-medium">Product</th>
                     <th className="pb-3 font-medium text-center">Quantity</th>
@@ -62,35 +62,35 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
                     <th className="pb-3 font-medium text-right">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-plum-800/50">
                   {order.items.map((item: any, idx: number) => (
                     <tr key={idx}>
                       <td className="py-4">
-                        <div className="font-medium text-gray-900">{item.name}</div>
-                        {item.sku && <div className="text-xs text-gray-500">SKU: {item.sku}</div>}
+                        <div className="font-medium text-plum-900 dark:text-ivory-100">{item.name}</div>
+                        {item.sku && <div className="text-xs text-slate-500 dark:text-slate-400">SKU: {item.sku}</div>}
                       </td>
-                      <td className="py-4 text-center text-gray-700">{item.quantity}</td>
-                      <td className="py-4 text-right text-gray-700">₹{item.price.toLocaleString("en-IN")}</td>
-                      <td className="py-4 text-right font-medium text-gray-900">₹{(item.price * item.quantity).toLocaleString("en-IN")}</td>
+                      <td className="py-4 text-center text-slate-700 dark:text-slate-300">{item.quantity}</td>
+                      <td className="py-4 text-right text-slate-700 dark:text-slate-300">₹{item.price.toLocaleString("en-IN")}</td>
+                      <td className="py-4 text-right font-medium text-plum-900 dark:text-ivory-100">₹{(item.price * item.quantity).toLocaleString("en-IN")}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               
-              <div className="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-2 text-sm">
-                <div className="flex justify-between w-64 text-gray-600">
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-plum-800 flex flex-col items-end space-y-2 text-sm">
+                <div className="flex justify-between w-64 text-slate-600 dark:text-slate-300">
                   <span>Subtotal</span>
                   <span>₹{order.subtotal?.toLocaleString("en-IN")}</span>
                 </div>
-                <div className="flex justify-between w-64 text-gray-600">
+                <div className="flex justify-between w-64 text-slate-600 dark:text-slate-300">
                   <span>Shipping Fee</span>
                   <span>{order.shippingFee === 0 ? "Free" : `₹${order.shippingFee}`}</span>
                 </div>
-                <div className="flex justify-between w-64 text-gray-600">
+                <div className="flex justify-between w-64 text-slate-600 dark:text-slate-300">
                   <span>Estimated Tax</span>
                   <span>₹{order.tax?.toLocaleString("en-IN")}</span>
                 </div>
-                <div className="flex justify-between w-64 text-lg font-bold text-gray-900 pt-2 border-t border-gray-200 mt-2">
+                <div className="flex justify-between w-64 text-lg font-bold text-plum-900 dark:text-ivory-100 pt-2 border-t border-gray-200 dark:border-plum-800 mt-2">
                   <span>Total</span>
                   <span>₹{order.total?.toLocaleString("en-IN")}</span>
                 </div>
@@ -102,19 +102,19 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
         {/* Sidebar Column */}
         <div className="space-y-6">
           {/* Customer Info */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-              <User className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900">Customer</h2>
+          <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 rounded-lg shadow-sm">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-plum-800 bg-slate-50 dark:bg-plum-950/50 flex items-center gap-2">
+              <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <h2 className="text-lg font-semibold text-plum-900 dark:text-ivory-100">Customer</h2>
             </div>
             <div className="p-6 space-y-4 text-sm">
               <div>
-                <p className="font-medium text-gray-900">{order.customerName}</p>
-                <p className="text-gray-600">{order.email}</p>
-                <p className="text-gray-600">{order.phone}</p>
+                <p className="font-medium text-plum-900 dark:text-ivory-100">{order.customerName}</p>
+                <p className="text-slate-600 dark:text-slate-300">{order.email}</p>
+                <p className="text-slate-600 dark:text-slate-300">{order.phone}</p>
               </div>
               <div>
-                <span className="inline-block px-2.5 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium uppercase">
+                <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-plum-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium uppercase">
                   {order.purchaseType || 'PERSONAL'} PURCHASE
                 </span>
               </div>
@@ -122,37 +122,37 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
           </div>
 
           {/* Payment Info */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
+          <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 rounded-lg shadow-sm">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-plum-800 bg-slate-50 dark:bg-plum-950/50 flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <h2 className="text-lg font-semibold text-plum-900 dark:text-ivory-100">Payment Details</h2>
             </div>
             <div className="p-6 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Method</span>
-                <span className="font-medium text-gray-900">{order.paymentMethod}</span>
+                <span className="text-slate-500 dark:text-slate-400">Method</span>
+                <span className="font-medium text-plum-900 dark:text-ivory-100">{order.paymentMethod}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">Status</span>
+                <span className="text-slate-500 dark:text-slate-400">Status</span>
                 <StatusBadge status={order.paymentStatus} />
               </div>
               {order.razorpayPaymentId && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Transaction ID</span>
-                  <span className="font-mono text-xs text-gray-900">{order.razorpayPaymentId}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Transaction ID</span>
+                  <span className="font-mono text-xs text-plum-900 dark:text-ivory-100">{order.razorpayPaymentId}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Addresses */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900">Shipping Address</h2>
+          <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 rounded-lg shadow-sm">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-plum-800 bg-slate-50 dark:bg-plum-950/50 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <h2 className="text-lg font-semibold text-plum-900 dark:text-ivory-100">Shipping Address</h2>
             </div>
-            <div className="p-6 text-sm text-gray-600 space-y-1">
-              <p className="font-medium text-gray-900">{order.shippingAddress?.fullName || order.customerName}</p>
+            <div className="p-6 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+              <p className="font-medium text-plum-900 dark:text-ivory-100">{order.shippingAddress?.fullName || order.customerName}</p>
               <p>{order.shippingAddress?.street}</p>
               {order.shippingAddress?.apartment && <p>{order.shippingAddress.apartment}</p>}
               <p>{order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.pincode}</p>
@@ -162,19 +162,19 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
 
           {/* GST Details (if business) */}
           {order.purchaseType === 'BUSINESS' && order.gstDetails && (
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-gray-500" />
-                <h2 className="text-lg font-semibold text-gray-900">GST Information</h2>
+            <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 rounded-lg shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-plum-800 bg-slate-50 dark:bg-plum-950/50 flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                <h2 className="text-lg font-semibold text-plum-900 dark:text-ivory-100">GST Information</h2>
               </div>
               <div className="p-6 text-sm space-y-3">
                 <div>
-                  <p className="text-gray-500 text-xs">Legal Business Name</p>
-                  <p className="font-medium text-gray-900">{order.gstDetails.legalName}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs">Legal Business Name</p>
+                  <p className="font-medium text-plum-900 dark:text-ivory-100">{order.gstDetails.legalName}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs">GSTIN</p>
-                  <p className="font-mono font-medium text-gray-900">{order.gstDetails.gstin}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs">GSTIN</p>
+                  <p className="font-mono font-medium text-plum-900 dark:text-ivory-100">{order.gstDetails.gstin}</p>
                 </div>
               </div>
             </div>
@@ -182,12 +182,12 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
           
           {/* Notes */}
           {order.notes && (
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-gray-500" />
-                <h2 className="text-lg font-semibold text-gray-900">Notes</h2>
+            <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 rounded-lg shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-plum-800 bg-slate-50 dark:bg-plum-950/50 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                <h2 className="text-lg font-semibold text-plum-900 dark:text-ivory-100">Notes</h2>
               </div>
-              <div className="p-6 text-sm text-gray-600 whitespace-pre-wrap">
+              <div className="p-6 text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
                 {order.notes}
               </div>
             </div>

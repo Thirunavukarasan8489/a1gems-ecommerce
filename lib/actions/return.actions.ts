@@ -8,6 +8,7 @@ import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import { ReturnCreateSchema, ReturnProcessSchema } from '@/lib/validations/return.schema';
+import { restockInventory } from '@/lib/inventory';
 
 // Helper to check auth
 async function checkAuth(allowedRoles: string[]) {
@@ -108,15 +109,8 @@ export async function processReturn(id: string, status: string, refundAmount: nu
       // If moving to APPROVED or REFUNDED, we must restock the items
       if (['APPROVED', 'REFUNDED'].includes(validatedData.status) && returnReq.status === 'PENDING_INSPECTION') {
         for (const item of returnReq.items) {
-          if (!item.productId) continue;
-          const product = await Product.findById(item.productId).session(session);
-          if (product) {
-            product.inventory.stockQuantity += item.quantity;
-            if (product.inventory.stockStatus === 'OUT_OF_STOCK' && product.inventory.stockQuantity > 0) {
-              product.inventory.stockStatus = 'IN_STOCK';
-            }
-            await product.save({ session });
-          }
+          if (!item.productId || !item.variantId) continue;
+          await restockInventory(item.productId.toString(), item.variantId, item.quantity, session);
         }
         
         // Also update the order status

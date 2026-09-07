@@ -20,6 +20,11 @@ async function checkAuth(allowedRoles: string[]) {
   return session;
 }
 
+function generateShortname(name: string, length = 3) {
+  if (!name) return 'UNK';
+  return name.replace(/[^A-Za-z0-9]/g, '').substring(0, length).toUpperCase();
+}
+
 // Generate guaranteed unique slug from product name
 export async function generateUniqueProductSlug(name: string, excludeId?: string): Promise<string> {
   const baseSlug = name
@@ -109,6 +114,17 @@ export async function createProduct(data: any) {
     };
     delete mappedData.categoryId;
 
+    // Fetch Category to build SKU
+    const categoryObj = await Category.findById(mappedData.category).lean();
+    const categoryName = categoryObj ? categoryObj.name : 'Uncategorized';
+    const catShort = generateShortname(categoryName);
+    const prodShort = generateShortname(mappedData.name);
+    const baseSkuPrefix = `A1-${catShort}-${prodShort}`;
+
+    if (!mappedData.baseSku) {
+      mappedData.baseSku = `${baseSkuPrefix}-001`;
+    }
+
     // If variants enabled, format names and compute aggregate stock/status
     let totalStock = 0;
     let isLowStock = false;
@@ -126,6 +142,12 @@ export async function createProduct(data: any) {
           v.name = `${v.size}`;
         } else {
           v.name = v.name && v.name.trim() ? v.name : `Option ${idx + 1}`;
+        }
+
+        if (!v.sku) {
+          const varShort = generateShortname(v.name);
+          const indexStr = String(idx + 1).padStart(3, '0');
+          v.sku = `${baseSkuPrefix}-${varShort}-${indexStr}`;
         }
 
         const vStock = Number(v.stock) || 0;
@@ -186,6 +208,17 @@ export async function updateProduct(id: string, data: any) {
       mappedData.slug = await generateUniqueProductSlug(mappedData.name, id);
     }
     
+    // Fetch Category to build SKU
+    const categoryObj = await Category.findById(mappedData.category).lean();
+    const categoryName = categoryObj ? categoryObj.name : 'Uncategorized';
+    const catShort = generateShortname(categoryName);
+    const prodShort = generateShortname(mappedData.name);
+    const baseSkuPrefix = `A1-${catShort}-${prodShort}`;
+
+    if (!mappedData.baseSku) {
+      mappedData.baseSku = `${baseSkuPrefix}-001`;
+    }
+
     // If variants enabled, format names and compute aggregate stock/status
     let totalStock = 0;
     let isLowStock = false;
@@ -203,6 +236,12 @@ export async function updateProduct(id: string, data: any) {
           v.name = `${v.size}`;
         } else {
           v.name = v.name && v.name.trim() ? v.name : `Option ${idx + 1}`;
+        }
+
+        if (!v.sku) {
+          const varShort = generateShortname(v.name);
+          const indexStr = String(idx + 1).padStart(3, '0');
+          v.sku = `${baseSkuPrefix}-${varShort}-${indexStr}`;
         }
 
         const vStock = Number(v.stock) || 0;

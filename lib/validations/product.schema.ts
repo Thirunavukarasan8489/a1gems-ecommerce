@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const VariantSchema = z.object({
   name: z.string().optional(),
+  sku: z.string().optional(),
   caratApprox: z.coerce.number().optional(),
   size: z.string().optional(),
   price: z.coerce.number().min(0, 'Selling Price is required'),
@@ -18,6 +19,7 @@ export const ImageSchema = z.object({
 export const ProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   slug: z.string().optional(),
+  baseSku: z.string().optional(),
   category: z.string().optional(),
   categoryId: z.string().optional(),
   shortDescription: z.string().optional(),
