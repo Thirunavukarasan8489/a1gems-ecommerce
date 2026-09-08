@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -13,6 +13,11 @@ export default function AdminLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsSidebarOpen(false), 0);
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   // Auth pages (login, forgot-password, reset-password) render standalone without admin sidebar/topbar
   const isAuthPage =

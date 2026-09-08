@@ -256,12 +256,15 @@ function mapToPublicProduct(doc: any): PublicProduct {
     hasVariants: doc.hasVariants || false,
     variants: doc.variants?.map((v: any) => ({
       name: v.name,
+      slug: v.slug,
       caratApprox: v.caratApprox,
+      variantValue: v.variantValue,
       size: v.size,
       price: v.price || 0,
       comparePrice: v.comparePrice,
       stock: v.stock || 0,
       lowStockThreshold: v.lowStockThreshold || 5,
+      image: v.image?.url?.trim() ? { url: v.image.url, altText: v.image.altText } : undefined,
     })) || [],
     seo: {
       metaTitle: doc.metaTitle,
@@ -300,11 +303,28 @@ export const getProducts = unstable_cache(async () => {
 export const getProductBySlug = unstable_cache(async (slug: string) => {
   try {
     await dbConnect();
-    let doc = await Product.findOne({ slug, status: 'ACTIVE' }).populate('category').lean();
+    let doc = await Product.findOne({ 
+      status: 'ACTIVE',
+      $or: [{ slug }, { 'variants.slug': slug }]
+    }).populate('category').lean();
+    
     if (!doc) {
-      doc = await Product.findOne({ slug }).populate('category').lean();
+      doc = await Product.findOne({ 
+        $or: [{ slug }, { 'variants.slug': slug }]
+      }).populate('category').lean();
     }
-    if (doc) return mapToPublicProduct(doc);
+    if (doc) {
+      const publicProduct = mapToPublicProduct(doc);
+      if (publicProduct.slug === slug || !publicProduct.hasVariants) {
+        return publicProduct;
+      } else {
+        // It's a variant slug, so find it and return the flattened version
+        const utils = await import('@/lib/utils');
+        const flattened = utils.flattenVariants([publicProduct]);
+        const found = flattened.find((p: any) => p.slug === slug);
+        return found || publicProduct;
+      }
+    }
   } catch (error) {
     console.error("Error fetching product by slug:", error);
   }

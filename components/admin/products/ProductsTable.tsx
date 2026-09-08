@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useMemo } from 'react';
 import DataTable from '@/components/admin/ui/DataTable';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, Filter, X } from 'lucide-react';
 import Link from 'next/link';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import DeleteConfirmButton from '@/components/admin/ui/DeleteConfirmButton';
@@ -22,6 +23,92 @@ type ProductRow = {
 };
 
 export default function ProductsTable({ products }: { products: ProductRow[] }) {
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [stockStatusFilter, setStockStatusFilter] = useState('');
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      if (categoryFilter && p.category?.name !== categoryFilter) return false;
+      if (statusFilter && p.status !== statusFilter) return false;
+      if (stockStatusFilter && p.stockStatus !== stockStatusFilter) return false;
+      return true;
+    });
+  }, [products, categoryFilter, statusFilter, stockStatusFilter]);
+
+  const uniqueCategories = Array.from(new Set(products.map(p => p.category?.name).filter(Boolean)));
+
+  const renderFilter = () => (
+    <div className="relative">
+      <button 
+        onClick={() => setFilterOpen(!filterOpen)}
+        className={`p-2 border rounded-lg transition-colors flex items-center gap-2 ${filterOpen || categoryFilter || statusFilter || stockStatusFilter ? 'bg-gold-50 border-gold-300 text-gold-700' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+      >
+        <Filter size={18} />
+        {(categoryFilter || statusFilter || stockStatusFilter) && (
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+        )}
+      </button>
+
+      {filterOpen && (
+        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-20 p-4 space-y-4">
+          <div className="flex items-center justify-between border-b pb-2">
+            <h4 className="font-semibold text-sm">Filter Products</h4>
+            <button onClick={() => {
+              setCategoryFilter('');
+              setStatusFilter('');
+              setStockStatusFilter('');
+            }} className="text-xs text-red-500 hover:underline">
+              Clear All
+            </button>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500">Category</label>
+            <select 
+              value={categoryFilter} 
+              onChange={e => setCategoryFilter(e.target.value)}
+              className="w-full text-sm border-gray-200 rounded-md"
+            >
+              <option value="">All Categories</option>
+              {uniqueCategories.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500">Status</label>
+            <select 
+              value={statusFilter} 
+              onChange={e => setStatusFilter(e.target.value)}
+              className="w-full text-sm border-gray-200 rounded-md"
+            >
+              <option value="">All Statuses</option>
+              <option value="ACTIVE">Active</option>
+              <option value="DRAFT">Draft</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500">Stock Status</label>
+            <select 
+              value={stockStatusFilter} 
+              onChange={e => setStockStatusFilter(e.target.value)}
+              className="w-full text-sm border-gray-200 rounded-md"
+            >
+              <option value="">All Stock Statuses</option>
+              <option value="IN_STOCK">In Stock</option>
+              <option value="LOW_STOCK">Low Stock</option>
+              <option value="OUT_OF_STOCK">Out of Stock</option>
+            </select>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const columns = [
     {
       header: 'Product',
@@ -126,5 +213,5 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
     },
   ];
 
-  return <DataTable title="All Products" columns={columns} data={products} />;
+  return <DataTable title="All Products" columns={columns} data={filteredProducts} renderFilter={renderFilter} />;
 }

@@ -21,6 +21,7 @@ import {
   getProductsByCategory,
 } from "@/lib/services/product-service";
 import { getHeroSections } from "@/lib/actions/cms.actions";
+import { flattenVariants } from "@/lib/utils";
 
 export default async function HomePage() {
   const [
@@ -58,7 +59,7 @@ export default async function HomePage() {
           href="/products?sort=popular"
         />
         <div className="mt-7">
-          <ProductRail products={bestsellers} />
+          <ProductRail products={flattenVariants(bestsellers)} />
         </div>
       </section>
 
@@ -78,7 +79,7 @@ export default async function HomePage() {
             href="/products?category=bracelets"
           />
           <div className="mt-7">
-            <ProductRail products={bracelets} />
+            <ProductRail products={flattenVariants(bracelets)} />
           </div>
         </div>
       </section>

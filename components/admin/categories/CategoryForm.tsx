@@ -20,6 +20,8 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
     metaTitle: initialData?.metaTitle || '',
     metaDescription: initialData?.metaDescription || '',
     image: initialData?.image || '',
+    variantType: initialData?.variantType || 'NONE',
+    calculateDiscountOnVariantValue: initialData?.calculateDiscountOnVariantValue || false,
   });
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -27,8 +29,12 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const target = e.target as HTMLInputElement;
+    const { name, value, type, checked } = target;
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,6 +163,55 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                   className="w-full px-4 py-2 border border-gold-200 dark:border-gold-700 rounded-md bg-gold-50 dark:bg-gold-800 text-gold-800 dark:text-gold-200 focus:outline-none focus:ring-2 focus:ring-gold-500 transition-colors"
                   placeholder="Describe the category..."
                 />
+              </div>
+
+              <div className="pt-4 border-t border-gold-200 dark:border-gold-800">
+                <h4 className="text-md font-semibold text-gold-800 dark:text-white mb-3">Variant Settings</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gold-700 dark:text-gold-300 mb-1">
+                      Variant Type *
+                    </label>
+                    <AdminSelect
+                      name="variantType"
+                      value={[
+                        { value: 'CARAT', label: 'Carat' },
+                        { value: 'SIZE', label: 'Size' },
+                        { value: 'WEIGHT', label: 'Weight' },
+                        { value: 'NONE', label: 'None' }
+                      ].find(o => o.value === formData.variantType) || { value: 'NONE', label: 'None' }}
+                      onChange={(opt: any) => handleChange({ target: { name: 'variantType', value: opt ? opt.value : 'NONE' } } as any)}
+                      options={[
+                        { value: 'CARAT', label: 'Carat' },
+                        { value: 'SIZE', label: 'Size' },
+                        { value: 'WEIGHT', label: 'Weight' },
+                        { value: 'NONE', label: 'None' }
+                      ]}
+                    />
+                    <p className="text-xs text-gold-500 mt-1">If products in this category have variants, what type are they?</p>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="calculateDiscountOnVariantValue"
+                        name="calculateDiscountOnVariantValue"
+                        type="checkbox"
+                        checked={formData.calculateDiscountOnVariantValue}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-emerald-600 bg-gold-50 border-gold-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                    </div>
+                    <div className="text-sm">
+                      <label htmlFor="calculateDiscountOnVariantValue" className="font-medium text-gold-700 dark:text-gold-300">
+                        Calculate Discounts based on Variant Value
+                      </label>
+                      <p className="text-gold-500 dark:text-gold-400">
+                        If checked, bulk discount rules apply to the total variant value (e.g. total Carats) rather than the number of pieces.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

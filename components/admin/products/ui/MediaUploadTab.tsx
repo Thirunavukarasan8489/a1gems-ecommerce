@@ -38,7 +38,7 @@ export function MediaUploadTab({
 
   return (
     <div className={isActive ? 'space-y-6' : 'hidden'}>
-      <h2 className="text-lg font-semibold text-gold-900 dark:text-white border-b border-gold-100 dark:border-gold-800 pb-3">
+      <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gold-800 to-gold-500 dark:from-gold-300 dark:to-gold-500 border-b border-gold-200 dark:border-gold-800 pb-4">
         Cover Image & Feature Gallery
       </h2>
 

@@ -33,12 +33,15 @@ export interface ProductSpecifications {
 
 export interface ProductVariant {
   name: string;
+  slug: string;
   caratApprox?: number;
+  variantValue?: number;
   size?: string;
   price: number;
   comparePrice?: number;
   stock: number;
   lowStockThreshold: number;
+  image?: { url: string; altText?: string };
 }
 
 export interface ProductSeo {
@@ -91,6 +94,8 @@ export interface Product {
   rating: number;
   reviewCount: number;
   published: boolean;
+  
+  selectedVariantName?: string;
 }
 
 /** §13 Inventory Flow: available = stock - reserved */

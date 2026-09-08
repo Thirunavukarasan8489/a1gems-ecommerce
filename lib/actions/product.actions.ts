@@ -150,6 +150,14 @@ export async function createProduct(data: any) {
           v.sku = `${baseSkuPrefix}-${varShort}-${indexStr}`;
         }
 
+        // Generate variant slug
+        const varSlugSuffix = v.name
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '');
+        v.slug = `${slug}-${varSlugSuffix}`;
+
         const vStock = Number(v.stock) || 0;
         const vThreshold = Number(v.lowStockThreshold) || 5;
         totalStock += vStock;
@@ -203,9 +211,15 @@ export async function updateProduct(id: string, data: any) {
       delete mappedData.categoryId;
     }
 
+    // Fetch old product to find orphaned images and get original slug if needed
+    const oldProduct = await Product.findById(id).lean();
+    if (!oldProduct) throw new Error('Product not found');
+
     // Ensure slug is uniquely maintained if name changed
-    if (mappedData.name && !mappedData.slug) {
+    if (mappedData.name && !mappedData.slug && mappedData.name !== oldProduct.name) {
       mappedData.slug = await generateUniqueProductSlug(mappedData.name, id);
+    } else if (!mappedData.slug) {
+      mappedData.slug = oldProduct.slug;
     }
     
     // Fetch Category to build SKU
@@ -244,6 +258,14 @@ export async function updateProduct(id: string, data: any) {
           v.sku = `${baseSkuPrefix}-${varShort}-${indexStr}`;
         }
 
+        // Generate variant slug
+        const varSlugSuffix = v.name
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)+/g, '');
+        v.slug = `${mappedData.slug}-${varSlugSuffix}`;
+
         const vStock = Number(v.stock) || 0;
         const vThreshold = Number(v.lowStockThreshold) || 5;
         totalStock += vStock;
@@ -262,11 +284,8 @@ export async function updateProduct(id: string, data: any) {
       mappedData.stockStatus = 'IN_STOCK';
     }
 
-    // Fetch old product to find orphaned images
-    const oldProduct = await Product.findById(id).lean();
-
     const product = await Product.findByIdAndUpdate(id, mappedData, { new: true });
-    
+
     // Clean up orphaned images asynchronously
     if (oldProduct) {
       const oldImages = new Set<string>();

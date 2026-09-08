@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -31,16 +32,19 @@ import { toast } from 'react-hot-toast';
 import { BasicInfoTab } from './ui/BasicInfoTab';
 import { PricingVariantsTab } from './ui/PricingVariantsTab';
 import { MediaUploadTab } from './ui/MediaUploadTab';
-import { SpecificationsSeoTab } from './ui/SpecificationsSeoTab';
+import { SpecificationsTab } from './ui/SpecificationsTab';
 import { PurchaseRulesTab } from './ui/PurchaseRulesTab';
+import { SeoTab } from './ui/SeoTab';
+import { DiscountRulesTab } from './ui/DiscountRulesTab';
 
 const variantSchema = z.object({
-  caratApprox: z.coerce.number().optional(),
+  variantValue: z.coerce.number().optional(),
   size: z.string().optional(),
   price: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().min(0, 'Selling Price is required')),
   comparePrice: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().optional()),
   stock: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().min(0, 'Stock must be 0 or more').int()),
   lowStockThreshold: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().int().optional()),
+  image: z.object({ url: z.string().optional(), altText: z.string().optional() }).optional(),
 });
 
 const productSchema = z.object({
@@ -56,6 +60,11 @@ const productSchema = z.object({
   // Purchase Rules
   purchaseType: z.enum(['BUY_ONLY', 'ENQUIRE_ONLY', 'BUY_ENQUIRE']),
   whatsappEnabled: z.boolean().optional(),
+  discountRules: z.array(z.object({
+    minQty: z.coerce.number().min(1, 'Min Qty is required'),
+    maxQty: z.coerce.number().min(1, 'Max Qty is required'),
+    discountPercentage: z.coerce.number().min(0).max(100, 'Invalid discount %'),
+  })).optional(),
 
   // Specifications
   material: z.string().optional(),
@@ -97,6 +106,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
         }))
       : []
   );
+  const [variantFiles, setVariantFiles] = useState<Record<number, { file: File; previewUrl: string; }>>({});
   const [validationErrors, setValidationErrors] = useState<{ field: string; message: string; tabId: string }[] | null>(null);
 
   const methods = useForm<ProductFormValues>({
@@ -149,6 +159,32 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   // Remove the useEffect for getCategories since categories are passed via props
 
 
+
+  // Handle Variant Image Selection
+  const handleVariantFileSelect = (index: number, file: File | null) => {
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setVariantFiles(prev => ({
+        ...prev,
+        [index]: { file, previewUrl }
+      }));
+    } else {
+      setVariantFiles(prev => {
+        const newFiles = { ...prev };
+        if (newFiles[index]?.previewUrl) {
+          URL.revokeObjectURL(newFiles[index].previewUrl);
+        }
+        delete newFiles[index];
+        return newFiles;
+      });
+      // also clear it from form data
+      const currentVariants = getValues('variants') || [];
+      if (currentVariants[index]) {
+        currentVariants[index].image = { url: '', altText: '' };
+        setValue('variants', currentVariants, { shouldValidate: true });
+      }
+    }
+  };
 
   // Handle Cover Image Selection
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -266,19 +302,21 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   };
 
   const tabs = [
-    { id: 'basic', label: '1. Basic Info' },
-    { id: 'variants', label: '2. Pricing & Variants' },
-    { id: 'media', label: '3. Cover & Gallery Images' },
-    { id: 'specs', label: '4. Specifications & SEO' },
-    { id: 'purchase', label: '5. Purchase Rules' },
+    { id: 'basic', label: '1. Basic Details' },
+    { id: 'media', label: '2. Cover Image & Gallery' },
+    { id: 'variants', label: '3. Price & Variant' },
+    { id: 'discount', label: '4. Discount Rule' },
+    { id: 'purchase', label: '5. Purchase Rule' },
+    { id: 'seo', label: '6. SEO' },
   ];
 
   const tabFields: Record<string, (keyof ProductFormValues)[]> = {
-    basic: ['name', 'categoryId', 'status', 'shortDescription', 'description'],
-    variants: ['hasVariants', 'variants'],
+    basic: ['name', 'categoryId', 'status', 'shortDescription', 'description', 'material', 'stone', 'size', 'weight', 'origin', 'certification', 'guide'],
     media: ['primaryImage', 'gallery'],
-    specs: ['material', 'stone', 'size', 'weight', 'origin', 'certification', 'guide', 'metaTitle', 'metaDescription'],
+    variants: ['hasVariants', 'variants'],
+    discount: ['discountRules'],
     purchase: ['purchaseType', 'whatsappEnabled'],
+    seo: ['metaTitle', 'metaDescription'],
   };
 
   const onInvalid = (formErrors: any) => {
@@ -317,10 +355,10 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-16">
+    <div className="space-y-6 max-w-7xl mx-auto pb-16 relative">
 
-      {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Sticky Top Action Bar */}
+      <div className="sticky top-0 z-40 bg-white/80 dark:bg-plum-950/80 backdrop-blur-md border-b border-gold-200 dark:border-gold-800 py-4 px-6 rounded-b-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 -mx-4 sm:mx-0 mb-8">
         <div className="flex items-center gap-4">
           <Link
             href="/admin/products"
@@ -358,26 +396,39 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
       <div className="flex flex-col md:flex-row gap-6 items-start">
 
         {/* Navigation Tabs Sidebar */}
-        <div className="w-full md:w-60 shrink-0 bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm p-2 sticky top-24">
-          <nav className="flex flex-col space-y-1">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? 'bg-gold-100 text-gold-900 dark:bg-gold-800 dark:text-gold-100 font-semibold'
-                  : 'text-gold-600 dark:text-gold-400 hover:bg-gold-50 dark:hover:bg-gold-800'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+        <div className="w-full md:w-64 shrink-0 bg-gradient-to-b from-gold-50/50 to-transparent dark:from-gold-900/20 dark:to-transparent border border-gold-200/60 dark:border-gold-800/60 rounded-2xl shadow-sm p-3 sticky top-32">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-gold-400 mb-3 px-3">Form Steps</h3>
+          <nav className="flex flex-col space-y-1.5">
+            {tabs.map((tab, idx) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 overflow-hidden group ${isActive
+                    ? 'text-gold-900 dark:text-gold-50 shadow-sm'
+                    : 'text-gold-600 dark:text-gold-400 hover:bg-white dark:hover:bg-gold-800/50 hover:shadow-sm'
+                    }`}
+                >
+                  {isActive && (
+                    <span className="absolute inset-0 bg-gradient-to-r from-gold-200 to-gold-100 dark:from-gold-800 dark:to-gold-900 opacity-50 border-l-4 border-gold-500 rounded-xl" />
+                  )}
+                  <span className="relative z-10 flex items-center justify-between">
+                    <span>{tab.label}</span>
+                    {isActive && <CheckCircle2 className="w-4 h-4 text-gold-600 dark:text-gold-400" />}
+                  </span>
+                </button>
+              );
+            })}
           </nav>
         </div>
 
         {/* Form Content Area */}
-        <div className="flex-1 w-full bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm p-5 lg:p-6">
+        <div className="flex-1 w-full bg-white dark:bg-gold-950 border border-gold-200 dark:border-gold-800 rounded-2xl shadow-md p-6 lg:p-8 relative">
+          {/* Subtle gradient background element for premium feel */}
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-gold-50 dark:from-gold-900/30 to-transparent rounded-t-2xl pointer-events-none" />
+          
           <form
             id="product-form"
             className="space-y-6"
@@ -390,13 +441,13 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
           >
 
             <FormProvider {...methods}>
-              {/* 1. BASIC INFO */}
-              <BasicInfoTab categories={categories} isActive={activeTab === 'basic'} />
+              {/* 1. BASIC DETAILS & SPECS */}
+              <div className={activeTab === 'basic' ? 'space-y-6' : 'hidden'}>
+                <BasicInfoTab categories={categories} isActive={true} />
+                <SpecificationsTab isActive={true} guides={guides} />
+              </div>
 
-              {/* 2. PRICING & VARIANTS */}
-              <PricingVariantsTab isActive={activeTab === 'variants'} />
-
-              {/* 3. COVER & GALLERY IMAGES */}
+              {/* 2. COVER IMAGE & GALLERY */}
               <MediaUploadTab 
                 isActive={activeTab === 'media'}
                 coverFile={coverFile}
@@ -407,11 +458,22 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
                 removeGalleryImage={removeGalleryImage}
               />
 
-              {/* 4. SPECIFICATIONS & SEO */}
-              <SpecificationsSeoTab isActive={activeTab === 'specs'} guides={guides} />
+              {/* 3. PRICE & VARIANT */}
+              <PricingVariantsTab 
+                isActive={activeTab === 'variants'} 
+                categories={categories} 
+                variantFiles={variantFiles}
+                onVariantFileSelect={handleVariantFileSelect}
+              />
 
-              {/* 5. PURCHASE RULES */}
+              {/* 4. DISCOUNT RULE */}
+              <DiscountRulesTab isActive={activeTab === 'discount'} />
+
+              {/* 5. PURCHASE RULE */}
               <PurchaseRulesTab isActive={activeTab === 'purchase'} />
+
+              {/* 6. SEO */}
+              <SeoTab isActive={activeTab === 'seo'} />
             </FormProvider>
 
             {/* Form Navigation / Save */}

@@ -20,11 +20,38 @@ interface DataTableProps<T> {
   data: T[];
   title?: string;
   selectable?: boolean;
+  renderFilter?: () => React.ReactNode;
 }
 
-export default function DataTable<T>({ columns, data, title = "Data", selectable = false }: DataTableProps<T>) {
+export default function DataTable<T>({ columns, data, title = "Data", selectable = false, renderFilter }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Filter data based on search term (simple generic string matching across row values)
+  const filteredData = data.filter(row => {
+    if (!searchTerm) return true;
+    return Object.values(row as any).some(val => 
+      String(val).toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
+  
+  // Pagination
+  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   return (
     <div className="bg-white dark:bg-plum-900 border border-gray-200 dark:border-plum-800 shadow-xs rounded-xl overflow-hidden">
@@ -43,15 +70,34 @@ export default function DataTable<T>({ columns, data, title = "Data", selectable
               type="text"
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className="pl-9 pr-4 py-2 border border-gray-200 dark:border-plum-700 rounded-lg text-sm bg-gray-50 dark:bg-plum-950 text-plum-900 dark:text-ivory-100 focus:outline-none focus:ring-2 focus:ring-plum-600/30 w-full sm:w-64 transition-all hover:bg-gray-100 dark:hover:bg-plum-900"
             />
           </div>
 
-          {/* Filter */}
-          <button className="p-2 border border-gray-200 dark:border-plum-700 text-plum-700 dark:text-plum-300 rounded-lg hover:bg-gray-50 dark:hover:bg-plum-800 transition-colors">
-            <Filter size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-plum-600 dark:text-plum-400 hidden sm:inline">Show:</span>
+            <select
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              className="px-2 py-2 border border-gray-200 dark:border-plum-700 rounded-lg text-sm bg-gray-50 dark:bg-plum-950 text-plum-900 dark:text-ivory-100 focus:outline-none focus:ring-2 focus:ring-plum-600/30 transition-all hover:bg-gray-100 dark:hover:bg-plum-900"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+
+          {/* Filter Component or Button */}
+          {renderFilter ? renderFilter() : (
+            <button className="p-2 border border-gray-200 dark:border-plum-700 text-plum-700 dark:text-plum-300 rounded-lg hover:bg-gray-50 dark:hover:bg-plum-800 transition-colors">
+              <Filter size={18} />
+            </button>
+          )}
 
           {/* Export Dropdown */}
           <div className="relative">
@@ -99,14 +145,14 @@ export default function DataTable<T>({ columns, data, title = "Data", selectable
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-plum-800">
-            {data.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length + 1} className="px-5 py-8 text-center text-gold-500 dark:text-gold-400">
                   No data found.
                 </td>
               </tr>
             ) : (
-              data.map((row, i) => (
+              paginatedData.map((row, i) => (
                 <tr key={i} className="hover:bg-gold-50/50 dark:hover:bg-gold-900/30 transition-colors group">
                   {selectable && (
                     <td className="px-5 py-4.5 whitespace-nowrap">
@@ -128,15 +174,26 @@ export default function DataTable<T>({ columns, data, title = "Data", selectable
       {/* Pagination Footer */}
       <div className="px-5 py-4 border-t border-gold-200 dark:border-gold-900 flex items-center justify-between bg-gold-50/30 dark:bg-gold-950">
         <p className="text-sm text-gold-500 dark:text-gold-400">
-          Showing <span className="font-medium text-gold-700 dark:text-gold-200">1</span> to <span className="font-medium text-gold-700 dark:text-gold-200">{Math.min(10, data.length)}</span> of <span className="font-medium text-gold-700 dark:text-gold-200">{data.length}</span> results
+          Showing <span className="font-medium text-gold-700 dark:text-gold-200">{Math.min((currentPage - 1) * pageSize + 1, filteredData.length)}</span> to <span className="font-medium text-gold-700 dark:text-gold-200">{Math.min(currentPage * pageSize, filteredData.length)}</span> of <span className="font-medium text-gold-700 dark:text-gold-200">{filteredData.length}</span> results
         </p>
-        <div className="flex gap-1.5">
-          <button className="p-1.5 border border-gold-200 dark:border-gold-800 rounded-lg text-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-gold-900 transition-colors disabled:opacity-50 disabled:pointer-events-none">
-            <ChevronLeft size={18} />
-          </button>
-          <button className="p-1.5 border border-gold-200 dark:border-gold-800 rounded-lg text-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-gold-900 transition-colors disabled:opacity-50 disabled:pointer-events-none">
-            <ChevronRight size={18} />
-          </button>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gold-500 dark:text-gold-400 mr-2">Page {currentPage} of {totalPages}</span>
+          <div className="flex gap-1.5">
+            <button 
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="p-1.5 border border-gold-200 dark:border-gold-800 rounded-lg text-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-gold-900 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button 
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="p-1.5 border border-gold-200 dark:border-gold-800 rounded-lg text-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-gold-900 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

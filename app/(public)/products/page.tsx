@@ -11,6 +11,7 @@ import { EmptyState, PageHeader } from "@/components/public/ui/page-header";
 import { getCategories } from "@/lib/services/category-service";
 import { getProducts } from "@/lib/services/product-service";
 import { applyFilters, toQuery } from "@/lib/filters";
+import { flattenVariants } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "All Gemstones",
@@ -24,7 +25,7 @@ export default async function ProductsPage(props: PageProps<"/products">) {
     getProducts(),
     getCategories()
   ]);
-  const results = applyFilters(products, query);
+  const results = flattenVariants(applyFilters(products, query));
 
   return (
     <>

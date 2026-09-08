@@ -63,7 +63,7 @@ export function AddToCart({
         </div>
       )}
 
-      <Button size="lg" full onClick={() => add(product, qty, variantName, variantPrice)}>
+      <Button size="lg" full onClick={() => add(product, qty, variantName || product.selectedVariantName, variantPrice || product.sellingPrice)}>
         <ShoppingBag size={18} strokeWidth={2.25} />
         Add to cart
       </Button>
@@ -83,7 +83,7 @@ export function QuickAdd({ product }: { product: Product }) {
       aria-label={soldOut ? "Sold out" : `Add ${product.name} to cart`}
       onClick={(e) => {
         e.preventDefault();
-        add(product, 1);
+        add(product, 1, product.selectedVariantName, product.sellingPrice);
       }}
       className="grid size-11 shrink-0 place-items-center rounded-full bg-plum-900 text-ivory-100 shadow-md transition-[background-color,transform] duration-200 hover:bg-gold-500 hover:text-plum-950 active:scale-95 disabled:pointer-events-none disabled:opacity-35"
     >

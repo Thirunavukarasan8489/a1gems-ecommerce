@@ -10,13 +10,20 @@ const ProductSchema = new mongoose.Schema(
     shortDescription: { type: String },
     description: { type: String },
 
-    // Pricing & Inventory (Removed Base pricing/stock as per requirements)
+    // Pricing & Inventory
+    discountRules: [{
+      minQty: { type: Number, required: true },
+      maxQty: { type: Number, required: true },
+      discountPercentage: { type: Number, required: true }
+    }],
 
     // Variants
     hasVariants: { type: Boolean, default: true },
     variants: [{
       name: { type: String, required: true },
+      slug: { type: String }, // Auto-generated
       sku: { type: String },
+      variantValue: { type: Number },
       caratApprox: { type: Number },
       size: { type: String },
       price: { type: Number, required: true },
@@ -24,6 +31,10 @@ const ProductSchema = new mongoose.Schema(
       stock: { type: Number, required: true, default: 0 },
       reservedQuantity: { type: Number, default: 0 },
       lowStockThreshold: { type: Number, default: 5 },
+      image: {
+        url: { type: String },
+        altText: { type: String }
+      }
     }],
 
     // Inventory
