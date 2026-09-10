@@ -2,7 +2,7 @@ import React, { use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Edit, ArrowLeft, Trash2, Tag, Box, Info, Image as ImageIcon, Layers, Settings, FileText, CheckCircle2 } from 'lucide-react';
+import { Edit, ArrowLeft, Trash2, Tag, Info, Image as ImageIcon, Layers, Settings, FileText, CheckCircle2 } from 'lucide-react';
 import { getProductById } from '@/lib/actions/product.actions';
 import StatusBadge from '@/components/admin/ui/StatusBadge';
 
@@ -127,6 +127,7 @@ async function ProductViewLoader({ id }: { id: string }) {
                       <th className="px-4 py-3 font-medium">Price</th>
                       <th className="px-4 py-3 font-medium">Compare At</th>
                       <th className="px-4 py-3 font-medium">Stock</th>
+                      <th className="px-4 py-3 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gold-100 dark:divide-gold-800">
@@ -142,6 +143,11 @@ async function ProductViewLoader({ id }: { id: string }) {
                           <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${variant.stock < (variant.lowStockThreshold || 5) ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'}`}>
                             {variant.stock || 0} in stock
                           </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Link href={`/admin/productvarients/${variant._id}/edit`} className="text-emerald-600 hover:underline text-xs font-medium">
+                            Edit
+                          </Link>
                         </td>
                       </tr>
                     ))}
@@ -204,42 +210,6 @@ async function ProductViewLoader({ id }: { id: string }) {
         
         {/* RIGHT COLUMN: Meta Info */}
         <div className="lg:col-span-4 space-y-6">
-          
-          {/* 4. Specifications */}
-          <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gold-100 dark:border-gold-800 flex items-center gap-2">
-              <Box size={18} className="text-gold-500 dark:text-gold-400" />
-              <h2 className="font-semibold text-gold-800 dark:text-white">Specifications</h2>
-            </div>
-            <div className="p-0">
-              <ul className="divide-y divide-gold-100 dark:divide-gold-800">
-                <li className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-sm font-medium text-gold-500 dark:text-gold-400">Gemstone Type</span>
-                  <span className="text-sm text-gold-800 dark:text-gold-200 font-medium">{product.stone || '—'}</span>
-                </li>
-                <li className="px-5 py-3 flex justify-between items-center bg-gold-50/50 dark:bg-gold-800/20">
-                  <span className="text-sm font-medium text-gold-500 dark:text-gold-400">Weight</span>
-                  <span className="text-sm text-gold-800 dark:text-gold-200 font-medium">{product.weight || '—'}</span>
-                </li>
-                <li className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-sm font-medium text-gold-500 dark:text-gold-400">Origin/Mine</span>
-                  <span className="text-sm text-gold-800 dark:text-gold-200 font-medium">{product.origin || '—'}</span>
-                </li>
-                <li className="px-5 py-3 flex justify-between items-center bg-gold-50/50 dark:bg-gold-800/20">
-                  <span className="text-sm font-medium text-gold-500 dark:text-gold-400">Material</span>
-                  <span className="text-sm text-gold-800 dark:text-gold-200 font-medium">{product.material || '—'}</span>
-                </li>
-                <li className="px-5 py-3 flex justify-between items-center">
-                  <span className="text-sm font-medium text-gold-500 dark:text-gold-400">Dimensions</span>
-                  <span className="text-sm text-gold-800 dark:text-gold-200 font-medium">{product.size || '—'}</span>
-                </li>
-                <li className="px-5 py-3 flex justify-between items-center bg-gold-50/50 dark:bg-gold-800/20">
-                  <span className="text-sm font-medium text-gold-500 dark:text-gold-400">Certification</span>
-                  <span className="text-sm text-gold-800 dark:text-gold-200 font-medium">{product.certification || '—'}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
           
           {/* 5. Purchase Rules */}
           <div className="bg-white dark:bg-gold-900 border border-gold-200 dark:border-gold-800 rounded-xl shadow-sm overflow-hidden">

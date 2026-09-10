@@ -10,7 +10,7 @@ const CategorySchema = new mongoose.Schema(
     metaDescription: { type: String },
     image: { type: String }, // Cloudinary URL
     variantType: { type: String, enum: ['CARAT', 'SIZE', 'WEIGHT', 'NONE'], required: true, default: 'NONE' },
-    calculateDiscountOnVariantValue: { type: Boolean, default: false },
+    calculatePriceOnVariantValue: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

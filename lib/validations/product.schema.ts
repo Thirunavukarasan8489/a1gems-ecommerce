@@ -48,14 +48,7 @@ export const ProductSchema = z.object({
   
   purchaseType: z.enum(['ENQUIRE_ONLY', 'BUY_ONLY', 'BUY_ENQUIRE']),
   whatsappEnabled: z.boolean().default(false),
-  
-  material: z.string().optional(),
-  stone: z.string().optional(),
-  size: z.string().optional(),
-  weight: z.string().optional(),
-  origin: z.string().optional(),
-  certification: z.string().optional(),
-  
+
   primaryImage: ImageSchema.optional(),
   gallery: z.array(ImageSchema).optional(),
   

@@ -74,6 +74,8 @@ export function ProductGallery({
               <img
                 src={images[i].url}
                 alt={images[i].altText || `${name} — view ${i + 1} of ${slides.length}`}
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "auto"}
                 className="aspect-square w-full sm:rounded-2xl object-cover"
               />
             ) : (

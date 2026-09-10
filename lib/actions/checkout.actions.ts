@@ -33,7 +33,12 @@ export async function placeOrder(data: any) {
       );
       const orderNumber = `ORD-${new Date().getFullYear()}-${counter.seq.toString().padStart(4, '0')}`;
       
-      const serverSubtotal = data.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+      const serverSubtotal = data.items.reduce((acc: number, item: any) => {
+        if (item.calculatePriceOnVariantValue && item.variantValue) {
+          return acc + (item.price * item.quantity * item.variantValue);
+        }
+        return acc + (item.price * item.quantity);
+      }, 0);
       const totals = await calculateOrderTotals(serverSubtotal, data.shippingAddress.state || "", data.purchaseType || "PERSONAL");
 
       const orderPayload = {

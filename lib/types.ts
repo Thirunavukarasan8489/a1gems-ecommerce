@@ -20,28 +20,25 @@ export interface Category {
   image?: string;
   displayOrder: number;
   published: boolean;
-}
-
-export interface ProductSpecifications {
-  material?: string;
-  stone?: string;
-  size?: string;
-  weight?: string;
-  origin?: string;
-  certification?: string;
+  calculatePriceOnVariantValue?: boolean;
 }
 
 export interface ProductVariant {
+  id: string;
   name: string;
   slug: string;
+  sku?: string;
   caratApprox?: number;
   variantValue?: number;
   size?: string;
   price: number;
   comparePrice?: number;
   stock: number;
+  reservedQuantity: number;
   lowStockThreshold: number;
   image?: { url: string; altText?: string };
+  primaryImage?: { url: string; altText?: string };
+  gallery?: { url: string; altText?: string }[];
 }
 
 export interface ProductSeo {
@@ -72,8 +69,6 @@ export interface Product {
   enquiryEnabled: boolean;
   whatsappEnabled: boolean;
 
-  specifications: ProductSpecifications;
-
   /** Hue anchor for the placeholder artwork until real media is uploaded. */
   gemColor: string;
   gallery: number;
@@ -84,10 +79,6 @@ export interface Product {
   variants?: ProductVariant[];
 
   seo?: ProductSeo;
-  guide?: {
-    name: string;
-    slug: string;
-  };
 
   featured: boolean;
   bestseller: boolean;
@@ -126,6 +117,8 @@ export function canEnquire(product: Product) {
 
 export interface CartLine {
   productId: string;
+  variantId?: string;
+  sku?: string;
   slug: string;
   name: string;
   image?: string;
@@ -134,6 +127,8 @@ export interface CartLine {
   unitPrice: number;
   quantity: number;
   variantName?: string;
+  variantValue?: number;
+  calculatePriceOnVariantValue?: boolean;
 }
 
 export interface LeadNote {

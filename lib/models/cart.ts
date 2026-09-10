@@ -2,8 +2,11 @@ import mongoose from 'mongoose';
 
 const CartItemSchema = new mongoose.Schema({
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  variantId: { type: String },
   quantity: { type: Number, required: true, min: 1 },
-  priceSnapshot: { type: Number, required: true }
+  priceSnapshot: { type: Number, required: true },
+  variantValue: { type: Number },
+  calculatePriceOnVariantValue: { type: Boolean, default: false }
 });
 
 const TemporaryCartSchema = new mongoose.Schema(

@@ -13,10 +13,13 @@ export function ProductCard({
   product,
   category,
   className,
+  priority = false,
 }: {
   product: Product;
   category?: any;
   className?: string;
+  /** Set for the first cards in an above-the-fold grid/rail so Next.js eager-loads the LCP image instead of lazy-loading it. */
+  priority?: boolean;
 }) {
   const off = discountPercent(product.sellingPrice, product.comparePrice);
   const status = stockStatus(product);
@@ -36,6 +39,8 @@ export function ProductCard({
             alt={product.primaryImage.altText || product.name}
             width={400}
             height={500}
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
             className="aspect-4/5 w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04]"
           />
         ) : (
@@ -55,14 +60,6 @@ export function ProductCard({
           {!buyable && <Badge tone="emerald">By enquiry</Badge>}
           {status === "LOW_STOCK" && <Badge tone="warning">Last few</Badge>}
         </div>
-
-        {/* Certification is the single biggest trust signal in this category,
-            so it stays visible on the card rather than only on the detail page. */}
-        {product.specifications.certification && (
-          <p className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-plum-950/85 to-transparent px-3 pt-6 pb-2 text-[0.625rem] font-medium tracking-wide text-ivory-100">
-            {product.specifications.certification}
-          </p>
-        )}
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">

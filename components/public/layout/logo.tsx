@@ -29,6 +29,7 @@ export function Logo({
           width={100}
           height={100}
           className="object-contain w-auto h-auto"
+          priority
         />
       </span>
 

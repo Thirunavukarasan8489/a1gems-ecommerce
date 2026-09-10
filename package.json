@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "migrate:variants": "node scripts/migrate-variants.js",
+    "migrate:category-flags": "node scripts/migrate-category-variant-flags.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

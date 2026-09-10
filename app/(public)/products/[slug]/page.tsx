@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
-  BadgeCheck,
   MessageCircle,
   PackageCheck,
   RefreshCcw,
@@ -66,15 +64,6 @@ export default async function ProductDetailPage(
     getRelatedProducts(product.id, product.categorySlug)
   ]);
 
-  const specs = [
-    ["Stone", product.specifications.stone],
-    ["Material", product.specifications.material],
-    ["Weight", product.specifications.weight],
-    ["Dimensions", product.specifications.size],
-    ["Origin", product.specifications.origin],
-    ["SKU", product.sku],
-  ].filter(([, value]) => Boolean(value)) as [string, string][];
-
   return (
     <>
       <div className="shell gutter pt-5">
@@ -136,44 +125,6 @@ export default async function ProductDetailPage(
             </div>
           )}
 
-          {/* Linked Guide */}
-          {product.guide && (
-            <div className="mt-8 rounded-xl bg-ivory-200 p-5">
-              <h3 className="text-sm font-semibold text-plum-900">
-                Gemstone Education
-              </h3>
-              <p className="mt-1 text-sm text-plum-700">
-                Learn more about origin, treatment, and value in our guide.
-              </p>
-              <Link
-                href={`/guides/${product.guide.slug}`}
-                className="mt-3 inline-flex text-sm font-medium text-gold-600 hover:text-gold-700 transition-colors underline underline-offset-4"
-              >
-                Read the {product.guide.name} Guide
-              </Link>
-            </div>
-          )}
-
-          {/* Certification callout — the trust anchor of the whole page. */}
-          {product.specifications.certification && (
-            <div className="mt-6 flex items-start gap-3 rounded-xl border border-gold-500/25 bg-gold-50 p-4">
-              <BadgeCheck
-                size={20}
-                className="mt-0.5 shrink-0 text-gold-700"
-                strokeWidth={2.25}
-              />
-              <div>
-                <p className="text-sm font-semibold text-gold-900">
-                  {product.specifications.certification}
-                </p>
-                <p className="mt-1 text-[0.8125rem] leading-relaxed text-gold-800">
-                  The report number is issued to you before payment so you can
-                  verify it on the laboratory&rsquo;s own website.
-                </p>
-              </div>
-            </div>
-          )}
-
           <ul className="mt-6 grid grid-cols-3 gap-3 border-y border-ivory-300 py-4">
             {[
               { icon: Truck, label: "Insured delivery" },
@@ -191,25 +142,6 @@ export default async function ProductDetailPage(
               </li>
             ))}
           </ul>
-
-          <section className="mt-7">
-            <h2 className="font-display text-xl font-semibold text-plum-900">
-              Specifications
-            </h2>
-            <dl className="mt-3 overflow-hidden rounded-xl border border-ivory-300 bg-white">
-              {specs.map(([label, value], i) => (
-                <div
-                  key={label}
-                  className={`flex gap-4 px-4 py-3 text-sm ${
-                    i % 2 ? "bg-ivory-50" : ""
-                  }`}
-                >
-                  <dt className="w-32 shrink-0 text-ink-muted">{label}</dt>
-                  <dd className="font-medium text-plum-900">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
 
           <section className="mt-7">
             <h2 className="font-display text-xl font-semibold text-plum-900">

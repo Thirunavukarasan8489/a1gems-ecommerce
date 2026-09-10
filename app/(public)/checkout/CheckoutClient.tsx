@@ -120,6 +120,15 @@ export default function CheckoutClient({ customer }: { customer: any | null }) {
           ? { gstin: formData.gstin, legalName: formData.gstLegalName }
           : undefined;
 
+      const shippingAddressObj = {
+        street: formData.address,
+        apartment: formData.apartment,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.zip,
+        country: formData.country,
+      };
+
       const orderData = {
         customerName: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.email,
@@ -128,19 +137,17 @@ export default function CheckoutClient({ customer }: { customer: any | null }) {
         businessName: isBusiness ? formData.businessName : undefined,
         contactPerson: isBusiness ? formData.contactPerson : undefined,
         gstDetails,
-        shippingAddress: {
-          street: formData.address,
-          apartment: formData.apartment,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.zip,
-          country: formData.country,
-        },
+        shippingAddress: shippingAddressObj,
+        billingAddress: shippingAddressObj, // Map billing to shipping
         items: lines.map((l) => ({
           productId: l.productId,
+          variantId: l.variantId,
+          sku: l.sku,
           name: l.name,
           quantity: l.quantity,
           price: l.unitPrice,
+          variantValue: l.variantValue,
+          calculatePriceOnVariantValue: l.calculatePriceOnVariantValue,
         })),
         paymentMethod: formData.paymentMethod,
         subtotal: totals.subtotal,

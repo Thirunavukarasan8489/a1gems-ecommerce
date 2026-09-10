@@ -17,6 +17,10 @@ type CartContextValue = {
     quantity?: number,
     variantName?: string,
     variantPrice?: number,
+    variantValue?: number,
+    calculatePriceOnVariantValue?: boolean,
+    variantId?: string,
+    sku?: string
   ) => void;
   setQuantity: (productId: string, quantity: number) => void;
   remove: (productId: string) => void;
@@ -95,9 +99,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       quantity = 1,
       variantName?: string,
       variantPrice?: number,
+      variantValue?: number,
+      calculatePriceOnVariantValue?: boolean,
+      variantId?: string,
+      sku?: string
     ) => {
       const line: CartLine = {
         productId: product.id,
+        variantId,
+        sku,
         slug: product.slug,
         name: product.name,
         image: product.primaryImage?.url,
@@ -105,15 +115,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         unitPrice: variantPrice ?? product.sellingPrice,
         quantity,
         variantName,
+        variantValue,
+        calculatePriceOnVariantValue,
       };
 
       setLines((current) => {
         const existing = current.find(
-          (l) => l.productId === product.id && l.variantName === variantName,
+          (l) => l.productId === product.id && l.variantId === variantId,
         );
         if (!existing) return [...current, line];
         return current.map((l) =>
-          l.productId === product.id && l.variantName === variantName
+          l.productId === product.id && l.variantId === variantId
             ? { ...l, quantity: l.quantity + quantity }
             : l,
         );
@@ -148,7 +160,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       lines,
       hydrated,
       count: lines.reduce((n, l) => n + l.quantity, 0),
-      subtotal: lines.reduce((n, l) => n + l.unitPrice * l.quantity, 0),
+      subtotal: lines.reduce((n, l) => {
+        if (l.calculatePriceOnVariantValue && l.variantValue) {
+          return n + l.unitPrice * l.quantity * l.variantValue;
+        }
+        return n + l.unitPrice * l.quantity;
+      }, 0),
       add,
       setQuantity,
       remove,

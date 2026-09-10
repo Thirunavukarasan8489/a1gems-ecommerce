@@ -145,9 +145,9 @@ export function ProductPurchaseOptions({
     : product.comparePrice;
   const off = discountPercent(sellingPrice, comparePrice);
 
-  // Active stock based on variant or fallback
+  // Active stock based on variant or fallback (stock minus what's already reserved by pending orders)
   const available = activeVariant
-    ? Math.max(0, activeVariant.stock)
+    ? Math.max(0, activeVariant.stock - (activeVariant.reservedQuantity || 0))
     : Math.max(0, product.stockQuantity - product.reservedQuantity);
 
   const threshold = activeVariant
@@ -205,7 +205,7 @@ export function ProductPurchaseOptions({
           <div className="flex flex-wrap gap-2">
             {product.variants!.map((variant, idx) => {
               const isActive = idx === selectedVariantIdx;
-              const isSoldOut = variant.stock <= 0;
+              const isSoldOut = variant.stock - (variant.reservedQuantity || 0) <= 0;
               const cleanName = cleanVariantName(
                 variant.name,
                 variant.caratApprox,
@@ -257,9 +257,13 @@ export function ProductPurchaseOptions({
         {buyable && (
           <AddToCart
             product={product}
+            variantId={activeVariant?.id}
+            variantSku={activeVariant?.sku}
             variantName={activeCleanName}
             variantPrice={activeVariant?.price}
-            maxQuantity={activeVariant ? activeVariant.stock : undefined}
+            maxQuantity={activeVariant ? available : undefined}
+            variantValue={activeVariant?.variantValue}
+            calculatePriceOnVariantValue={category?.calculatePriceOnVariantValue}
           />
         )}
 
