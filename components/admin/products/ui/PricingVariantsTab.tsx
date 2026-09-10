@@ -188,106 +188,110 @@ export function PricingVariantsTab({ isActive, categories = [], variantFiles = {
       </div>
 
       <div className="space-y-4">
-        {variantFields.map((field, index) => (
-          <div
-            key={field.id}
-            className="p-3 border border-gold-200 dark:border-gold-700 rounded-xl bg-gold-50/60 dark:bg-gold-800/40 flex items-start gap-2 relative"
-          >
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
-              <AdminInput
-                label={variantType}
-                placeholder={`e.g. 1.5`}
-                type="number"
-                step="0.01"
-                {...register(`variants.${index}.variantValue`)}
-                error={errors.variants?.[index]?.variantValue?.message}
-              />
-              <AdminInput
-                label="Size Description"
-                placeholder="e.g. 6x4mm"
-                {...register(`variants.${index}.size`)}
-                error={errors.variants?.[index]?.size?.message}
-              />
-              <AdminInput
-                type="text"
-                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                label="Selling Price (₹) *"
-                placeholder=""
-                {...register(`variants.${index}.price`)}
-                error={errors.variants?.[index]?.price?.message}
-              />
-              <AdminInput
-                type="text"
-                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                label="Compare Price"
-                placeholder=""
-                {...register(`variants.${index}.comparePrice`)}
-                error={errors.variants?.[index]?.comparePrice?.message}
-              />
-              <AdminInput
-                type="text"
-                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
-                label="Current Stock"
-                placeholder=""
-                {...register(`variants.${index}.stock`)}
-                error={errors.variants?.[index]?.stock?.message}
-              />
-              <div className="space-y-1">
-                <label className="block text-xs font-medium text-gold-700 dark:text-gold-300">Variant Image</label>
-                <div className="flex flex-col gap-2">
-                  {variantFiles[index] || getValues(`variants.${index}.image.url`) ? (
-                    <div className="relative w-full h-24 rounded-md border border-gold-200 dark:border-gold-700 overflow-hidden group bg-white dark:bg-gold-900">
-                      <Image 
-                        src={variantFiles[index]?.previewUrl || getValues(`variants.${index}.image.url`)} 
-                        alt="Variant preview" 
-                        fill
-                        className="object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onVariantFileSelect) onVariantFileSelect(index, null);
-                          setValue(`variants.${index}.image.url`, '', { shouldValidate: true, shouldDirty: true });
-                        }}
-                        className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="w-5 h-5 text-white" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gold-200 dark:border-gold-700 rounded-md cursor-pointer hover:bg-gold-50 dark:hover:bg-gold-800 transition-colors bg-white dark:bg-gold-900">
-                      <div className="flex flex-col items-center justify-center pt-2 pb-3">
-                        <ImageIcon className="w-6 h-6 text-gold-400 mb-1" />
-                        <p className="text-[10px] text-gold-500 text-center px-2">Click to upload</p>
+        {variantFields.map((field, index) => {
+          const variantImgSrc = variantFiles[index]?.previewUrl || getValues(`variants.${index}.image.url`);
+
+          return (
+            <div
+              key={field.id}
+              className="p-3 border border-gold-200 dark:border-gold-700 rounded-xl bg-gold-50/60 dark:bg-gold-800/40 flex items-start gap-2 relative"
+            >
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+                <AdminInput
+                  label={variantType}
+                  placeholder={`e.g. 1.5`}
+                  type="number"
+                  step="0.01"
+                  {...register(`variants.${index}.variantValue`)}
+                  error={errors.variants?.[index]?.variantValue?.message}
+                />
+                <AdminInput
+                  label="Size Description"
+                  placeholder="e.g. 6x4mm"
+                  {...register(`variants.${index}.size`)}
+                  error={errors.variants?.[index]?.size?.message}
+                />
+                <AdminInput
+                  type="text"
+                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                  label="Selling Price (₹) *"
+                  placeholder=""
+                  {...register(`variants.${index}.price`)}
+                  error={errors.variants?.[index]?.price?.message}
+                />
+                <AdminInput
+                  type="text"
+                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                  label="Compare Price"
+                  placeholder=""
+                  {...register(`variants.${index}.comparePrice`)}
+                  error={errors.variants?.[index]?.comparePrice?.message}
+                />
+                <AdminInput
+                  type="text"
+                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); }}
+                  label="Current Stock"
+                  placeholder=""
+                  {...register(`variants.${index}.stock`)}
+                  error={errors.variants?.[index]?.stock?.message}
+                />
+                <div className="space-y-1">
+                  <label className="block text-xs font-medium text-gold-700 dark:text-gold-300">Variant Image</label>
+                  <div className="flex flex-col gap-2">
+                    {variantImgSrc ? (
+                      <div className="relative w-full h-24 rounded-md border border-gold-200 dark:border-gold-700 overflow-hidden group bg-white dark:bg-gold-900">
+                        <Image 
+                          src={variantImgSrc} 
+                          alt="Variant preview" 
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onVariantFileSelect) onVariantFileSelect(index, null);
+                            setValue(`variants.${index}.image.url`, '', { shouldValidate: true, shouldDirty: true });
+                          }}
+                          className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-5 h-5 text-white" />
+                        </button>
                       </div>
-                      <input 
-                        type="file" 
-                        className="hidden" 
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file && onVariantFileSelect) {
-                            onVariantFileSelect(index, file);
-                          }
-                        }}
-                      />
-                    </label>
-                  )}
+                    ) : (
+                      <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gold-200 dark:border-gold-700 rounded-md cursor-pointer hover:bg-gold-50 dark:hover:bg-gold-800 transition-colors bg-white dark:bg-gold-900">
+                        <div className="flex flex-col items-center justify-center pt-2 pb-3">
+                          <ImageIcon className="w-6 h-6 text-gold-400 mb-1" />
+                          <p className="text-[10px] text-gold-500 text-center px-2">Click to upload</p>
+                        </div>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file && onVariantFileSelect) {
+                              onVariantFileSelect(index, file);
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
                 </div>
               </div>
+              {variantFields.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeVariant(index)}
+                  className="mt-7 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors absolute -right-2 -top-2 bg-white shadow-sm border border-gold-200"
+                  title="Remove Variant"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
-            {variantFields.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeVariant(index)}
-                className="mt-7 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors absolute -right-2 -top-2 bg-white shadow-sm border border-gold-200"
-                title="Remove Variant"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-        ))}
+          );
+        })}
 
         <AdminButton
           type="button"
