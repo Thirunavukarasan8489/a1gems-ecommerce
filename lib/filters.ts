@@ -55,14 +55,7 @@ export function applyFilters(source: Product[], query: ProductQuery) {
   if (query.q) {
     const needle = query.q.trim().toLowerCase();
     result = result.filter((p) =>
-      [
-        p.name,
-        p.shortDescription,
-        p.sku,
-        p.categorySlug,
-        p.specifications.stone,
-        p.specifications.origin,
-      ]
+      [p.name, p.shortDescription, p.sku, p.categorySlug]
         .filter(Boolean)
         .some((field) => field!.toLowerCase().includes(needle)),
     );

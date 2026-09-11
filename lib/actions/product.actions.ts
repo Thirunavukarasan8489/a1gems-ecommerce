@@ -2,6 +2,7 @@
 
 import dbConnect from '@/lib/db';
 import { Product } from '@/lib/models/product';
+import { ProductVariant } from '@/lib/models/product-variant';
 import { Category } from '@/lib/models/category';
 import { Lead } from '@/lib/models/lead';
 import { Order } from '@/lib/models/order';
@@ -10,6 +11,8 @@ import { logAuditAction } from '@/lib/actions/audit';
 import { deleteMediaByUrl } from '@/lib/actions/media.actions';
 import { ProductSchema } from '@/lib/validations/product.schema';
 import { revalidatePath } from 'next/cache';
+import mongoose from 'mongoose';
+import { variantTypeLabel } from '@/lib/utils';
 
 async function checkAuth(allowedRoles: string[]) {
   const session = await getSession();
@@ -50,6 +53,65 @@ export async function generateUniqueProductSlug(name: string, excludeId?: string
   }
 }
 
+/**
+ * Formats variant name/sku/slug and returns aggregate stock stats, matching
+ * the naming rules used at creation time:
+ * - category.calculatePriceOnVariantValue=true  -> "<Product Name> <Variant Type> <Variant Value>" (e.g. "Natural Blue Sapphire Gemstone Carat 2.5")
+ * - category.calculatePriceOnVariantValue=false -> "<Product Name> <entered variant name>", falling back to "<Product Name> Option N"
+ * SKU always uses the category's variantType, since it identifies what kind of variant this product line uses regardless of pricing mode.
+ */
+function formatVariants(variants: any[], productName: string, category: any, baseSkuPrefix: string, productSlug: string) {
+  let totalStock = 0;
+  let isLowStock = false;
+  const priceOnValue = !!category?.calculatePriceOnVariantValue;
+  const skuVariantType = category?.variantType || 'NONE';
+
+  const formatted = variants.map((v: any, idx: number) => {
+    if (priceOnValue) {
+      v.name = `${productName} ${variantTypeLabel(category?.variantType)} ${v.variantValue ?? ''}`.trim();
+    } else {
+      const enteredName = v.size && String(v.size).trim() ? String(v.size).trim() : null;
+      v.name = enteredName ? `${productName} ${enteredName}` : `${productName} Option ${idx + 1}`;
+    }
+
+    if (!v.sku) {
+      const indexStr = String(idx + 1).padStart(3, '0');
+      v.sku = `${baseSkuPrefix}-${skuVariantType}-${indexStr}`;
+    }
+
+    const varSlugSuffix = v.name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+    v.slug = `${productSlug}-${varSlugSuffix}`;
+
+    const vStock = Number(v.stock) || 0;
+    const vThreshold = Number(v.lowStockThreshold) || 5;
+    totalStock += vStock;
+    if (vStock > 0 && vStock <= vThreshold) {
+      isLowStock = true;
+    }
+    return v;
+  });
+
+  const stockStatus: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' = totalStock === 0 ? 'OUT_OF_STOCK' : isLowStock ? 'LOW_STOCK' : 'IN_STOCK';
+  return { formatted, totalStock, stockStatus };
+}
+
+/** Attaches each product's ProductVariant documents as a `variants` array, matching the old embedded shape. */
+async function attachVariants<T extends { _id: any }>(products: T[]): Promise<(T & { variants: any[] })[]> {
+  if (products.length === 0) return products as (T & { variants: any[] })[];
+  const variants = await ProductVariant.find({ productId: { $in: products.map((p) => p._id) } }).lean();
+  const byProduct = new Map<string, any[]>();
+  for (const v of variants) {
+    const key = v.productId.toString();
+    if (!byProduct.has(key)) byProduct.set(key, []);
+    byProduct.get(key)!.push(v);
+  }
+  return products.map((p) => ({ ...p, variants: byProduct.get(p._id.toString()) || [] }));
+}
+
 export async function getProducts(page = 1, limit = 50) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
@@ -62,11 +124,13 @@ export async function getProducts(page = 1, limit = 50) {
       .limit(limit)
       .select('-__v')
       .lean();
-    
+
+    const withVariants = await attachVariants(products);
+
     const totalCount = await Product.countDocuments();
-    return { 
-      success: true, 
-      data: JSON.parse(JSON.stringify(products)),
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(withVariants)),
       pagination: {
         totalCount,
         page,
@@ -85,7 +149,8 @@ export async function getProductById(id: string) {
     await dbConnect();
     const product = await Product.findById(id).populate('category', 'name').lean();
     if (!product) return { success: false, error: 'Product not found' };
-    return { success: true, data: JSON.parse(JSON.stringify(product)) };
+    const [withVariants] = await attachVariants([product as any]);
+    return { success: true, data: JSON.parse(JSON.stringify(withVariants)) };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
@@ -94,7 +159,7 @@ export async function getProductById(id: string) {
 export async function createProduct(data: any) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
-    
+
     const parsed = ProductSchema.safeParse(data);
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
@@ -102,17 +167,20 @@ export async function createProduct(data: any) {
     const validatedData = parsed.data;
 
     await dbConnect();
-    
+
     // Automatically generate guaranteed unique slug on backend
     const slug = await generateUniqueProductSlug(validatedData.name);
 
     // Handle Category reference
-    const mappedData: any = { 
-      ...validatedData, 
+    const mappedData: any = {
+      ...validatedData,
       slug,
-      category: validatedData.categoryId || validatedData.category 
+      category: validatedData.categoryId || validatedData.category
     };
     delete mappedData.categoryId;
+
+    const initialVariants = Array.isArray(mappedData.variants) ? mappedData.variants : [];
+    delete mappedData.variants;
 
     // Fetch Category to build SKU
     const categoryObj = await Category.findById(mappedData.category).lean();
@@ -125,59 +193,54 @@ export async function createProduct(data: any) {
       mappedData.baseSku = `${baseSkuPrefix}-001`;
     }
 
-    // If variants enabled, format names and compute aggregate stock/status
     let totalStock = 0;
-    let isLowStock = false;
+    let stockStatus: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK' = 'OUT_OF_STOCK';
+    let formattedVariants: any[] = [];
 
-    if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
-      mappedData.variants = mappedData.variants.map((v: any, idx: number) => {
-        const hasCarat = v.caratApprox && Number(v.caratApprox) > 0;
-        const hasSize = v.size && v.size !== '0' && v.size !== '0 mm' && String(v.size).toLowerCase() !== 'n/a' && String(v.size).trim() !== '';
-
-        if (hasCarat && hasSize) {
-          v.name = `${v.caratApprox} Carat - ${v.size}`;
-        } else if (hasCarat) {
-          v.name = `${v.caratApprox} Carat`;
-        } else if (hasSize) {
-          v.name = `${v.size}`;
-        } else {
-          v.name = v.name && v.name.trim() ? v.name : `Option ${idx + 1}`;
-        }
-
-        if (!v.sku) {
-          const varShort = generateShortname(v.name);
-          const indexStr = String(idx + 1).padStart(3, '0');
-          v.sku = `${baseSkuPrefix}-${varShort}-${indexStr}`;
-        }
-
-        // Generate variant slug
-        const varSlugSuffix = v.name
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-        v.slug = `${slug}-${varSlugSuffix}`;
-
-        const vStock = Number(v.stock) || 0;
-        const vThreshold = Number(v.lowStockThreshold) || 5;
-        totalStock += vStock;
-        if (vStock > 0 && vStock <= vThreshold) {
-          isLowStock = true;
-        }
-        return v;
-      });
+    if (mappedData.hasVariants && initialVariants.length > 0) {
+      const result = formatVariants(initialVariants, mappedData.name, categoryObj, baseSkuPrefix, slug);
+      formattedVariants = result.formatted;
+      totalStock = result.totalStock;
+      stockStatus = result.stockStatus;
     }
 
-    if (totalStock === 0) {
-      mappedData.stockStatus = 'OUT_OF_STOCK';
-    } else if (isLowStock) {
-      mappedData.stockStatus = 'LOW_STOCK';
-    } else {
-      mappedData.stockStatus = 'IN_STOCK';
+    mappedData.stockStatus = stockStatus;
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    let product: any;
+    try {
+      const created = await Product.create([mappedData], { session });
+      product = created[0];
+
+      if (formattedVariants.length > 0) {
+        await ProductVariant.insertMany(
+          formattedVariants.map((v) => ({
+            ...v,
+            productId: product._id,
+            categoryId: categoryObj?._id,
+            // Variants have no image UI of their own at creation time, and
+            // inherit the product's discount/purchase rules as a starting
+            // point — both are still editable per-variant afterward.
+            primaryImage: mappedData.primaryImage,
+            gallery: mappedData.gallery,
+            discountRules: mappedData.discountRules,
+            purchaseType: mappedData.purchaseType,
+            whatsappEnabled: mappedData.whatsappEnabled,
+          })),
+          { session }
+        );
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+    } catch (txError) {
+      await session.abortTransaction();
+      session.endSession();
+      throw txError;
     }
-    
-    const product = await Product.create(mappedData);
-    
+
     await logAuditAction({
       action: 'PRODUCT_CREATED',
       entity: 'Product',
@@ -187,6 +250,7 @@ export async function createProduct(data: any) {
 
     revalidatePath('/admin/products');
     revalidatePath('/admin/inventory');
+    revalidatePath('/admin/productvarients');
     return { success: true, data: JSON.parse(JSON.stringify(product)) };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -196,7 +260,7 @@ export async function createProduct(data: any) {
 export async function updateProduct(id: string, data: any) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
-    
+
     const parsed = ProductSchema.safeParse(data);
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
@@ -204,12 +268,16 @@ export async function updateProduct(id: string, data: any) {
     const validatedData = parsed.data;
 
     await dbConnect();
-    
+
     const mappedData: any = { ...validatedData };
     if (mappedData.categoryId) {
       mappedData.category = mappedData.categoryId;
       delete mappedData.categoryId;
     }
+
+    // Variant pricing/stock is managed on the standalone ProductVariant
+    // screens, not through the main product edit form.
+    delete mappedData.variants;
 
     // Fetch old product to find orphaned images and get original slug if needed
     const oldProduct = await Product.findById(id).lean();
@@ -221,7 +289,7 @@ export async function updateProduct(id: string, data: any) {
     } else if (!mappedData.slug) {
       mappedData.slug = oldProduct.slug;
     }
-    
+
     // Fetch Category to build SKU
     const categoryObj = await Category.findById(mappedData.category).lean();
     const categoryName = categoryObj ? categoryObj.name : 'Uncategorized';
@@ -231,57 +299,6 @@ export async function updateProduct(id: string, data: any) {
 
     if (!mappedData.baseSku) {
       mappedData.baseSku = `${baseSkuPrefix}-001`;
-    }
-
-    // If variants enabled, format names and compute aggregate stock/status
-    let totalStock = 0;
-    let isLowStock = false;
-
-    if (mappedData.hasVariants && Array.isArray(mappedData.variants) && mappedData.variants.length > 0) {
-      mappedData.variants = mappedData.variants.map((v: any, idx: number) => {
-        const hasCarat = v.caratApprox && Number(v.caratApprox) > 0;
-        const hasSize = v.size && v.size !== '0' && v.size !== '0 mm' && String(v.size).toLowerCase() !== 'n/a' && String(v.size).trim() !== '';
-
-        if (hasCarat && hasSize) {
-          v.name = `${v.caratApprox} Carat - ${v.size}`;
-        } else if (hasCarat) {
-          v.name = `${v.caratApprox} Carat`;
-        } else if (hasSize) {
-          v.name = `${v.size}`;
-        } else {
-          v.name = v.name && v.name.trim() ? v.name : `Option ${idx + 1}`;
-        }
-
-        if (!v.sku) {
-          const varShort = generateShortname(v.name);
-          const indexStr = String(idx + 1).padStart(3, '0');
-          v.sku = `${baseSkuPrefix}-${varShort}-${indexStr}`;
-        }
-
-        // Generate variant slug
-        const varSlugSuffix = v.name
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-        v.slug = `${mappedData.slug}-${varSlugSuffix}`;
-
-        const vStock = Number(v.stock) || 0;
-        const vThreshold = Number(v.lowStockThreshold) || 5;
-        totalStock += vStock;
-        if (vStock > 0 && vStock <= vThreshold) {
-          isLowStock = true;
-        }
-        return v;
-      });
-    }
-
-    if (totalStock === 0) {
-      mappedData.stockStatus = 'OUT_OF_STOCK';
-    } else if (isLowStock) {
-      mappedData.stockStatus = 'LOW_STOCK';
-    } else {
-      mappedData.stockStatus = 'IN_STOCK';
     }
 
     const product = await Product.findByIdAndUpdate(id, mappedData, { new: true });
@@ -297,7 +314,7 @@ export async function updateProduct(id: string, data: any) {
       if (product.gallery) product.gallery.forEach((g: any) => { if (g.url) newImages.add(g.url); });
 
       const orphanedImages = Array.from(oldImages).filter(url => !newImages.has(url));
-      
+
       // Fire and forget
       Promise.allSettled(orphanedImages.map(url => deleteMediaByUrl(url)));
     }
@@ -321,7 +338,7 @@ export async function deleteProduct(id: string) {
   try {
     await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
     await dbConnect();
-    
+
     // Check references
     const orderCount = await Order.countDocuments({ 'items.productId': id });
     if (orderCount > 0) {
@@ -336,15 +353,22 @@ export async function deleteProduct(id: string) {
     const productToDelete = await Product.findById(id).lean();
     if (!productToDelete) throw new Error('Product not found');
 
+    const variantsToDelete = await ProductVariant.find({ productId: id }).lean();
+
     await Product.findByIdAndDelete(id);
-    
+    await ProductVariant.deleteMany({ productId: id });
+
     // Clean up images asynchronously
     const urlsToDelete = new Set<string>();
     if (productToDelete.primaryImage?.url) urlsToDelete.add(productToDelete.primaryImage.url);
     if (productToDelete.gallery) {
       productToDelete.gallery.forEach((g: any) => { if (g.url) urlsToDelete.add(g.url); });
     }
-    
+    for (const v of variantsToDelete as any[]) {
+      if (v.primaryImage?.url) urlsToDelete.add(v.primaryImage.url);
+      if (v.gallery) v.gallery.forEach((g: any) => { if (g.url) urlsToDelete.add(g.url); });
+    }
+
     // Fire and forget
     Promise.allSettled(Array.from(urlsToDelete).map(url => deleteMediaByUrl(url)));
 
@@ -356,7 +380,97 @@ export async function deleteProduct(id: string) {
 
     revalidatePath('/admin/products');
     revalidatePath('/admin/inventory');
+    revalidatePath('/admin/productvarients');
     return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getVariant(productId: string, variantId: string) {
+  try {
+    await dbConnect();
+    const variant = await ProductVariant.findOne({ _id: variantId, productId }).lean();
+    if (!variant) throw new Error('Variant not found');
+
+    return { success: true, data: JSON.parse(JSON.stringify(variant)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateVariant(productId: string, variantId: string, data: any) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER']);
+    await dbConnect();
+
+    const variant = await ProductVariant.findOneAndUpdate(
+      { _id: variantId, productId },
+      { $set: data },
+      { new: true }
+    );
+    if (!variant) throw new Error('Variant not found');
+
+    await logAuditAction({
+      action: 'PRODUCT_VARIANT_UPDATED',
+      entity: 'Product',
+      entityId: productId,
+      metadata: { variantId }
+    });
+
+    revalidatePath('/admin/products');
+    revalidatePath('/admin/productvarients');
+    return { success: true, data: JSON.parse(JSON.stringify(variant)) };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+/** Flat list of every variant across all products, for the standalone Product Variants admin screen. */
+export async function getAllProductVariants(page = 1, limit = 50) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
+    await dbConnect();
+    const skip = (page - 1) * limit;
+
+    const variants = await ProductVariant.find()
+      .populate('productId', 'name slug primaryImage')
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const totalCount = await ProductVariant.countDocuments();
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(variants)),
+      pagination: {
+        totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+/** Single variant + its parent product, for the standalone view/edit screens. */
+export async function getProductVariantById(variantId: string) {
+  try {
+    await checkAuth(['SUPER_ADMIN', 'CONTENT_MANAGER', 'LEAD_MANAGER']);
+    await dbConnect();
+    const variant = await ProductVariant.findById(variantId)
+      .populate({
+        path: 'productId',
+        select: 'name slug category',
+        populate: { path: 'category', select: 'name variantType calculatePriceOnVariantValue' },
+      })
+      .lean();
+    if (!variant) return { success: false, error: 'Variant not found' };
+    return { success: true, data: JSON.parse(JSON.stringify(variant)) };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

@@ -9,50 +9,6 @@ if (!FAQ) console.warn("FAQ model not loaded");
 if (!Testimonial) console.warn("Testimonial model not loaded");
 if (!Policy) console.warn("Policy model not loaded");
 
-const DEFAULT_FAQS = [
-  {
-    _id: "faq-1",
-    question: "How do I verify the authenticity of a gemstone?",
-    answer: "Every natural gemstone sold by A1 Gems comes with an independent lab report from recognized laboratories like GIA, IGI, or GRS. Each report includes a unique certificate number that can be verified online directly on the laboratory's official website.",
-    category: "Authentication",
-    displayOrder: 1,
-    isActive: true,
-  },
-  {
-    _id: "faq-2",
-    question: "Are your gemstones treated or heated?",
-    answer: "We specialize in unheated and untreated gemstones. Any treatment (such as heat or minor oiling in emeralds) is 100% disclosed in the gemstone specifications and lab reports before purchase.",
-    category: "Quality",
-    displayOrder: 2,
-    isActive: true,
-  },
-  {
-    _id: "faq-3",
-    question: "What is your return & inspection policy?",
-    answer: "We offer a hassle-free 7-day inspection window. If you wish to return an item, contact us within 7 days of delivery for a full refund or exchange, provided the stone remains in its original sealed lab capsule condition.",
-    category: "Returns",
-    displayOrder: 3,
-    isActive: true,
-  },
-  {
-    _id: "faq-4",
-    question: "Can I consult a gemmologist before making a purchase?",
-    answer: "Yes! Our experienced in-house gemmologists are available via WhatsApp or phone call for unpressured advice regarding Rashi suitability, origin, weight, and clarity recommendations.",
-    category: "Consultation",
-    displayOrder: 4,
-    isActive: true,
-  },
-  {
-    _id: "faq-5",
-    question: "How is shipping handled?",
-    answer: "All orders are shipped via fully insured express courier service with signature confirmation upon delivery. Tracking numbers are provided immediately after dispatch.",
-    category: "Shipping",
-    displayOrder: 5,
-    isActive: true,
-  },
-];
-
-
 export const getFaqs = unstable_cache(async () => {
   try {
     await dbConnect();
@@ -63,7 +19,7 @@ export const getFaqs = unstable_cache(async () => {
   } catch (error) {
     console.error("Error in getFaqs:", error);
   }
-  return DEFAULT_FAQS;
+  return [];
 }, ['public-faqs-v3'], { revalidate: 60, tags: ['content'] });
 
 export const getTestimonials = unstable_cache(async () => {

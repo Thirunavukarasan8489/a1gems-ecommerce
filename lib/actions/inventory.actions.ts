@@ -2,10 +2,12 @@
 
 import dbConnect from '@/lib/db';
 import { Product } from '@/lib/models/product';
+import { ProductVariant } from '@/lib/models/product-variant';
 import { getSession } from '@/lib/auth';
 import { logAuditAction } from '@/lib/actions/audit';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
+import { recalcProductStockStatus } from '@/lib/inventory';
 
 async function checkAuth(allowedRoles: string[]) {
   const session = await getSession();
@@ -26,15 +28,22 @@ export async function getInventoryList() {
       .sort({ updatedAt: -1 })
       .lean();
 
+    const allVariants = await ProductVariant.find({ productId: { $in: products.map((p: any) => p._id) } }).lean();
+    const variantsByProduct = new Map<string, any[]>();
+    for (const v of allVariants) {
+      const key = v.productId.toString();
+      if (!variantsByProduct.has(key)) variantsByProduct.set(key, []);
+      variantsByProduct.get(key)!.push(v);
+    }
+
     const inventoryItems = products.map((p: any) => {
-      const isVariant = p.hasVariants && Array.isArray(p.variants) && p.variants.length > 0;
-      const totalStock = isVariant
-        ? p.variants.reduce((sum: number, v: any) => sum + (Number(v.stock) || 0), 0)
-        : Number(p.stockQuantity) || 0;
-      
-      const reserved = Number(p.reservedQuantity) || 0;
+      const variants = variantsByProduct.get(p._id.toString()) || [];
+      const totalStock = variants.reduce((sum: number, v: any) => sum + (Number(v.stock) || 0), 0);
+      const reserved = variants.reduce((sum: number, v: any) => sum + (Number(v.reservedQuantity) || 0), 0);
       const available = Math.max(0, totalStock - reserved);
-      const threshold = Number(p.lowStockThreshold) || 5;
+      const threshold = variants.length > 0
+        ? Math.min(...variants.map((v: any) => Number(v.lowStockThreshold) || 5))
+        : 5;
 
       let status = 'IN_STOCK';
       if (available === 0) {
@@ -51,7 +60,7 @@ export async function getInventoryList() {
         category: p.category?.name || 'Uncategorized',
         categoryId: p.category?._id?.toString() || '',
         hasVariants: p.hasVariants || false,
-        variants: (p.variants || []).map((v: any) => ({
+        variants: variants.map((v: any) => ({
           _id: v._id?.toString() || '',
           name: v.name,
           sku: v.sku,
@@ -87,40 +96,28 @@ export async function updateStockLevel(params: {
     session.startTransaction();
 
     try {
-      const product = await Product.findById(params.productId).session(session);
-      if (!product) {
-        throw new Error('Product not found');
+      const variant = params.variantId
+        ? await ProductVariant.findOne({ _id: params.variantId, productId: params.productId }).session(session)
+        : await ProductVariant.findOne({ productId: params.productId }).session(session);
+
+      if (!variant) {
+        throw new Error('Variant not found');
       }
 
-      if (params.variantId && product.hasVariants) {
-        const variant = product.variants.id(params.variantId);
-        if (!variant) {
-          throw new Error('Variant not found');
-        }
-        variant.stock = Math.max(0, (variant.stock || 0) + params.adjustment);
-        
-        // Recalculate total product stock
-        product.stockQuantity = product.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0);
-      } else {
-        product.stockQuantity = Math.max(0, (product.stockQuantity || 0) + params.adjustment);
-      }
+      variant.stock = Math.max(0, (variant.stock || 0) + params.adjustment);
+      await variant.save({ session });
 
-      // Re-evaluate stockStatus
-      const threshold = product.lowStockThreshold || 5;
-      const reserved = product.reservedQuantity || 0;
-      const available = Math.max(0, product.stockQuantity - reserved);
+      const { totalAvailable, stockStatus } = await recalcProductStockStatus(params.productId, session);
 
-      if (available === 0) {
-        product.stockStatus = 'OUT_OF_STOCK';
-      } else if (available <= threshold) {
-        product.stockStatus = 'LOW_STOCK';
-      } else {
-        product.stockStatus = 'IN_STOCK';
-      }
+      const totalStock = await ProductVariant.aggregate([
+        { $match: { productId: new mongoose.Types.ObjectId(params.productId) } },
+        { $group: { _id: null, total: { $sum: '$stock' } } },
+      ]).session(session);
 
-      await product.save({ session });
       await session.commitTransaction();
       session.endSession();
+
+      const newStock = totalStock[0]?.total || 0;
 
       await logAuditAction({
         action: 'INVENTORY_STOCK_ADJUSTED',
@@ -129,14 +126,14 @@ export async function updateStockLevel(params: {
         metadata: {
           variantId: params.variantId,
           adjustment: params.adjustment,
-          newStockQuantity: product.stockQuantity,
+          newStockQuantity: newStock,
           reason: params.reason || 'Manual Adjustment',
         },
       });
 
       revalidatePath('/admin/inventory');
       revalidatePath('/admin/products');
-      return { success: true, newStock: product.stockQuantity, stockStatus: product.stockStatus };
+      return { success: true, newStock, stockStatus, available: totalAvailable };
     } catch (txError: any) {
       await session.abortTransaction();
       session.endSession();

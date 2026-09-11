@@ -10,8 +10,8 @@ export const AddressSchema = z.object({
 
 export const OrderItemSchema = z.object({
   productId: z.string().min(1, 'Product ID is required'),
-  variantId: z.string().min(1, 'Variant ID is required'),
-  sku: z.string().min(1, 'SKU is required'),
+  variantId: z.string().optional(),
+  sku: z.string().optional(),
   name: z.string().min(1, 'Name is required'),
   quantity: z.number().int().min(1, 'Quantity must be at least 1'),
   price: z.number().min(0, 'Price must be non-negative'),

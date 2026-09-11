@@ -34,7 +34,6 @@ export default function ForgotPassword() {
       // Simulate API call for password reset
       await new Promise((resolve) => setTimeout(resolve, 1000));
       // In a real app, you would POST to /api/auth/forgot-password
-      // console.log('Sending password reset email to:', data.email);
       setIsSubmitted(true);
     } catch (error) {
       console.error('Password reset request failed', error);

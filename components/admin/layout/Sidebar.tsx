@@ -48,6 +48,7 @@ const hasAccess = (itemHref: string, role: string) => {
     if (
       itemHref.startsWith("/admin/categories") ||
       itemHref.startsWith("/admin/products") ||
+      itemHref.startsWith("/admin/productvarients") ||
       itemHref.startsWith("/admin/inventory") ||
       itemHref.startsWith("/admin/website")
     ) {
@@ -69,6 +70,7 @@ const sidebarGroups = [
     items: [
       { name: "Categories", href: "/admin/categories", icon: Layers },
       { name: "Products", href: "/admin/products", icon: Package },
+      { name: "Product Variants", href: "/admin/productvarients", icon: List },
       { name: "Inventory", href: "/admin/inventory", icon: Boxes },
     ],
   },
@@ -157,6 +159,7 @@ export default function Sidebar({
               width={80}
               height={80}
               className="object-contain w-auto h-auto"
+              priority
             />
           </span>
         </div>

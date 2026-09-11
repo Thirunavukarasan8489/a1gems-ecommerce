@@ -6,32 +6,8 @@ import { Rating } from "@/components/public/ui/rating";
 import { SectionHeading } from "@/components/public/ui/section-heading";
 import { cn } from "@/lib/utils";
 
-const FALLBACK_TESTIMONIALS = [
-  {
-    name: "Dr. Rajesh Sharma",
-    location: "New Delhi",
-    product: "4.25ct Ceylon Blue Sapphire",
-    rating: 5,
-    body: "Purchased a natural unheated Neelam after consulting their gemmologist. Received the GIA lab report directly. Excellent transparency and authentic quality.",
-  },
-  {
-    name: "Ananya Iyer",
-    location: "Bengaluru",
-    product: "3.10ct Burmese Ruby",
-    rating: 5,
-    body: "The ruby exceeded my expectations in brilliance and color depth. Fast insured delivery to Bengaluru with complete certification documents.",
-  },
-  {
-    name: "Vikramaditya Mehta",
-    location: "Mumbai",
-    product: "5.15ct Zambian Emerald",
-    rating: 5,
-    body: "Honest pricing with no hidden charges. The gemmologist took time to explain the clarity grade and origin report over a quick video call.",
-  },
-];
-
 export function Testimonials({ items }: { items?: any[] }) {
-  const testimonials = items && items.length > 0 ? items : FALLBACK_TESTIMONIALS;
+  const testimonials = items || [];
   const [active, setActive] = React.useState(0);
   const trackRef = React.useRef<HTMLUListElement>(null);
 
@@ -53,6 +29,8 @@ export function Testimonials({ items }: { items?: any[] }) {
     }
   };
 
+  if (testimonials.length === 0) return null;
+
   return (
     <section className="relative w-full max-w-full overflow-hidden bg-ivory-200 py-12 sm:py-16 lg:py-20">
       <div className="shell gutter">
@@ -73,7 +51,7 @@ export function Testimonials({ items }: { items?: any[] }) {
         >
           {testimonials.map((t: any, i: number) => (
             <li
-              key={t.name + i}
+              key={t._id || i}
               data-index={i}
               className="w-[84%] min-w-[15.5rem] shrink-0 snap-start lg:w-auto lg:min-w-0"
             >
@@ -83,13 +61,13 @@ export function Testimonials({ items }: { items?: any[] }) {
                   className="mb-3 shrink-0 fill-gold-200 text-gold-400"
                 />
                 <blockquote className="flex-1 text-[0.9375rem] leading-relaxed text-plum-900 font-normal">
-                  &quot;{t.body}&quot;
+                  &quot;{t.quote}&quot;
                 </blockquote>
                 <figcaption className="mt-5 border-t border-ivory-200 pt-4">
                   <Rating value={t.rating} className="mb-2" />
-                  <p className="text-sm font-semibold text-plum-950">{t.name}</p>
+                  <p className="text-sm font-semibold text-plum-950">{t.customerName}</p>
                   <p className="mt-0.5 text-xs text-plum-600 font-medium">
-                    {t.location} · purchased {t.product}
+                    {t.location}{t.productReference?.name ? ` · purchased ${t.productReference.name}` : ''}
                   </p>
                 </figcaption>
               </figure>

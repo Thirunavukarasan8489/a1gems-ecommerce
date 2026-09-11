@@ -9,19 +9,28 @@ import { availableQuantity, type Product } from "@/lib/types";
 export function AddToCart({
   product,
   withQuantity = true,
+  variantId,
+  variantSku,
   variantName,
   variantPrice,
   maxQuantity,
+  variantValue,
+  calculatePriceOnVariantValue,
 }: {
   product: Product;
   withQuantity?: boolean;
+  variantId?: string;
+  variantSku?: string;
   variantName?: string;
   variantPrice?: number;
   maxQuantity?: number;
+  variantValue?: number;
+  calculatePriceOnVariantValue?: boolean;
 }) {
   const { add } = useCart();
   const [qty, setQty] = React.useState(1);
-  const max = maxQuantity ?? availableQuantity(product);
+  const rawMax = maxQuantity ?? availableQuantity(product);
+  const max = isNaN(Number(rawMax)) ? 99 : Number(rawMax);
   const soldOut = max <= 0;
 
   if (soldOut) {
@@ -63,7 +72,7 @@ export function AddToCart({
         </div>
       )}
 
-      <Button size="lg" full onClick={() => add(product, qty, variantName || product.selectedVariantName, variantPrice || product.sellingPrice)}>
+      <Button size="lg" full onClick={() => add(product, qty, variantName || product.selectedVariantName, variantPrice || product.sellingPrice, variantValue, calculatePriceOnVariantValue, variantId, variantSku)}>
         <ShoppingBag size={18} strokeWidth={2.25} />
         Add to cart
       </Button>
@@ -83,7 +92,8 @@ export function QuickAdd({ product }: { product: Product }) {
       aria-label={soldOut ? "Sold out" : `Add ${product.name} to cart`}
       onClick={(e) => {
         e.preventDefault();
-        add(product, 1, product.selectedVariantName, product.sellingPrice);
+        const variant = product.variants?.[0];
+        add(product, 1, product.selectedVariantName, product.sellingPrice, variant?.variantValue, undefined, variant?.id, variant?.sku);
       }}
       className="grid size-11 shrink-0 place-items-center rounded-full bg-plum-900 text-ivory-100 shadow-md transition-[background-color,transform] duration-200 hover:bg-gold-500 hover:text-plum-950 active:scale-95 disabled:pointer-events-none disabled:opacity-35"
     >

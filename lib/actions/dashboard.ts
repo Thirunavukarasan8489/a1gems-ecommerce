@@ -25,7 +25,7 @@ export async function getDashboardKpis() {
     const todaysOrders = await Order.countDocuments({ createdAt: { $gte: today } });
     const pendingPayments = await Order.countDocuments({ paymentStatus: 'PENDING' });
     const pendingOrders = await Order.countDocuments({ orderStatus: 'PROCESSING' });
-    const lowStockCount = await Product.countDocuments({ stockQuantity: { $lt: 5 } });
+    const lowStockCount = await Product.countDocuments({ stockStatus: { $in: ['LOW_STOCK', 'OUT_OF_STOCK'] } });
     const returnsCount = await ReturnRequest.countDocuments({ status: { $ne: 'REJECTED' } });
 
     // Leads

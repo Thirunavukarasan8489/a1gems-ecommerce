@@ -12,9 +12,12 @@ import { cn } from "@/lib/utils";
 export function ProductRail({
   products,
   className,
+  priority = false,
 }: {
   products: Product[];
   className?: string;
+  /** Set only for a rail that renders above the fold (e.g. right after the hero) — not for below-the-fold rails like "related products". */
+  priority?: boolean;
 }) {
   const [active, setActive] = React.useState(0);
   const trackRef = React.useRef<HTMLUListElement>(null);
@@ -55,16 +58,16 @@ export function ProductRail({
             data-index={i}
             className="w-[46%] min-w-[10.5rem] shrink-0 snap-start"
           >
-            <ProductCard product={product} className="h-full" />
+            <ProductCard product={product} className="h-full" priority={priority && i < 2} />
           </li>
         ))}
       </ul>
 
       {/* Desktop Grid Layout */}
       <ul className="hidden gap-5 lg:grid lg:grid-cols-4">
-        {displayProducts.map((product) => (
+        {displayProducts.map((product, i) => (
           <li key={product.slug}>
-            <ProductCard product={product} className="h-full" />
+            <ProductCard product={product} className="h-full" priority={priority && i < 4} />
           </li>
         ))}
       </ul>
@@ -96,9 +99,9 @@ export function ProductRail({
 export function ProductGrid({ products }: { products: Product[] }) {
   return (
     <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-      {products.map((product) => (
+      {products.map((product, i) => (
         <li key={product.slug}>
-          <ProductCard product={product} className="h-full" />
+          <ProductCard product={product} className="h-full" priority={i < 4} />
         </li>
       ))}
     </ul>

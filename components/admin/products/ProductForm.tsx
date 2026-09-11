@@ -1,30 +1,21 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm, useWatch, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   ArrowLeft,
   Save,
-  UploadCloud,
-  Plus,
-  Trash2,
-  Image as ImageIcon,
   CheckCircle2,
+  AlertCircle,
   X,
-  Sparkles,
-  Layers,
-  IndianRupee,
   Package
 } from 'lucide-react';
-import Image from 'next/image';
 import { AdminButton } from '@/components/admin/ui/AdminButton';
-import { AdminInput } from '@/components/admin/ui/AdminInput';
-import { AdminSelect } from '@/components/admin/ui/AdminSelect';
 import { createProduct, updateProduct } from '@/lib/actions/product.actions';
 import { uploadMedia } from '@/lib/actions/media.actions';
 import { toast } from 'react-hot-toast';
@@ -32,7 +23,6 @@ import { toast } from 'react-hot-toast';
 import { BasicInfoTab } from './ui/BasicInfoTab';
 import { PricingVariantsTab } from './ui/PricingVariantsTab';
 import { MediaUploadTab } from './ui/MediaUploadTab';
-import { SpecificationsTab } from './ui/SpecificationsTab';
 import { PurchaseRulesTab } from './ui/PurchaseRulesTab';
 import { SeoTab } from './ui/SeoTab';
 import { DiscountRulesTab } from './ui/DiscountRulesTab';
@@ -44,7 +34,6 @@ const variantSchema = z.object({
   comparePrice: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().optional()),
   stock: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().min(0, 'Stock must be 0 or more').int()),
   lowStockThreshold: z.preprocess((val) => val === '' ? undefined : val, z.coerce.number().int().optional()),
-  image: z.object({ url: z.string().optional(), altText: z.string().optional() }).optional(),
 });
 
 const productSchema = z.object({
@@ -64,16 +53,36 @@ const productSchema = z.object({
     minQty: z.coerce.number().min(1, 'Min Qty is required'),
     maxQty: z.coerce.number().min(1, 'Max Qty is required'),
     discountPercentage: z.coerce.number().min(0).max(100, 'Invalid discount %'),
-  })).optional(),
+  })).optional().superRefine((rules, ctx) => {
+    if (!rules || rules.length <= 1) return;
 
-  // Specifications
-  material: z.string().optional(),
-  stone: z.string().optional(),
-  size: z.string().optional(),
-  weight: z.string().optional(),
-  origin: z.string().optional(),
-  certification: z.string().optional(),
-  guide: z.string().optional(),
+    // Check for min > max
+    rules.forEach((rule, index) => {
+      if (rule.minQty > rule.maxQty) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Min Qty cannot be greater than Max Qty",
+          path: [index, 'minQty']
+        });
+      }
+    });
+
+    // Check for overlaps
+    for (let i = 0; i < rules.length; i++) {
+      for (let j = i + 1; j < rules.length; j++) {
+        const r1 = rules[i];
+        const r2 = rules[j];
+        // Overlap condition: r1.min <= r2.max && r1.max >= r2.min
+        if (r1.minQty <= r2.maxQty && r1.maxQty >= r2.minQty) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Discount ranges cannot overlap",
+            path: [j, 'minQty']
+          });
+        }
+      }
+    }
+  }),
 
   // Images & Media
   primaryImage: z.object({ url: z.string(), altText: z.string().optional() }).optional(),
@@ -88,17 +97,16 @@ const productSchema = z.object({
 
 export type ProductFormValues = z.infer<typeof productSchema>;
 
-export default function ProductForm({ initialData, categories = [], guides = [] }: { initialData?: any; categories?: { label: string; value: string }[], guides?: { label: string; value: string }[] }) {
+export default function ProductForm({ initialData, categories = [] }: { initialData?: any; categories?: { label: string; value: string; variantType?: string; calculatePriceOnVariantValue?: boolean }[] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('basic');
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [coverFile, setCoverFile] = useState<{ file?: File; previewUrl: string; isExisting: boolean } | null>(
     initialData?.primaryImage?.url ? { previewUrl: initialData.primaryImage.url, isExisting: true } : null
   );
-  
+
   const [galleryItems, setGalleryItems] = useState<{ id: string; file?: File; previewUrl: string; isExisting: boolean }[]>(
-    initialData?.gallery?.length > 0 
+    initialData?.gallery?.length > 0
       ? initialData.gallery.filter((img: any) => img && img.url && img.url.trim() !== '').map((img: any, i: number) => ({
           id: `existing-${i}-${img.url.slice(-10).replace(/[^a-zA-Z0-9]/g, '')}`,
           previewUrl: img.url,
@@ -106,7 +114,6 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
         }))
       : []
   );
-  const [variantFiles, setVariantFiles] = useState<Record<number, { file: File; previewUrl: string; }>>({});
   const [validationErrors, setValidationErrors] = useState<{ field: string; message: string; tabId: string }[] | null>(null);
 
   const methods = useForm<ProductFormValues>({
@@ -114,7 +121,6 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
     defaultValues: initialData ? {
       ...initialData,
       categoryId: initialData.category?._id || initialData.categoryId || '',
-      guide: initialData.guide?._id || initialData.guide || '',
     } : {
       name: '',
       categoryId: '',
@@ -124,13 +130,6 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
       variants: [],
       purchaseType: 'BUY_ENQUIRE',
       whatsappEnabled: false,
-      material: '',
-      stone: '',
-      size: '',
-      weight: '',
-      origin: '',
-      certification: '',
-      guide: '',
       primaryImage: { url: '', altText: '' },
       gallery: [],
       metaTitle: '',
@@ -140,51 +139,12 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   });
 
   const {
-    register,
     control,
     handleSubmit,
     setValue,
-    watch,
     getValues,
-    trigger,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isSubmitted },
   } = methods;
-
-
-
-  const hasVariants = useWatch({ control, name: 'hasVariants' });
-  const primaryImage = useWatch({ control, name: 'primaryImage' });
-  const gallery = useWatch({ control, name: 'gallery' }) || [];
-
-  // Remove the useEffect for getCategories since categories are passed via props
-
-
-
-  // Handle Variant Image Selection
-  const handleVariantFileSelect = (index: number, file: File | null) => {
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setVariantFiles(prev => ({
-        ...prev,
-        [index]: { file, previewUrl }
-      }));
-    } else {
-      setVariantFiles(prev => {
-        const newFiles = { ...prev };
-        if (newFiles[index]?.previewUrl) {
-          URL.revokeObjectURL(newFiles[index].previewUrl);
-        }
-        delete newFiles[index];
-        return newFiles;
-      });
-      // also clear it from form data
-      const currentVariants = getValues('variants') || [];
-      if (currentVariants[index]) {
-        currentVariants[index].image = { url: '', altText: '' };
-        setValue('variants', currentVariants, { shouldValidate: true });
-      }
-    }
-  };
 
   // Handle Cover Image Selection
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,8 +193,6 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   };
 
   const onSubmit = async (data: ProductFormValues) => {
-    setSubmitError(null);
-
     const uploadAndSubmit = async () => {
       let finalPrimaryImage = data.primaryImage;
 
@@ -296,27 +254,36 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
       setTimeout(() => {
         router.push('/admin/products');
       }, 1500);
-    }).catch((err) => {
-      setSubmitError(err.message);
+    }).catch(() => {
+      // toast.promise already surfaced the error to the user; nothing else to do.
     });
   };
-
+ 
   const tabs = [
-    { id: 'basic', label: '1. Basic Details' },
-    { id: 'media', label: '2. Cover Image & Gallery' },
-    { id: 'variants', label: '3. Price & Variant' },
-    { id: 'discount', label: '4. Discount Rule' },
-    { id: 'purchase', label: '5. Purchase Rule' },
-    { id: 'seo', label: '6. SEO' },
+    { id: 'basic', label: '1. Basic Details', shortLabel: 'Basic' },
+    { id: 'media', label: '2. Cover Image & Gallery', shortLabel: 'Media' },
+    { id: 'variants', label: '3. Price & Variant', shortLabel: 'Pricing' },
+    { id: 'discount', label: '4. Discount Rule', shortLabel: 'Discount' },
+    { id: 'purchase', label: '5. Purchase Rule', shortLabel: 'Purchase' },
+    { id: 'seo', label: '6. SEO', shortLabel: 'SEO' },
   ];
 
   const tabFields: Record<string, (keyof ProductFormValues)[]> = {
-    basic: ['name', 'categoryId', 'status', 'shortDescription', 'description', 'material', 'stone', 'size', 'weight', 'origin', 'certification', 'guide'],
+    basic: ['name', 'categoryId', 'status', 'shortDescription', 'description'],
     media: ['primaryImage', 'gallery'],
     variants: ['hasVariants', 'variants'],
     discount: ['discountRules'],
     purchase: ['purchaseType', 'whatsappEnabled'],
     seo: ['metaTitle', 'metaDescription'],
+  };
+
+  // Which tabs currently hold a validation error, so the sidebar can flag
+  // them without the admin having to hunt through every step. Only shown
+  // once a submit has been attempted, so a fresh form doesn't look broken.
+  const tabHasError = (tabId: string) => {
+    if (!isSubmitted) return false;
+    if (tabId === 'media' && !coverFile) return true;
+    return tabFields[tabId].some((field) => !!(errors as any)[field]);
   };
 
   const onInvalid = (formErrors: any) => {
@@ -357,66 +324,106 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16 relative">
 
-      {/* Sticky Top Action Bar */}
-      <div className="sticky top-0 z-40 bg-white/80 dark:bg-plum-950/80 backdrop-blur-md border-b border-gold-200 dark:border-gold-800 py-4 px-6 rounded-b-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 -mx-4 sm:mx-0 mb-8">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/admin/products"
-            className="p-2 border border-gold-200 dark:border-gold-700 rounded-lg hover:bg-gold-100 dark:hover:bg-gold-800 transition-colors text-gold-600 dark:text-gold-300"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gold-800 dark:text-white flex items-center gap-2">
-              <Package className="w-6 h-6 text-gold-600" />
-              {initialData ? 'Edit Product' : 'Create Product'}
-            </h1>
-            <p className="text-xs text-gold-500 dark:text-gold-400 mt-0.5">
-              Unique slug is automatically generated in the backend from product title.
-            </p>
+      {/* Sticky Header — z-30, deliberately below the global mobile sidebar's
+          overlay (z-40) and drawer (z-50, see Sidebar.tsx) so it never paints
+          over the mobile nav when it's open. Title/actions and, on mobile and
+          tablet, the step strip live inside ONE sticky wrapper so they always
+          stay pinned together as a single unit — no separate sticky element
+          to fall out of sync while scrolling. */}
+      <div className="sticky top-0 z-30 bg-white/90 dark:bg-plum-950/90 backdrop-blur-md border-b border-gray-200 dark:border-plum-800 rounded-b-2xl shadow-sm -mx-4 sm:mx-0 mb-8">
+        <div className="py-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/products"
+              className="p-2 border border-gray-200 dark:border-plum-700 rounded-lg hover:bg-gray-50 dark:hover:bg-plum-800 transition-colors text-plum-500 dark:text-plum-300"
+            >
+              <ArrowLeft size={20} />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold text-plum-900 dark:text-ivory-100 flex items-center gap-2">
+                <Package className="w-6 h-6 text-gold-500" />
+                {initialData ? 'Edit Product' : 'Create Product'}
+              </h1>
+              <p className="text-xs text-plum-500 dark:text-plum-400 mt-0.5">
+                Unique slug is automatically generated in the backend from product title.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <AdminButton type="button" variant="outline" onClick={() => router.push('/admin/products')}>
+              Cancel
+            </AdminButton>
+            <AdminButton onClick={handleFormSubmit} isLoading={isSubmitting} className="gap-2">
+              <Save size={18} />
+              {initialData ? 'Update Product' : 'Publish Product'}
+            </AdminButton>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <AdminButton type="button" variant="outline" onClick={() => router.push('/admin/products')}>
-            Cancel
-          </AdminButton>
-          <AdminButton onClick={handleFormSubmit} isLoading={isSubmitting} className="gap-2">
-            <Save size={18} />
-            {initialData ? 'Update Product' : 'Publish Product'}
-          </AdminButton>
-        </div>
-      </div>
 
-      {submitError && (
-        <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm font-medium">
-          {submitError}
-        </div>
-      )}
-
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-
-        {/* Navigation Tabs Sidebar */}
-        <div className="w-full md:w-64 shrink-0 bg-gradient-to-b from-gold-50/50 to-transparent dark:from-gold-900/20 dark:to-transparent border border-gold-200/60 dark:border-gold-800/60 rounded-2xl shadow-sm p-3 sticky top-32">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-gold-400 mb-3 px-3">Form Steps</h3>
-          <nav className="flex flex-col space-y-1.5">
+        {/* Mobile & tablet step strip — replaces the vertical "Form Steps"
+            sidebar below md, since a 6-item vertical list pinned on screen
+            would eat most of a phone's viewport. Horizontally scrollable,
+            numbered, and part of the same sticky header above. */}
+        <div className="md:hidden overflow-x-auto no-scrollbar border-t border-gray-100 dark:border-plum-800 px-4 py-2.5">
+          <div className="flex gap-2 w-max">
             {tabs.map((tab, idx) => {
               const isActive = activeTab === tab.id;
+              const hasError = tabHasError(tab.id);
               return (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 overflow-hidden group ${isActive
-                    ? 'text-gold-900 dark:text-gold-50 shadow-sm'
-                    : 'text-gold-600 dark:text-gold-400 hover:bg-white dark:hover:bg-gold-800/50 hover:shadow-sm'
+                  className={`shrink-0 flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${isActive
+                    ? 'bg-plum-900 dark:bg-ivory-100 text-white dark:text-plum-900 border-plum-900 dark:border-ivory-100'
+                    : 'bg-white dark:bg-plum-900 text-plum-600 dark:text-plum-300 border-gray-200 dark:border-plum-700'
                     }`}
                 >
-                  {isActive && (
-                    <span className="absolute inset-0 bg-gradient-to-r from-gold-200 to-gold-100 dark:from-gold-800 dark:to-gold-900 opacity-50 border-l-4 border-gold-500 rounded-xl" />
-                  )}
-                  <span className="relative z-10 flex items-center justify-between">
+                  <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold shrink-0 ${isActive
+                    ? 'bg-white/25 text-white dark:bg-plum-900/15 dark:text-plum-900'
+                    : hasError
+                    ? 'bg-rose-500 text-white'
+                    : 'bg-gray-100 dark:bg-plum-800 text-plum-500 dark:text-plum-400'
+                    }`}>
+                    {hasError && !isActive ? '!' : idx + 1}
+                  </span>
+                  {tab.shortLabel}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-6 items-start">
+
+        {/* Navigation Tabs Sidebar — desktop/tablet-landscape only (md+); the
+            step strip above covers mobile and tablet-portrait. z-20 is
+            explicitly below the sticky header above (z-30) so a tall header
+            always wins if the two ever overlap while scrolling. */}
+        <div className="hidden md:block md:w-64 shrink-0 bg-white dark:bg-plum-950 border border-gray-200 dark:border-plum-800 rounded-2xl shadow-sm p-3 sticky top-32 z-20">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-plum-400 dark:text-plum-500 mb-3 px-3">Form Steps</h3>
+          <nav className="flex flex-col space-y-1">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const hasError = tabHasError(tab.id);
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors border-l-[3px] ${isActive
+                    ? 'text-plum-900 dark:text-ivory-100 bg-gray-50 dark:bg-plum-900 border-emerald-500'
+                    : 'text-plum-600 dark:text-plum-400 border-transparent hover:bg-gray-50 dark:hover:bg-plum-900/60'
+                    }`}
+                >
+                  <span className="flex items-center justify-between gap-2">
                     <span>{tab.label}</span>
-                    {isActive && <CheckCircle2 className="w-4 h-4 text-gold-600 dark:text-gold-400" />}
+                    {hasError ? (
+                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                    ) : isActive ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    ) : null}
                   </span>
                 </button>
               );
@@ -425,10 +432,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
         </div>
 
         {/* Form Content Area */}
-        <div className="flex-1 w-full bg-white dark:bg-gold-950 border border-gold-200 dark:border-gold-800 rounded-2xl shadow-md p-6 lg:p-8 relative">
-          {/* Subtle gradient background element for premium feel */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-gold-50 dark:from-gold-900/30 to-transparent rounded-t-2xl pointer-events-none" />
-          
+        <div className="flex-1 w-full bg-white dark:bg-plum-950 border border-gray-200 dark:border-plum-800 rounded-2xl shadow-sm p-6 lg:p-8">
           <form
             id="product-form"
             className="space-y-6"
@@ -441,14 +445,13 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
           >
 
             <FormProvider {...methods}>
-              {/* 1. BASIC DETAILS & SPECS */}
+              {/* 1. BASIC DETAILS */}
               <div className={activeTab === 'basic' ? 'space-y-6' : 'hidden'}>
                 <BasicInfoTab categories={categories} isActive={true} />
-                <SpecificationsTab isActive={true} guides={guides} />
               </div>
 
               {/* 2. COVER IMAGE & GALLERY */}
-              <MediaUploadTab 
+              <MediaUploadTab
                 isActive={activeTab === 'media'}
                 coverFile={coverFile}
                 setCoverFile={setCoverFile}
@@ -459,11 +462,10 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
               />
 
               {/* 3. PRICE & VARIANT */}
-              <PricingVariantsTab 
-                isActive={activeTab === 'variants'} 
-                categories={categories} 
-                variantFiles={variantFiles}
-                onVariantFileSelect={handleVariantFileSelect}
+              <PricingVariantsTab
+                isActive={activeTab === 'variants'}
+                categories={categories}
+                productId={initialData?._id}
               />
 
               {/* 4. DISCOUNT RULE */}
@@ -477,7 +479,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
             </FormProvider>
 
             {/* Form Navigation / Save */}
-            <div className="flex items-center justify-between p-4 mt-6 bg-white dark:bg-gold-900 border-t border-gold-200 dark:border-gold-800 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] rounded-b-xl -mx-5 -mb-5 lg:-mx-6 lg:-mb-6">
+            <div className="flex items-center justify-between p-4 mt-6 bg-white dark:bg-plum-950 border-t border-gray-200 dark:border-plum-800 rounded-b-xl -mx-5 -mb-5 lg:-mx-6 lg:-mb-6">
               <div>
                 {tabs.findIndex(t => t.id === activeTab) > 0 && (
                   <AdminButton
@@ -509,8 +511,8 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
                     Next Step
                   </AdminButton>
                 )}
-                
-                <AdminButton type="button" onClick={handleFormSubmit} isLoading={isSubmitting} className="gap-2 bg-gold-600 hover:bg-gold-700 text-white">
+
+                <AdminButton type="button" onClick={handleFormSubmit} isLoading={isSubmitting} className="gap-2">
                   <Save size={18} />
                   {initialData ? 'Update Product' : 'Publish Product'}
                 </AdminButton>
@@ -521,25 +523,27 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
         </div>
       </div>
 
-      {/* Validation Errors Modal */}
+      {/* Validation Errors Modal — z-[60], explicitly above the global mobile
+          sidebar's drawer (z-50, see Sidebar.tsx) so a blocking modal is
+          never hidden behind it instead of relying on DOM order. */}
       {validationErrors && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gold-900/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gold-900 rounded-xl shadow-2xl max-w-md w-full border border-gold-200 dark:border-gold-800 overflow-hidden">
-            <div className="p-4 border-b border-gold-100 dark:border-gold-800 flex justify-between items-center bg-red-50 dark:bg-red-900/20">
-              <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-plum-950/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-plum-950 rounded-xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-plum-800 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-plum-800 flex justify-between items-center bg-rose-50 dark:bg-rose-900/20">
+              <h3 className="font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2">
                 <X size={18} /> Validation Errors
               </h3>
-              <button onClick={() => setValidationErrors(null)} className="text-gold-400 hover:text-gold-600">
+              <button onClick={() => setValidationErrors(null)} className="text-plum-400 hover:text-plum-600 dark:hover:text-plum-200">
                 <X size={20} />
               </button>
             </div>
             <div className="p-4 max-h-96 overflow-y-auto">
-              <p className="text-sm text-gold-600 dark:text-gold-300 mb-4">Please fix the following required fields before saving:</p>
+              <p className="text-sm text-plum-600 dark:text-plum-300 mb-4">Please fix the following required fields before saving:</p>
               <ul className="space-y-3">
                 {validationErrors.map((err, i) => (
-                  <li key={i} className="flex flex-col text-sm p-3 bg-gold-50 dark:bg-gold-800/50 rounded-lg border border-gold-100 dark:border-gold-800">
-                    <span className="font-medium text-gold-800 dark:text-gold-200 capitalize">{err.field.replace(/\./g, ' ')}</span>
-                    <span className="text-red-600 dark:text-red-400 mt-1">{err.message}</span>
+                  <li key={i} className="flex flex-col text-sm p-3 bg-gray-50 dark:bg-plum-900 rounded-lg border border-gray-100 dark:border-plum-800">
+                    <span className="font-medium text-plum-800 dark:text-plum-200 capitalize">{err.field.replace(/\./g, ' ')}</span>
+                    <span className="text-rose-600 dark:text-rose-400 mt-1">{err.message}</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -547,7 +551,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
                         setActiveTab(err.tabId);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="text-gold-600 text-xs font-semibold text-left mt-2 hover:underline"
+                      className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold text-left mt-2 hover:underline"
                     >
                       Go to {tabs.find(t => t.id === err.tabId)?.label.replace(/^\d+\.\s/, '')} Tab &rarr;
                     </button>
@@ -555,7 +559,7 @@ export default function ProductForm({ initialData, categories = [], guides = [] 
                 ))}
               </ul>
             </div>
-            <div className="p-4 border-t border-gold-100 dark:border-gold-800 bg-gold-50 dark:bg-gold-800/20 flex justify-end">
+            <div className="p-4 border-t border-gray-200 dark:border-plum-800 bg-gray-50 dark:bg-plum-900/40 flex justify-end">
               <AdminButton onClick={() => setValidationErrors(null)} variant="outline">Close</AdminButton>
             </div>
           </div>

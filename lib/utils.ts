@@ -6,6 +6,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Human-readable label for a Category's `variantType`, shared between the admin variant form and the server-side variant name/SKU generation so they stay in sync. */
+export const VARIANT_TYPE_LABELS: Record<string, string> = {
+  CARAT: "Carat",
+  SIZE: "Size",
+  WEIGHT: "Weight",
+  NONE: "Variant Value",
+};
+
+export function variantTypeLabel(variantType?: string) {
+  return VARIANT_TYPE_LABELS[variantType || "NONE"] || "Variant Value";
+}
+
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -50,11 +62,16 @@ export function flattenVariants(products: Product[]): Product[] {
           sellingPrice: variant.price,
           comparePrice: variant.comparePrice,
           stockQuantity: variant.stock,
+          reservedQuantity: variant.reservedQuantity || 0,
           lowStockThreshold: variant.lowStockThreshold || product.lowStockThreshold,
-          primaryImage: variant.image?.url ? variant.image : product.primaryImage,
+          primaryImage: variant.primaryImage?.url ? variant.primaryImage : product.primaryImage,
           selectedVariantName: variant.name,
-          hasVariants: false,
-          variants: [],
+          // Keep the variant on the flattened product (instead of discarding
+          // it via hasVariants: false) so the purchase flow still knows the
+          // variant's id/sku — otherwise Add to Cart can't reserve inventory
+          // for products reached directly via a variant-specific slug.
+          hasVariants: true,
+          variants: [variant],
         };
         flattened.push(variantProduct);
       }

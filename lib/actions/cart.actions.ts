@@ -3,6 +3,7 @@
 import dbConnect from '@/lib/db';
 import { TemporaryCart } from '@/lib/models/cart';
 import { Product } from '@/lib/models/product';
+import { ProductVariant } from '@/lib/models/product-variant';
 import { CartLine } from '@/lib/types';
 
 export async function syncCart(sessionId: string, lines: CartLine[]) {
@@ -10,11 +11,14 @@ export async function syncCart(sessionId: string, lines: CartLine[]) {
 
   try {
     await dbConnect();
-    
+
     const items = lines.map(line => ({
       productId: line.productId,
+      variantId: line.variantId,
       quantity: line.quantity,
       priceSnapshot: line.unitPrice,
+      variantValue: line.variantValue,
+      calculatePriceOnVariantValue: line.calculatePriceOnVariantValue
     }));
 
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
@@ -61,16 +65,22 @@ export async function validateCart(sessionId: string) {
         continue;
       }
 
-      let stockQuantity = 0;
-      if (product.hasVariants && item.variantName) {
-        const variant = product.variants?.find((v: any) => v.name === item.variantName);
-        if (variant) stockQuantity = variant.stock;
+      let stock = 0;
+      let reserved = 0;
+      if (item.variantId) {
+        const variant = await ProductVariant.findOne({ _id: item.variantId, productId: item.productId }).lean();
+        if (variant) {
+          stock = variant.stock || 0;
+          reserved = variant.reservedQuantity || 0;
+        }
       } else {
-        // Fallback or sum of variants if no specific variant is selected
-        stockQuantity = product.variants?.reduce((acc: number, v: any) => acc + (v.stock || 0), 0) || 0;
+        // No specific variant selected — validate against the product's total stock.
+        const variants = await ProductVariant.find({ productId: item.productId }).lean();
+        stock = variants.reduce((acc, v) => acc + (v.stock || 0), 0);
+        reserved = variants.reduce((acc, v) => acc + (v.reservedQuantity || 0), 0);
       }
 
-      const available = Math.max(0, stockQuantity - (product.reservedQuantity || 0));
+      const available = Math.max(0, stock - reserved);
       if (item.quantity > available) {
         validations.push(`Only ${available} left for ${product.name}.`);
       }

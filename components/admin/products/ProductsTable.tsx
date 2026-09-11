@@ -15,11 +15,10 @@ type ProductRow = {
   name: string;
   slug: string;
   category?: { name: string } | null;
-  stockQuantity?: number;
   stockStatus?: string;
   status?: string;
   primaryImage?: { url: string; altText?: string };
-  variants?: { price?: number }[];
+  variants?: { price?: number; stock?: number }[];
 };
 
 export default function ProductsTable({ products }: { products: ProductRow[] }) {
@@ -166,7 +165,7 @@ export default function ProductsTable({ products }: { products: ProductRow[] }) 
     {
       header: 'Stock',
       cell: (item: ProductRow) => {
-        const qty = item.stockQuantity ?? 0;
+        const qty = item.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) ?? 0;
         return (
           <span className={qty < 5 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gold-700 dark:text-gold-300'}>
             {qty}

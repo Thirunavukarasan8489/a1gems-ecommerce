@@ -47,6 +47,8 @@ export async function FeaturedCategories() {
                     alt={cat.name}
                     width={500}
                     height={500}
+                    priority={i < 4}
+                    loading={i < 4 ? undefined : "lazy"}
                     className="aspect-square w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-105"
                   />
                 ) : (

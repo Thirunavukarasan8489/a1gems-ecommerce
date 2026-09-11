@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -11,6 +12,7 @@ interface DeleteConfirmButtonProps {
 }
 
 export default function DeleteConfirmButton({ entityId, entityName, deleteAction }: DeleteConfirmButtonProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -21,6 +23,7 @@ export default function DeleteConfirmButton({ entityId, entityName, deleteAction
       if (result.success) {
         toast.success(`"${entityName}" deleted successfully`);
         setIsOpen(false);
+        router.refresh();
       } else {
         toast.error(result.error || 'Failed to delete item');
       }

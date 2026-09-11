@@ -12,7 +12,7 @@ import { ProductRail } from "@/components/public/product/product-rail";
 import { Accordion } from "@/components/public/ui/accordion";
 import { buttonStyles } from "@/components/public/ui/button";
 import { SectionHeading } from "@/components/public/ui/section-heading";
-import { getFaqs } from "@/lib/services/content-service";
+import { getFaqs, getTestimonials } from "@/lib/services/content-service";
 import { getCategories } from "@/lib/services/category-service";
 import { NAV_DATA } from "@/lib/utils";
 import {
@@ -30,14 +30,16 @@ export default async function HomePage() {
     bracelets,
     faqs,
     categories,
-    sectionsRes
+    sectionsRes,
+    testimonials
   ] = await Promise.all([
     getFeaturedProducts(),
     getBestsellers(),
     getProductsByCategory("bracelets"),
     getFaqs(),
     getCategories(),
-    getHeroSections()
+    getHeroSections(),
+    getTestimonials()
   ]);
 
   const banners = sectionsRes.success && Array.isArray(sectionsRes.data) ? sectionsRes.data.filter((s: any) => s.isActive) : undefined;
@@ -88,7 +90,7 @@ export default async function HomePage() {
       <ConsultationCta business={NAV_DATA.business} />
 
       {/* 8. Testimonials Section */}
-      <Testimonials />
+      <Testimonials items={testimonials} />
 
       {/* 9. Final CTA */}
       <FinalCta />

@@ -17,25 +17,10 @@ const ProductSchema = new mongoose.Schema(
       discountPercentage: { type: Number, required: true }
     }],
 
-    // Variants
+    // Variants live in the standalone ProductVariant collection, referenced by
+    // productId. hasVariants just toggles whether the storefront shows the
+    // variant selector UI.
     hasVariants: { type: Boolean, default: true },
-    variants: [{
-      name: { type: String, required: true },
-      slug: { type: String }, // Auto-generated
-      sku: { type: String },
-      variantValue: { type: Number },
-      caratApprox: { type: Number },
-      size: { type: String },
-      price: { type: Number, required: true },
-      comparePrice: { type: Number },
-      stock: { type: Number, required: true, default: 0 },
-      reservedQuantity: { type: Number, default: 0 },
-      lowStockThreshold: { type: Number, default: 5 },
-      image: {
-        url: { type: String },
-        altText: { type: String }
-      }
-    }],
 
     // Inventory
     reservedQuantity: { type: Number, required: true, default: 0 },
@@ -49,14 +34,6 @@ const ProductSchema = new mongoose.Schema(
       required: true
     },
     whatsappEnabled: { type: Boolean, default: false },
-
-    // Specifications
-    material: { type: String },
-    stone: { type: String },
-    size: { type: String },
-    weight: { type: String },
-    origin: { type: String },
-    certification: { type: String },
 
     // Images
     primaryImage: {
@@ -73,9 +50,6 @@ const ProductSchema = new mongoose.Schema(
     metaDescription: { type: String },
     keywords: [{ type: String }],
     ogImage: { type: String },
-
-    // Linked CMS Content
-    guide: { type: mongoose.Schema.Types.ObjectId, ref: 'Guide' },
   },
   { timestamps: true }
 );

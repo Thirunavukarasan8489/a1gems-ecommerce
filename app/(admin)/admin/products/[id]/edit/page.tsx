@@ -15,11 +15,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     return notFound();
   }
   
-  const categories = categoriesRes.success && categoriesRes.data 
-    ? categoriesRes.data.map((c: any) => ({ label: c.name, value: c._id }))
+  const categories = categoriesRes.success && categoriesRes.data
+    ? categoriesRes.data.map((c: any) => ({ label: c.name, value: c._id, variantType: c.variantType, calculatePriceOnVariantValue: c.calculatePriceOnVariantValue }))
     : [];
     
-  const guides: any[] = [];
   // Format the existing gallery into the shape expected by ProductForm
   const formattedData = {
     ...productRes.data,
@@ -28,6 +27,6 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       altText: g.altText || ''
     })) || []
   };
-  
-  return <ProductForm initialData={formattedData} categories={categories} guides={guides} />;
+
+  return <ProductForm initialData={formattedData} categories={categories} />;
 }

@@ -21,7 +21,7 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
     metaDescription: initialData?.metaDescription || '',
     image: initialData?.image || '',
     variantType: initialData?.variantType || 'NONE',
-    calculateDiscountOnVariantValue: initialData?.calculateDiscountOnVariantValue || false,
+    calculatePriceOnVariantValue: initialData?.calculatePriceOnVariantValue || false,
   });
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -194,20 +194,20 @@ export default function CategoryForm({ initialData }: { initialData?: any }) {
                   <div className="flex items-start gap-3">
                     <div className="flex items-center h-5">
                       <input
-                        id="calculateDiscountOnVariantValue"
-                        name="calculateDiscountOnVariantValue"
+                        id="calculatePriceOnVariantValue"
+                        name="calculatePriceOnVariantValue"
                         type="checkbox"
-                        checked={formData.calculateDiscountOnVariantValue}
-                        onChange={handleChange}
-                        className="w-4 h-4 text-emerald-600 bg-gold-50 border-gold-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        checked={formData.calculatePriceOnVariantValue}
+                        onChange={(e) => setFormData({ ...formData, calculatePriceOnVariantValue: e.target.checked })}
+                        className="h-4 w-4 rounded border-plum-300 text-gold-600 focus:ring-gold-500"
                       />
                     </div>
-                    <div className="text-sm">
-                      <label htmlFor="calculateDiscountOnVariantValue" className="font-medium text-gold-700 dark:text-gold-300">
-                        Calculate Discounts based on Variant Value
+                    <div className="ml-3 text-sm">
+                      <label htmlFor="calculatePriceOnVariantValue" className="font-medium text-gold-700 dark:text-gold-300">
+                        Price Calculation Rule (Per Variant Unit)
                       </label>
                       <p className="text-gold-500 dark:text-gold-400">
-                        If checked, bulk discount rules apply to the total variant value (e.g. total Carats) rather than the number of pieces.
+                        If checked, the product price will be calculated as Variant Value × Quantity × Price. If unchecked, it will be Quantity × Price.
                       </p>
                     </div>
                   </div>
