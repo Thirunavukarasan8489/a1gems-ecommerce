@@ -8,6 +8,7 @@ import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
@@ -83,9 +84,12 @@ export default function AdminLogin() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gold-500/15 border border-gold-400/30 mb-8">
             <Gem className="text-gold-400" size={26} />
           </div>
-          <h1 className="text-foil font-display text-4xl xl:text-5xl font-semibold tracking-tight">
+          <div className="">
+            <Image src="/logo.png" alt="A1 Gems" width={150} height={100} className="rounded-lg bg-white" />
+          </div>
+          {/* <h1 className="text-foil font-display text-4xl xl:text-5xl font-semibold tracking-tight">
             A1 Gems
-          </h1>
+          </h1> */}
           <p className="mt-3 text-plum-300 text-sm tracking-[0.2em] uppercase">
             Operations Console
           </p>
